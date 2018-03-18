@@ -64,8 +64,6 @@ message Id {
 // Database is a namespace for tables.
 message Database {
     Id id = 1;
-    string description = 2; // human-readable description
-    string location = 3;    // Default location of tables within the database
     map<string, string> parameters = 4; // Database parameters
 }
 
@@ -75,7 +73,6 @@ message Database {
 // unique ID is assigned by the service.
 message CreateDatabaseRequest {
     Id id = 1;
-    string description = 2;
     map<string, string> parameters = 3;
 }
 
@@ -96,10 +93,9 @@ message ListDatabasesRequest {
 }
 
 // Request to drop a database.
-// If cascade is true, also drops all tables within the database
+// Dropping a database also drops all objects contained in the database
 message DropDatabaseRequest {
     Id id = 1;
-    bool cascade = 2;
 }
 
 
