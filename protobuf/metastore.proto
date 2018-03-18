@@ -1,0 +1,105 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.akolb.metastore";
+option java_outer_classname = "MetaStore";
+
+package metastore;
+
+// Metastore service
+service Metastore {
+    // Create a new database
+    rpc CreateDabatase (CreateDatabaseRequest) returns (GetDatabaseResponse);
+    // Get database information
+    rpc GetDatabase (GetDatabaseRequest) returns  (GetDatabaseResponse);
+    // Get collection of databases
+    rpc ListDatabases (ListDatabasesRequest) returns  (stream Database);
+    // Destroy a database
+    rpc DropDatabase (DropDatabaseRequest) returns (RequestStatus);
+}
+
+// General status for results
+message RequestStatus {
+    enum Status {
+        OK = 0;       // successful request
+        ERROR = 1;    // General error
+        NOTFOUND = 2; // Requested object not found
+        CONFLICT = 3; // Object already exists
+    }
+    Status status = 1;
+    string error = 2; // detailed error message
+}
+
+// Every object belongs to a namespace.
+message Namespace {
+    string name = 1;
+}
+
+// Objects belong to a specific namespace and have unique name and unique ID
+// in the namespace.
+message Id {
+    Namespace namespace = 1;
+    string name = 2;
+    string id = 3;
+}
+
+// Database is a namespace for tables.
+message Database {
+    Id id = 1;
+    string description = 2; // human-readable description
+    string location = 3;    // Default location of tables within the database
+    map<string, string> parameters = 4; // Database parameters
+}
+
+// Create a new database.
+// Request should have the namespace and the name of the database.
+// The name should be unique within the namespace
+// unique ID is assigned by the service.
+message CreateDatabaseRequest {
+    Id id = 1;
+    string description = 2;
+    map<string, string> parameters = 3;
+}
+
+// Request to get database by its ID.
+message GetDatabaseRequest {
+    Id id = 1;
+}
+
+message GetDatabaseResponse {
+    Database database = 1;
+    RequestStatus status = 2;
+}
+
+// Request to get list of databases
+message ListDatabasesRequest {
+    Namespace namespace = 1;
+    string name_pattern = 2;
+}
+
+// Request to drop a database.
+// If cascade is true, also drops all tables within the database
+message DropDatabaseRequest {
+    Id id = 1;
+    bool cascade = 2;
+}
+
+
