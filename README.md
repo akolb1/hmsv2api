@@ -11,6 +11,7 @@ The API also introduces the notion of an object ID - globally unique string
 associated with the object. While object name can change (e.g. with
 rename operation), identity of the object never changes.
 
+[metastore gRpc spec](protobuf/metastore.proto)
 
 ## Service
 
