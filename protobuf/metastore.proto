@@ -16,6 +16,19 @@
  * limitations under the License.
  */
 
+/*
+ * Hive Metastore API definition.
+ *
+ * This API is different from traditional metastore API. It separates all
+ * metadata-only operations and does not include any filesystem operations.
+ * The assumption is that some other service or the client deals with file system
+ * operations.
+ *
+ * The API also introduces the notion of an object ID - globally unique string
+ * associated with the object. While object name can change (e.g. with
+ * rename operation), identity of the object never changes.
+ */
+
 syntax = "proto3";
 
 option java_multiple_files = true;
@@ -53,6 +66,14 @@ message Namespace {
     string name = 1;
 }
 
+// Cookie is supposed to be used to associate multiple requests to a single session.
+// The value of the cookie is likely to be printed in logs so it shouldn't contain
+// any sensitive information.
+// Metastore service does not interpret the cookie but may print it in its logs.
+message Cookie {
+    string cookie = 1;
+}
+
 // Objects belong to a specific namespace and have unique name and unique ID
 // in the namespace.
 message Id {
@@ -62,9 +83,12 @@ message Id {
 }
 
 // Database is a namespace for tables.
+// Originam Metastore Database object also had location and owner information.
+// These can be represented using parameters if needed since the current
+// metastore service does n;t interpret either Location or Owner info.
 message Database {
     Id id = 1;
-    map<string, string> parameters = 4; // Database parameters
+    map<string, string> parameters = 2; // Database parameters
 }
 
 // Create a new database.
@@ -73,12 +97,14 @@ message Database {
 // unique ID is assigned by the service.
 message CreateDatabaseRequest {
     Id id = 1;
+    Cookie cookie = 2;
     map<string, string> parameters = 3;
 }
 
 // Request to get database by its ID.
 message GetDatabaseRequest {
     Id id = 1;
+    Cookie cookie = 2;
 }
 
 message GetDatabaseResponse {
@@ -89,13 +115,15 @@ message GetDatabaseResponse {
 // Request to get list of databases
 message ListDatabasesRequest {
     Namespace namespace = 1;
-    string name_pattern = 2;
+    Cookie cookie = 2;
+    string name_pattern = 3;
 }
 
 // Request to drop a database.
 // Dropping a database also drops all objects contained in the database
 message DropDatabaseRequest {
     Id id = 1;
+    Cookie cookie = 2;
 }
 
 
