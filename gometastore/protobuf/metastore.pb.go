@@ -165,7 +165,7 @@ func (m *Id) GetId() string {
 }
 
 // Database is a namespace for tables.
-// Originam Metastore Database object also had location and owner information.
+// Original Metastore Database object also had location and owner information.
 // These can be represented using parameters if needed since the current
 // metastore service does n;t interpret either Location or Owner info.
 type Database struct {
