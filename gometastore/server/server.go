@@ -29,15 +29,15 @@ func newServer(db *bolt.DB) *metastoreServer {
 func (s *metastoreServer) CreateDabatase(c context.Context,
 	req *pb.CreateDatabaseRequest) (*pb.GetDatabaseResponse, error) {
 	log.Println(req, "session =", req.Cookie.Cookie)
-	namespace := req.Id.Namespace.Name
+	namespace := req.Database.Id.Namespace.Name
 	if namespace == "" {
 		return nil, fmt.Errorf("missing empty namespace")
 	}
-	dbName := req.Id.Name
+	dbName := req.Database.Id.Name
 	if dbName == "" {
 		return nil, fmt.Errorf("missing database name")
 	}
-	database := &pb.Database{Id: req.Id, Parameters: req.Parameters}
+	database := req.Database
 	data, err := proto.Marshal(database)
 	if err != nil {
 		log.Println("failed to deserialize", err)
