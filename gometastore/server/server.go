@@ -28,7 +28,9 @@ func newServer(db *bolt.DB) *metastoreServer {
 
 func (s *metastoreServer) CreateDabatase(c context.Context,
 	req *pb.CreateDatabaseRequest) (*pb.GetDatabaseResponse, error) {
-	log.Println(req, "session =", req.Cookie.Cookie)
+	if req.Cookie != nil {
+		log.Println(req, "session =", req.Cookie.Cookie)
+	}
 	namespace := req.Database.Id.Namespace.Name
 	if namespace == "" {
 		return nil, fmt.Errorf("missing empty namespace")
@@ -66,7 +68,9 @@ func (s *metastoreServer) CreateDabatase(c context.Context,
 
 func (s *metastoreServer) GetDatabase(c context.Context,
 	req *pb.GetDatabaseRequest) (*pb.GetDatabaseResponse, error) {
-	log.Println(req, "session =", req.Cookie.Cookie)
+	if req.Cookie != nil {
+		log.Println(req, "session =", req.Cookie.Cookie)
+	}
 	namespace := req.Id.Namespace.Name
 	if namespace == "" {
 		return nil, fmt.Errorf("missing empty namespace")
@@ -99,8 +103,42 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 	}, nil
 }
 
-func (*metastoreServer) ListDatabases(*pb.ListDatabasesRequest,
-	pb.Metastore_ListDatabasesServer) error {
+func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
+	stream pb.Metastore_ListDatabasesServer) error {
+	if req.Cookie != nil {
+		log.Println(req, "session =", req.Cookie.Cookie)
+	}
+	namespace := req.Namespace.Name
+	if namespace == "" {
+		return fmt.Errorf("empty namespace")
+	}
+	bucketName := []byte(namespace)
+
+	err := s.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(bucketName)
+		if b == nil {
+			return nil
+		}
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			database := new(pb.Database)
+			err := proto.Unmarshal(v, database)
+			if err != nil {
+				continue
+			}
+			log.Println("send", database)
+			if err = stream.Send(database); err != nil {
+				log.Println("err sending ", err)
+				return err
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
