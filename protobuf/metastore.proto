@@ -58,10 +58,15 @@ message RequestStatus {
         CONFLICT = 3; // Object already exists
     }
     Status status = 1;
-    string error = 2; // detailed error message
+    string error = 2;  // detailed error message
+    Cookie cookie = 3; // copied from request
 }
 
-// Every object belongs to a namespace.
+// Every object belongs to a namespace. The idea is that operations across
+// namespaces are completely independent. They can be forwarded to different storage
+// engines.
+// Namespase is created automatically when an object is placed in a namespace.
+// NOTE - should we explicitely manage namespaces instead?
 message Namespace {
     string name = 1;
 }
@@ -70,6 +75,8 @@ message Namespace {
 // The value of the cookie is likely to be printed in logs so it shouldn't contain
 // any sensitive information.
 // Metastore service does not interpret the cookie but may print it in its logs.
+// We could call it SessionId but callers may decide to use it for whatever other
+// purposes, so using generic term here.
 message Cookie {
     string cookie = 1;
 }
@@ -82,7 +89,7 @@ message Id {
     string id = 3;
 }
 
-// Database is a namespace for tables.
+// Database is a container for tables.
 // Original Metastore Database object also had location and owner information.
 // These can be represented using parameters if needed since the current
 // metastore service does n;t interpret either Location or Owner info.
@@ -92,13 +99,9 @@ message Database {
 }
 
 // Create a new database.
-// Request should have the namespace and the name of the database.
-// The name should be unique within the namespace
-// unique ID is assigned by the service.
 message CreateDatabaseRequest {
-    Id id = 1;
+    Database database = 1;
     Cookie cookie = 2;
-    map<string, string> parameters = 3;
 }
 
 // Request to get database by its ID.
