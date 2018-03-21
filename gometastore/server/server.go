@@ -28,12 +28,13 @@ func newServer(db *bolt.DB) *metastoreServer {
 
 func (s *metastoreServer) CreateDabatase(c context.Context,
 	req *pb.CreateDatabaseRequest) (*pb.GetDatabaseResponse, error) {
-	if req.Cookie != nil {
-		log.Println(req, "session =", req.Cookie.Cookie)
+	log.Println("CreateDabatase:", req)
+	if req.Database == nil || req.Database.Id == nil || req.Database.Id.Namespace == nil {
+		return nil, fmt.Errorf("missing Database info")
 	}
 	namespace := req.Database.Id.Namespace.Name
 	if namespace == "" {
-		return nil, fmt.Errorf("missing empty namespace")
+		return nil, fmt.Errorf("missing namespace")
 	}
 	dbName := req.Database.Id.Name
 	if dbName == "" {
@@ -50,11 +51,15 @@ func (s *metastoreServer) CreateDabatase(c context.Context,
 		if err != nil {
 			return err
 		}
-		bucket.Put([]byte(dbName), data)
+		err = bucket.Put([]byte(dbName), data)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 
 	if err != nil {
+		log.Println("failed to create database:", err)
 		return &pb.GetDatabaseResponse{
 			Status: &pb.RequestStatus{Status: pb.RequestStatus_ERROR, Error: err.Error()},
 		}, nil
@@ -68,12 +73,13 @@ func (s *metastoreServer) CreateDabatase(c context.Context,
 
 func (s *metastoreServer) GetDatabase(c context.Context,
 	req *pb.GetDatabaseRequest) (*pb.GetDatabaseResponse, error) {
-	if req.Cookie != nil {
-		log.Println(req, "session =", req.Cookie.Cookie)
+	log.Println("GetDatabase:", req)
+	if req.Id == nil || req.Id.Namespace == nil {
+		return nil, fmt.Errorf("missing identity info")
 	}
 	namespace := req.Id.Namespace.Name
 	if namespace == "" {
-		return nil, fmt.Errorf("missing empty namespace")
+		return nil, fmt.Errorf("missing namespace")
 	}
 	dbName := req.Id.Name
 	if dbName == "" {
@@ -83,7 +89,14 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 	bucketName := []byte(namespace)
 
 	err := s.db.View(func(tx *bolt.Tx) error {
-		data := tx.Bucket(bucketName).Get([]byte(dbName))
+		bucket := tx.Bucket(bucketName)
+		if bucket == nil {
+			return fmt.Errorf("bucket %s doesn't exist", bucketName)
+		}
+		data := bucket.Get([]byte(dbName))
+		if data == nil {
+			return fmt.Errorf("database %s doesn't exist", dbName)
+		}
 		err := proto.Unmarshal(data, &database)
 		if err != nil {
 			return err
@@ -92,6 +105,7 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 	})
 
 	if err != nil {
+		log.Println("failed to get database:", err)
 		return &pb.GetDatabaseResponse{
 			Status: &pb.RequestStatus{Status: pb.RequestStatus_ERROR, Error: err.Error()},
 		}, nil
@@ -105,9 +119,7 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 
 func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 	stream pb.Metastore_ListDatabasesServer) error {
-	if req.Cookie != nil {
-		log.Println(req, "session =", req.Cookie.Cookie)
-	}
+	log.Println("ListDatabases", req)
 	namespace := req.Namespace.Name
 	if namespace == "" {
 		return fmt.Errorf("empty namespace")
@@ -117,7 +129,7 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 	err := s.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(bucketName)
 		if b == nil {
-			return nil
+			return fmt.Errorf("bucket %s doesn't exist", bucketName)
 		}
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
@@ -136,14 +148,46 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 	})
 
 	if err != nil {
+		log.Println("failed to list databasew:", err)
 		return err
 	}
 
 	return nil
 }
 
-func (*metastoreServer) DropDatabase(context.Context,
-	*pb.DropDatabaseRequest) (*pb.RequestStatus, error) {
+func (s *metastoreServer) DropDatabase(c context.Context,
+	req *pb.DropDatabaseRequest) (*pb.RequestStatus, error) {
+	log.Println("DropDatabase:", req)
+	namespace := req.Id.Namespace.Name
+	if namespace == "" {
+		return nil, fmt.Errorf("missing empty namespace")
+	}
+	dbName := req.Id.Name
+	if dbName == "" {
+		return nil, fmt.Errorf("missing database name")
+	}
+	bucketName := []byte(namespace)
+
+	err := s.db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket(bucketName)
+		if b == nil {
+			return fmt.Errorf("bucket %s doesn't exist", bucketName)
+		}
+		if data := b.Get([]byte(dbName)); data == nil {
+			return fmt.Errorf("database %s doesn't exist", dbName)
+		}
+		err := b.Delete([]byte(dbName))
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		log.Println("failed to delete database:", err)
+		return nil, err
+	}
+
 	return &pb.RequestStatus{Status: pb.RequestStatus_OK}, nil
 }
 

@@ -34,7 +34,13 @@ req = GetDatabaseRequest(id=dbid, cookie=cookie)
 db = stub.GetDatabase(req)
 print(db)
 ldr = ListDatabasesRequest()
-for db in stub.ListDatabases(ListDatabasesRequest(namespace=ns, cookie=cookie, name_pattern='*')):
-    print(db.name)
+dbs = [d for d in stub.ListDatabases(ListDatabasesRequest(namespace=ns, cookie=cookie, name_pattern='*'))]
+for db in dbs:
+    print(db)
 
 
+names = []
+for db in dbs:
+    names.append(db.id.name)
+
+print (names)
