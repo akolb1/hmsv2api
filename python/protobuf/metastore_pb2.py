@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='metastore.proto',
   package='metastore',
   syntax='proto3',
-  serialized_pb=_b('\n\x0fmetastore.proto\x12\tmetastore\"\xab\x01\n\rRequestStatus\x12/\n\x06status\x18\x01 \x01(\x0e\x32\x1f.metastore.RequestStatus.Status\x12\r\n\x05\x65rror\x18\x02 \x01(\t\x12!\n\x06\x63ookie\x18\x03 \x01(\x0b\x32\x11.metastore.Cookie\"7\n\x06Status\x12\x06\n\x02OK\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x12\x0c\n\x08NOTFOUND\x10\x02\x12\x0c\n\x08\x43ONFLICT\x10\x03\"\x19\n\tNamespace\x12\x0c\n\x04name\x18\x01 \x01(\t\"\x18\n\x06\x43ookie\x12\x0e\n\x06\x63ookie\x18\x01 \x01(\t\"G\n\x02Id\x12\'\n\tnamespace\x18\x01 \x01(\x0b\x32\x14.metastore.Namespace\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\n\n\x02id\x18\x03 \x01(\t\"\x91\x01\n\x08\x44\x61tabase\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x37\n\nparameters\x18\x02 \x03(\x0b\x32#.metastore.Database.ParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"a\n\x15\x43reateDatabaseRequest\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12!\n\x06\x63ookie\x18\x02 \x01(\x0b\x32\x11.metastore.Cookie\"R\n\x12GetDatabaseRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12!\n\x06\x63ookie\x18\x02 \x01(\x0b\x32\x11.metastore.Cookie\"f\n\x13GetDatabaseResponse\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12(\n\x06status\x18\x02 \x01(\x0b\x32\x18.metastore.RequestStatus\"x\n\x14ListDatabasesRequest\x12\'\n\tnamespace\x18\x01 \x01(\x0b\x32\x14.metastore.Namespace\x12!\n\x06\x63ookie\x18\x02 \x01(\x0b\x32\x11.metastore.Cookie\x12\x14\n\x0cname_pattern\x18\x03 \x01(\t\"S\n\x13\x44ropDatabaseRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12!\n\x06\x63ookie\x18\x02 \x01(\x0b\x32\x11.metastore.Cookie2\xc0\x02\n\tMetastore\x12R\n\x0e\x43reateDabatase\x12 .metastore.CreateDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\x12L\n\x0bGetDatabase\x12\x1d.metastore.GetDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\x12G\n\rListDatabases\x12\x1f.metastore.ListDatabasesRequest\x1a\x13.metastore.Database0\x01\x12H\n\x0c\x44ropDatabase\x12\x1e.metastore.DropDatabaseRequest\x1a\x18.metastore.RequestStatusB\"\n\x13\x63om.akolb.metastoreB\tMetaStoreP\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0fmetastore.proto\x12\tmetastore\"\x98\x01\n\rRequestStatus\x12/\n\x06status\x18\x01 \x01(\x0e\x32\x1f.metastore.RequestStatus.Status\x12\r\n\x05\x65rror\x18\x02 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"7\n\x06Status\x12\x06\n\x02OK\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x12\x0c\n\x08NOTFOUND\x10\x02\x12\x0c\n\x08\x43ONFLICT\x10\x03\"1\n\x02Id\x12\x11\n\tnamespace\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\n\n\x02id\x18\x03 \x01(\t\"\x91\x01\n\x08\x44\x61tabase\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x37\n\nparameters\x18\x02 \x03(\x0b\x32#.metastore.Database.ParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"N\n\x15\x43reateDatabaseRequest\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\"?\n\x12GetDatabaseRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\"f\n\x13GetDatabaseResponse\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12(\n\x06status\x18\x02 \x01(\x0b\x32\x18.metastore.RequestStatus\"O\n\x14ListDatabasesRequest\x12\x11\n\tnamespace\x18\x01 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\x12\x14\n\x0cname_pattern\x18\x03 \x01(\t\"@\n\x13\x44ropDatabaseRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t2\xc0\x02\n\tMetastore\x12R\n\x0e\x43reateDabatase\x12 .metastore.CreateDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\x12L\n\x0bGetDatabase\x12\x1d.metastore.GetDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\x12G\n\rListDatabases\x12\x1f.metastore.ListDatabasesRequest\x1a\x13.metastore.Database0\x01\x12H\n\x0c\x44ropDatabase\x12\x1e.metastore.DropDatabaseRequest\x1a\x18.metastore.RequestStatusB\"\n\x13\x63om.akolb.metastoreB\tMetaStoreP\x01\x62\x06proto3')
 )
 
 
@@ -49,8 +49,8 @@ _REQUESTSTATUS_STATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=147,
-  serialized_end=202,
+  serialized_start=128,
+  serialized_end=183,
 )
 _sym_db.RegisterEnumDescriptor(_REQUESTSTATUS_STATUS)
 
@@ -78,8 +78,8 @@ _REQUESTSTATUS = _descriptor.Descriptor(
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='cookie', full_name='metastore.RequestStatus.cookie', index=2,
-      number=3, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
@@ -97,69 +97,7 @@ _REQUESTSTATUS = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=31,
-  serialized_end=202,
-)
-
-
-_NAMESPACE = _descriptor.Descriptor(
-  name='Namespace',
-  full_name='metastore.Namespace',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='name', full_name='metastore.Namespace.name', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=204,
-  serialized_end=229,
-)
-
-
-_COOKIE = _descriptor.Descriptor(
-  name='Cookie',
-  full_name='metastore.Cookie',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='cookie', full_name='metastore.Cookie.cookie', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=231,
-  serialized_end=255,
+  serialized_end=183,
 )
 
 
@@ -172,8 +110,8 @@ _ID = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='namespace', full_name='metastore.Id.namespace', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
@@ -203,8 +141,8 @@ _ID = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=257,
-  serialized_end=328,
+  serialized_start=185,
+  serialized_end=234,
 )
 
 
@@ -241,8 +179,8 @@ _DATABASE_PARAMETERSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=427,
-  serialized_end=476,
+  serialized_start=333,
+  serialized_end=382,
 )
 
 _DATABASE = _descriptor.Descriptor(
@@ -278,8 +216,8 @@ _DATABASE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=331,
-  serialized_end=476,
+  serialized_start=237,
+  serialized_end=382,
 )
 
 
@@ -299,8 +237,8 @@ _CREATEDATABASEREQUEST = _descriptor.Descriptor(
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='cookie', full_name='metastore.CreateDatabaseRequest.cookie', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
@@ -316,8 +254,8 @@ _CREATEDATABASEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=478,
-  serialized_end=575,
+  serialized_start=384,
+  serialized_end=462,
 )
 
 
@@ -337,8 +275,8 @@ _GETDATABASEREQUEST = _descriptor.Descriptor(
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='cookie', full_name='metastore.GetDatabaseRequest.cookie', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
@@ -354,8 +292,8 @@ _GETDATABASEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=577,
-  serialized_end=659,
+  serialized_start=464,
+  serialized_end=527,
 )
 
 
@@ -392,8 +330,8 @@ _GETDATABASERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=661,
-  serialized_end=763,
+  serialized_start=529,
+  serialized_end=631,
 )
 
 
@@ -406,15 +344,15 @@ _LISTDATABASESREQUEST = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='namespace', full_name='metastore.ListDatabasesRequest.namespace', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='cookie', full_name='metastore.ListDatabasesRequest.cookie', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
@@ -437,8 +375,8 @@ _LISTDATABASESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=765,
-  serialized_end=885,
+  serialized_start=633,
+  serialized_end=712,
 )
 
 
@@ -458,8 +396,8 @@ _DROPDATABASEREQUEST = _descriptor.Descriptor(
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='cookie', full_name='metastore.DropDatabaseRequest.cookie', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
@@ -475,30 +413,21 @@ _DROPDATABASEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=887,
-  serialized_end=970,
+  serialized_start=714,
+  serialized_end=778,
 )
 
 _REQUESTSTATUS.fields_by_name['status'].enum_type = _REQUESTSTATUS_STATUS
-_REQUESTSTATUS.fields_by_name['cookie'].message_type = _COOKIE
 _REQUESTSTATUS_STATUS.containing_type = _REQUESTSTATUS
-_ID.fields_by_name['namespace'].message_type = _NAMESPACE
 _DATABASE_PARAMETERSENTRY.containing_type = _DATABASE
 _DATABASE.fields_by_name['id'].message_type = _ID
 _DATABASE.fields_by_name['parameters'].message_type = _DATABASE_PARAMETERSENTRY
 _CREATEDATABASEREQUEST.fields_by_name['database'].message_type = _DATABASE
-_CREATEDATABASEREQUEST.fields_by_name['cookie'].message_type = _COOKIE
 _GETDATABASEREQUEST.fields_by_name['id'].message_type = _ID
-_GETDATABASEREQUEST.fields_by_name['cookie'].message_type = _COOKIE
 _GETDATABASERESPONSE.fields_by_name['database'].message_type = _DATABASE
 _GETDATABASERESPONSE.fields_by_name['status'].message_type = _REQUESTSTATUS
-_LISTDATABASESREQUEST.fields_by_name['namespace'].message_type = _NAMESPACE
-_LISTDATABASESREQUEST.fields_by_name['cookie'].message_type = _COOKIE
 _DROPDATABASEREQUEST.fields_by_name['id'].message_type = _ID
-_DROPDATABASEREQUEST.fields_by_name['cookie'].message_type = _COOKIE
 DESCRIPTOR.message_types_by_name['RequestStatus'] = _REQUESTSTATUS
-DESCRIPTOR.message_types_by_name['Namespace'] = _NAMESPACE
-DESCRIPTOR.message_types_by_name['Cookie'] = _COOKIE
 DESCRIPTOR.message_types_by_name['Id'] = _ID
 DESCRIPTOR.message_types_by_name['Database'] = _DATABASE
 DESCRIPTOR.message_types_by_name['CreateDatabaseRequest'] = _CREATEDATABASEREQUEST
@@ -514,20 +443,6 @@ RequestStatus = _reflection.GeneratedProtocolMessageType('RequestStatus', (_mess
   # @@protoc_insertion_point(class_scope:metastore.RequestStatus)
   ))
 _sym_db.RegisterMessage(RequestStatus)
-
-Namespace = _reflection.GeneratedProtocolMessageType('Namespace', (_message.Message,), dict(
-  DESCRIPTOR = _NAMESPACE,
-  __module__ = 'metastore_pb2'
-  # @@protoc_insertion_point(class_scope:metastore.Namespace)
-  ))
-_sym_db.RegisterMessage(Namespace)
-
-Cookie = _reflection.GeneratedProtocolMessageType('Cookie', (_message.Message,), dict(
-  DESCRIPTOR = _COOKIE,
-  __module__ = 'metastore_pb2'
-  # @@protoc_insertion_point(class_scope:metastore.Cookie)
-  ))
-_sym_db.RegisterMessage(Cookie)
 
 Id = _reflection.GeneratedProtocolMessageType('Id', (_message.Message,), dict(
   DESCRIPTOR = _ID,
@@ -598,8 +513,8 @@ _METASTORE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=973,
-  serialized_end=1293,
+  serialized_start=781,
+  serialized_end=1101,
   methods=[
   _descriptor.MethodDescriptor(
     name='CreateDabatase',

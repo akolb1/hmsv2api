@@ -33,10 +33,10 @@ func newServer(db *bolt.DB) *metastoreServer {
 func (s *metastoreServer) CreateDabatase(c context.Context,
 	req *pb.CreateDatabaseRequest) (*pb.GetDatabaseResponse, error) {
 	log.Println("CreateDabatase:", req)
-	if req.Database == nil || req.Database.Id == nil || req.Database.Id.Namespace == nil {
+	if req.Database == nil || req.Database.Id == nil {
 		return nil, fmt.Errorf("missing Database info")
 	}
-	namespace := req.Database.Id.Namespace.Name
+	namespace := req.Database.Id.Namespace
 	if namespace == "" {
 		return nil, fmt.Errorf("missing namespace")
 	}
@@ -83,10 +83,10 @@ func (s *metastoreServer) CreateDabatase(c context.Context,
 func (s *metastoreServer) GetDatabase(c context.Context,
 	req *pb.GetDatabaseRequest) (*pb.GetDatabaseResponse, error) {
 	log.Println("GetDatabase:", req)
-	if req.Id == nil || req.Id.Namespace == nil {
+	if req.Id == nil  {
 		return nil, fmt.Errorf("missing identity info")
 	}
-	namespace := req.Id.Namespace.Name
+	namespace := req.Id.Namespace
 	if namespace == "" {
 		return nil, fmt.Errorf("missing namespace")
 	}
@@ -129,7 +129,7 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 	stream pb.Metastore_ListDatabasesServer) error {
 	log.Println("ListDatabases", req)
-	namespace := req.Namespace.Name
+	namespace := req.Namespace
 	if namespace == "" {
 		return fmt.Errorf("empty namespace")
 	}
@@ -167,7 +167,7 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 func (s *metastoreServer) DropDatabase(c context.Context,
 	req *pb.DropDatabaseRequest) (*pb.RequestStatus, error) {
 	log.Println("DropDatabase:", req)
-	namespace := req.Id.Namespace.Name
+	namespace := req.Id.Namespace
 	if namespace == "" {
 		return nil, fmt.Errorf("missing empty namespace")
 	}

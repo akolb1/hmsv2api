@@ -27,6 +27,22 @@
  * The API also introduces the notion of an object ID - globally unique string
  * associated with the object. While object name can change (e.g. with
  * rename operation), identity of the object never changes.
+ *
+ * Cookie is supposed to be used to associate multiple requests to a single session.
+ * The value of the cookie is likely to be printed in logs so it shouldn't contain
+ * any sensitive information.
+ * Metastore service does not interpret the cookie but may print it in its logs.
+ * We could call it SessionId but callers may decide to use it for whatever other
+ * purposes, so using generic term here.
+ *
+ * Every object belongs to a namespace. The idea is that operations across
+ * namespaces are completely independent. They can be forwarded to different storage
+ * engines.
+ * Namespase is created automatically when an object is placed in a namespace.
+ * NOTE - should we explicitely manage namespaces instead?
+ *
+ * Objects belong to a specific namespace and have unique name and unique ID
+ * in the namespace.
  */
 
 syntax = "proto3";
@@ -59,32 +75,13 @@ message RequestStatus {
     }
     Status status = 1;
     string error = 2;  // detailed error message
-    Cookie cookie = 3; // copied from request
-}
-
-// Every object belongs to a namespace. The idea is that operations across
-// namespaces are completely independent. They can be forwarded to different storage
-// engines.
-// Namespase is created automatically when an object is placed in a namespace.
-// NOTE - should we explicitely manage namespaces instead?
-message Namespace {
-    string name = 1;
-}
-
-// Cookie is supposed to be used to associate multiple requests to a single session.
-// The value of the cookie is likely to be printed in logs so it shouldn't contain
-// any sensitive information.
-// Metastore service does not interpret the cookie but may print it in its logs.
-// We could call it SessionId but callers may decide to use it for whatever other
-// purposes, so using generic term here.
-message Cookie {
-    string cookie = 1;
+    string cookie = 3; // copied from request
 }
 
 // Objects belong to a specific namespace and have unique name and unique ID
 // in the namespace.
 message Id {
-    Namespace namespace = 1;
+    string namespace = 1;
     string name = 2;
     string id = 3;
 }
@@ -101,13 +98,13 @@ message Database {
 // Create a new database.
 message CreateDatabaseRequest {
     Database database = 1;
-    Cookie cookie = 2;
+    string cookie = 2;
 }
 
 // Request to get database by its ID.
 message GetDatabaseRequest {
     Id id = 1;
-    Cookie cookie = 2;
+    string cookie = 2;
 }
 
 message GetDatabaseResponse {
@@ -117,8 +114,8 @@ message GetDatabaseResponse {
 
 // Request to get list of databases
 message ListDatabasesRequest {
-    Namespace namespace = 1;
-    Cookie cookie = 2;
+    string namespace = 1;
+    string cookie = 2;
     string name_pattern = 3;
 }
 
@@ -126,7 +123,7 @@ message ListDatabasesRequest {
 // Dropping a database also drops all objects contained in the database
 message DropDatabaseRequest {
     Id id = 1;
-    Cookie cookie = 2;
+    string cookie = 2;
 }
 
 
