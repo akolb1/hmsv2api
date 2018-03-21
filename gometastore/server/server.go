@@ -1,11 +1,10 @@
+// Server implementation
 package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
-	"net"
 
 	"math/rand"
 	"time"
@@ -14,12 +13,6 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
 	"github.com/oklog/ulid"
-	"google.golang.org/grpc"
-)
-
-var (
-	port       = flag.Int("port", 10000, "The server port")
-	boltDbName = flag.String("dbname", "hms2.db", "db name")
 )
 
 type metastoreServer struct {
@@ -83,7 +76,7 @@ func (s *metastoreServer) CreateDabatase(c context.Context,
 func (s *metastoreServer) GetDatabase(c context.Context,
 	req *pb.GetDatabaseRequest) (*pb.GetDatabaseResponse, error) {
 	log.Println("GetDatabase:", req)
-	if req.Id == nil  {
+	if req.Id == nil {
 		return nil, fmt.Errorf("missing identity info")
 	}
 	namespace := req.Id.Namespace
@@ -205,21 +198,4 @@ func getULID() string {
 	t := time.Unix(1000000, 0)
 	entropy := rand.New(rand.NewSource(t.UnixNano()))
 	return ulid.MustNew(ulid.Timestamp(t), entropy).String()
-}
-
-func main() {
-	flag.Parse()
-	db, err := bolt.Open(*boltDbName, 0644, nil)
-	if err != nil {
-		log.Fatal("failed to open db:", err)
-	}
-	defer db.Close()
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	var opts []grpc.ServerOption
-	grpcServer := grpc.NewServer(opts...)
-	pb.RegisterMetastoreServer(grpcServer, newServer(db))
-	grpcServer.Serve(lis)
 }
