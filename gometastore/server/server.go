@@ -7,9 +7,13 @@ import (
 	"log"
 	"net"
 
+	"math/rand"
+	"time"
+
 	pb "github.com/akolb1/hmsv2api/gometastore/protobuf"
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
+	"github.com/oklog/ulid"
 	"google.golang.org/grpc"
 )
 
@@ -41,6 +45,11 @@ func (s *metastoreServer) CreateDabatase(c context.Context,
 		return nil, fmt.Errorf("missing database name")
 	}
 	database := req.Database
+	// Create unique ID if it isn's specified
+	if database.Id.Id == "" {
+		database.Id.Id = getULID()
+	}
+
 	data, err := proto.Marshal(database)
 	if err != nil {
 		log.Println("failed to deserialize", err)
@@ -189,6 +198,13 @@ func (s *metastoreServer) DropDatabase(c context.Context,
 	}
 
 	return &pb.RequestStatus{Status: pb.RequestStatus_OK}, nil
+}
+
+// getULID returns a unique ID.
+func getULID() string {
+	t := time.Unix(1000000, 0)
+	entropy := rand.New(rand.NewSource(t.UnixNano()))
+	return ulid.MustNew(ulid.Timestamp(t), entropy).String()
 }
 
 func main() {
