@@ -87,42 +87,49 @@ message Id {
 }
 
 // Database is a container for tables.
+// Database object has two sets of parameters:
+//  - User parameters are intended for user and are just transparently passed around
+//  - System parameters are intended to be used by Hive for its internal purposes
+//
 // Original Metastore Database object also had location and owner information.
-// These can be represented using parameters if needed since the current
-// metastore service does n;t interpret either Location or Owner info.
+// These can be represented using system parameters if needed since the current
+// metastore service does not interpret either Location or Owner info.
 message Database {
-    Id id = 1;
-    map<string, string> parameters = 2; // Database parameters
+    Id                  id = 1;
+    map<string, string> parameters = 2; // Database user parameters
+    map<string, string> system_parameters = 3;
 }
 
 // Create a new database.
 message CreateDatabaseRequest {
     Database database = 1;
-    string cookie = 2;
+    string   cookie = 2;
 }
 
 // Request to get database by its ID.
 message GetDatabaseRequest {
-    Id id = 1;
+    Id     id = 1;
     string cookie = 2;
 }
 
 message GetDatabaseResponse {
-    Database database = 1;
+    Database      database = 1;
     RequestStatus status = 2;
 }
 
 // Request to get list of databases
+// If exclude_params is set, result may omit parameters
 message ListDatabasesRequest {
     string namespace = 1;
     string cookie = 2;
     string name_pattern = 3;
+    bool   exclude_params = 4;
 }
 
 // Request to drop a database.
 // Dropping a database also drops all objects contained in the database
 message DropDatabaseRequest {
-    Id id = 1;
+    Id     id = 1;
     string cookie = 2;
 }
 

@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='metastore.proto',
   package='metastore',
   syntax='proto3',
-  serialized_pb=_b('\n\x0fmetastore.proto\x12\tmetastore\"\x98\x01\n\rRequestStatus\x12/\n\x06status\x18\x01 \x01(\x0e\x32\x1f.metastore.RequestStatus.Status\x12\r\n\x05\x65rror\x18\x02 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"7\n\x06Status\x12\x06\n\x02OK\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x12\x0c\n\x08NOTFOUND\x10\x02\x12\x0c\n\x08\x43ONFLICT\x10\x03\"1\n\x02Id\x12\x11\n\tnamespace\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\n\n\x02id\x18\x03 \x01(\t\"\x91\x01\n\x08\x44\x61tabase\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x37\n\nparameters\x18\x02 \x03(\x0b\x32#.metastore.Database.ParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"N\n\x15\x43reateDatabaseRequest\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\"?\n\x12GetDatabaseRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\"f\n\x13GetDatabaseResponse\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12(\n\x06status\x18\x02 \x01(\x0b\x32\x18.metastore.RequestStatus\"O\n\x14ListDatabasesRequest\x12\x11\n\tnamespace\x18\x01 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\x12\x14\n\x0cname_pattern\x18\x03 \x01(\t\"@\n\x13\x44ropDatabaseRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t2\xc0\x02\n\tMetastore\x12R\n\x0e\x43reateDabatase\x12 .metastore.CreateDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\x12L\n\x0bGetDatabase\x12\x1d.metastore.GetDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\x12G\n\rListDatabases\x12\x1f.metastore.ListDatabasesRequest\x1a\x13.metastore.Database0\x01\x12H\n\x0c\x44ropDatabase\x12\x1e.metastore.DropDatabaseRequest\x1a\x18.metastore.RequestStatusB\"\n\x13\x63om.akolb.metastoreB\tMetaStoreP\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0fmetastore.proto\x12\tmetastore\"\x98\x01\n\rRequestStatus\x12/\n\x06status\x18\x01 \x01(\x0e\x32\x1f.metastore.RequestStatus.Status\x12\r\n\x05\x65rror\x18\x02 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"7\n\x06Status\x12\x06\n\x02OK\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x12\x0c\n\x08NOTFOUND\x10\x02\x12\x0c\n\x08\x43ONFLICT\x10\x03\"1\n\x02Id\x12\x11\n\tnamespace\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\n\n\x02id\x18\x03 \x01(\t\"\x90\x02\n\x08\x44\x61tabase\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x37\n\nparameters\x18\x02 \x03(\x0b\x32#.metastore.Database.ParametersEntry\x12\x44\n\x11system_parameters\x18\x03 \x03(\x0b\x32).metastore.Database.SystemParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x37\n\x15SystemParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"N\n\x15\x43reateDatabaseRequest\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\"?\n\x12GetDatabaseRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\"f\n\x13GetDatabaseResponse\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12(\n\x06status\x18\x02 \x01(\x0b\x32\x18.metastore.RequestStatus\"g\n\x14ListDatabasesRequest\x12\x11\n\tnamespace\x18\x01 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\x12\x14\n\x0cname_pattern\x18\x03 \x01(\t\x12\x16\n\x0e\x65xclude_params\x18\x04 \x01(\x08\"@\n\x13\x44ropDatabaseRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t2\xc0\x02\n\tMetastore\x12R\n\x0e\x43reateDabatase\x12 .metastore.CreateDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\x12L\n\x0bGetDatabase\x12\x1d.metastore.GetDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\x12G\n\rListDatabases\x12\x1f.metastore.ListDatabasesRequest\x1a\x13.metastore.Database0\x01\x12H\n\x0c\x44ropDatabase\x12\x1e.metastore.DropDatabaseRequest\x1a\x18.metastore.RequestStatusB\"\n\x13\x63om.akolb.metastoreB\tMetaStoreP\x01\x62\x06proto3')
 )
 
 
@@ -179,8 +179,45 @@ _DATABASE_PARAMETERSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=333,
-  serialized_end=382,
+  serialized_start=403,
+  serialized_end=452,
+)
+
+_DATABASE_SYSTEMPARAMETERSENTRY = _descriptor.Descriptor(
+  name='SystemParametersEntry',
+  full_name='metastore.Database.SystemParametersEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='metastore.Database.SystemParametersEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='metastore.Database.SystemParametersEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=454,
+  serialized_end=509,
 )
 
 _DATABASE = _descriptor.Descriptor(
@@ -204,10 +241,17 @@ _DATABASE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='system_parameters', full_name='metastore.Database.system_parameters', index=2,
+      number=3, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
-  nested_types=[_DATABASE_PARAMETERSENTRY, ],
+  nested_types=[_DATABASE_PARAMETERSENTRY, _DATABASE_SYSTEMPARAMETERSENTRY, ],
   enum_types=[
   ],
   options=None,
@@ -217,7 +261,7 @@ _DATABASE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=237,
-  serialized_end=382,
+  serialized_end=509,
 )
 
 
@@ -254,8 +298,8 @@ _CREATEDATABASEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=384,
-  serialized_end=462,
+  serialized_start=511,
+  serialized_end=589,
 )
 
 
@@ -292,8 +336,8 @@ _GETDATABASEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=464,
-  serialized_end=527,
+  serialized_start=591,
+  serialized_end=654,
 )
 
 
@@ -330,8 +374,8 @@ _GETDATABASERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=529,
-  serialized_end=631,
+  serialized_start=656,
+  serialized_end=758,
 )
 
 
@@ -363,6 +407,13 @@ _LISTDATABASESREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='exclude_params', full_name='metastore.ListDatabasesRequest.exclude_params', index=3,
+      number=4, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -375,8 +426,8 @@ _LISTDATABASESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=633,
-  serialized_end=712,
+  serialized_start=760,
+  serialized_end=863,
 )
 
 
@@ -413,15 +464,17 @@ _DROPDATABASEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=714,
-  serialized_end=778,
+  serialized_start=865,
+  serialized_end=929,
 )
 
 _REQUESTSTATUS.fields_by_name['status'].enum_type = _REQUESTSTATUS_STATUS
 _REQUESTSTATUS_STATUS.containing_type = _REQUESTSTATUS
 _DATABASE_PARAMETERSENTRY.containing_type = _DATABASE
+_DATABASE_SYSTEMPARAMETERSENTRY.containing_type = _DATABASE
 _DATABASE.fields_by_name['id'].message_type = _ID
 _DATABASE.fields_by_name['parameters'].message_type = _DATABASE_PARAMETERSENTRY
+_DATABASE.fields_by_name['system_parameters'].message_type = _DATABASE_SYSTEMPARAMETERSENTRY
 _CREATEDATABASEREQUEST.fields_by_name['database'].message_type = _DATABASE
 _GETDATABASEREQUEST.fields_by_name['id'].message_type = _ID
 _GETDATABASERESPONSE.fields_by_name['database'].message_type = _DATABASE
@@ -459,12 +512,20 @@ Database = _reflection.GeneratedProtocolMessageType('Database', (_message.Messag
     # @@protoc_insertion_point(class_scope:metastore.Database.ParametersEntry)
     ))
   ,
+
+  SystemParametersEntry = _reflection.GeneratedProtocolMessageType('SystemParametersEntry', (_message.Message,), dict(
+    DESCRIPTOR = _DATABASE_SYSTEMPARAMETERSENTRY,
+    __module__ = 'metastore_pb2'
+    # @@protoc_insertion_point(class_scope:metastore.Database.SystemParametersEntry)
+    ))
+  ,
   DESCRIPTOR = _DATABASE,
   __module__ = 'metastore_pb2'
   # @@protoc_insertion_point(class_scope:metastore.Database)
   ))
 _sym_db.RegisterMessage(Database)
 _sym_db.RegisterMessage(Database.ParametersEntry)
+_sym_db.RegisterMessage(Database.SystemParametersEntry)
 
 CreateDatabaseRequest = _reflection.GeneratedProtocolMessageType('CreateDatabaseRequest', (_message.Message,), dict(
   DESCRIPTOR = _CREATEDATABASEREQUEST,
@@ -506,6 +567,8 @@ DESCRIPTOR.has_options = True
 DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('\n\023com.akolb.metastoreB\tMetaStoreP\001'))
 _DATABASE_PARAMETERSENTRY.has_options = True
 _DATABASE_PARAMETERSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
+_DATABASE_SYSTEMPARAMETERSENTRY.has_options = True
+_DATABASE_SYSTEMPARAMETERSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
 
 _METASTORE = _descriptor.ServiceDescriptor(
   name='Metastore',
@@ -513,8 +576,8 @@ _METASTORE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=781,
-  serialized_end=1101,
+  serialized_start=932,
+  serialized_end=1252,
   methods=[
   _descriptor.MethodDescriptor(
     name='CreateDabatase',

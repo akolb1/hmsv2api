@@ -140,7 +140,14 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 			if err != nil {
 				continue
 			}
-			log.Println("send", database)
+			log.Println("send", database.Id.Name)
+			// Database namespace should match request, no need to send it
+			database.Id.Namespace = ""
+			// Do not send parameters if not asked to
+			if req.ExcludeParams {
+			    database.Parameters = nil
+			    database.SystemParameters = nil
+            }
 			if err = stream.Send(database); err != nil {
 				log.Println("err sending ", err)
 				return err

@@ -74,6 +74,10 @@ in the namespace.
 
 Database is a container for tables.
 
+Database object has two sets of parameters:
+- User parameters are intended for user and are just transparently passed around
+- System parameters are intended to be used by Hive for its internal purposes
+
 Original Metastore Database object also had location and owner information.
 These can be represented using parameters if needed since the current
 metastore service does n;t interpret either Location or Owner info.
@@ -81,6 +85,7 @@ metastore service does n;t interpret either Location or Owner info.
     message Database {
         Id id;
         map<string, string> parameters; // Database parameters
+        map<string, string> system_parameters;
     }
 
 ## Requests
@@ -116,12 +121,14 @@ Request to get database by its ID.
 
 ### ListDatabasesRequest
 
-Request to get list of databases
+Request to get list of databases. If exclude_params is set, result may omit parameters
+.
 
     message ListDatabasesRequest {
         string namespace;
         string cookie;
         string name_pattern;
+        bool   exclude_params;
     }
 
 ### DropDatabaseRequest
