@@ -1,0 +1,137 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "metastore.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v2/databases/{id.namespace}/{id.name}": {
+      "get": {
+        "summary": "Get database information",
+        "operationId": "GetDatabase",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/metastoreGetDatabaseResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.namespace",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "cookie",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Metastore"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "RequestStatusStatus": {
+      "type": "string",
+      "enum": [
+        "OK",
+        "ERROR",
+        "NOTFOUND",
+        "CONFLICT"
+      ],
+      "default": "OK"
+    },
+    "metastoreDatabase": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/metastoreId"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "system_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Original Metastore Database object also had location and owner information.\nThese can be represented using system parameters if needed since the current\nmetastore service does not interpret either Location or Owner info.",
+      "title": "Database is a container for tables.\nDatabase object has two sets of parameters:\n - User parameters are intended for user and are just transparently passed around\n - System parameters are intended to be used by Hive for its internal purposes"
+    },
+    "metastoreGetDatabaseResponse": {
+      "type": "object",
+      "properties": {
+        "database": {
+          "$ref": "#/definitions/metastoreDatabase"
+        },
+        "status": {
+          "$ref": "#/definitions/metastoreRequestStatus"
+        }
+      }
+    },
+    "metastoreId": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "description": "Objects belong to a specific namespace and have unique name and unique ID\nin the namespace."
+    },
+    "metastoreRequestStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/RequestStatusStatus"
+        },
+        "error": {
+          "type": "string"
+        },
+        "cookie": {
+          "type": "string"
+        }
+      },
+      "title": "General status for results"
+    }
+  }
+}

@@ -1,1 +1,3 @@
 *.db
+gometastore/server/server
+gometastore/hmsproxy/hmsproxy

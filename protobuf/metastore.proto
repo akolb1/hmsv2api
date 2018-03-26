@@ -53,12 +53,18 @@ option java_outer_classname = "MetaStore";
 
 package metastore;
 
+import "google/api/annotations.proto";
+
 // Metastore service
 service Metastore {
     // Create a new database
     rpc CreateDabatase (CreateDatabaseRequest) returns (GetDatabaseResponse);
     // Get database information
-    rpc GetDatabase (GetDatabaseRequest) returns  (GetDatabaseResponse);
+    rpc GetDatabase (GetDatabaseRequest) returns  (GetDatabaseResponse) {
+        option (google.api.http) = {
+           get: "/v2/databases/{id.namespace}/{id.name}"
+        };
+    }
     // Get collection of databases
     rpc ListDatabases (ListDatabasesRequest) returns  (stream Database);
     // Destroy a database
