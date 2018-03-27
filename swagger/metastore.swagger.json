@@ -15,6 +15,50 @@
     "application/json"
   ],
   "paths": {
+    "/dblist/{namespace}": {
+      "get": {
+        "summary": "Get collection of databases",
+        "operationId": "ListDatabases",
+        "responses": {
+          "200": {
+            "description": "(streaming responses)",
+            "schema": {
+              "$ref": "#/definitions/metastoreDatabase"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "cookie",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name_pattern",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "exclude_params",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          }
+        ],
+        "tags": [
+          "Metastore"
+        ]
+      }
+    },
     "/v2/databases/{id.namespace}/{id.name}": {
       "get": {
         "summary": "Get database information",

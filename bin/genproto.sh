@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-TOP=$(dirname ${BASH_SOURCE[0]})/..
+myhome=$(git rev-parse --show-toplevel)
+TOP=${myhome}
 
 GOPATH=~/go
 
