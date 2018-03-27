@@ -15,7 +15,7 @@
     "application/json"
   ],
   "paths": {
-    "/dblist/{namespace}": {
+    "/dblist/{catalog}": {
       "get": {
         "summary": "Get collection of databases",
         "operationId": "ListDatabases",
@@ -29,7 +29,7 @@
         },
         "parameters": [
           {
-            "name": "namespace",
+            "name": "catalog",
             "in": "path",
             "required": true,
             "type": "string"
@@ -59,7 +59,7 @@
         ]
       }
     },
-    "/v2/databases/{id.namespace}/{id.name}": {
+    "/v2/databases/{id.catalog}/{id.name}": {
       "get": {
         "summary": "Get database information",
         "operationId": "GetDatabase",
@@ -73,7 +73,7 @@
         },
         "parameters": [
           {
-            "name": "id.namespace",
+            "name": "id.catalog",
             "in": "path",
             "required": true,
             "type": "string"
@@ -120,6 +120,9 @@
         "id": {
           "$ref": "#/definitions/metastoreId"
         },
+        "location": {
+          "type": "string"
+        },
         "parameters": {
           "type": "object",
           "additionalProperties": {
@@ -133,7 +136,7 @@
           }
         }
       },
-      "description": "Original Metastore Database object also had location and owner information.\nThese can be represented using system parameters if needed since the current\nmetastore service does not interpret either Location or Owner info.",
+      "description": "Original Metastore Database object also had owner information.\nThese can be represented using system parameters if needed since the current\nmetastore service does not interpret Owner info.",
       "title": "Database is a container for tables.\nDatabase object has two sets of parameters:\n - User parameters are intended for user and are just transparently passed around\n - System parameters are intended to be used by Hive for its internal purposes"
     },
     "metastoreGetDatabaseResponse": {
@@ -150,7 +153,7 @@
     "metastoreId": {
       "type": "object",
       "properties": {
-        "namespace": {
+        "catalog": {
           "type": "string"
         },
         "name": {
@@ -160,7 +163,7 @@
           "type": "string"
         }
       },
-      "description": "Objects belong to a specific namespace and have unique name and unique ID\nin the namespace."
+      "description": "Objects belong to a specific catalog and have unique name and unique ID\nin the catalog."
     },
     "metastoreRequestStatus": {
       "type": "object",

@@ -62,13 +62,13 @@ service Metastore {
     // Get database information
     rpc GetDatabase (GetDatabaseRequest) returns  (GetDatabaseResponse) {
         option (google.api.http) = {
-           get: "/v2/databases/{id.namespace}/{id.name}"
+           get: "/v2/databases/{id.catalog}/{id.name}"
         };
     }
     // Get collection of databases
     rpc ListDatabases (ListDatabasesRequest) returns  (stream Database) {
         option (google.api.http) = {
-	       get: "/dblist/{namespace}"
+	       get: "/dblist/{catalog}"
 	};
     }
     // Destroy a database
@@ -88,10 +88,10 @@ message RequestStatus {
     string cookie = 3; // copied from request
 }
 
-// Objects belong to a specific namespace and have unique name and unique ID
-// in the namespace.
+// Objects belong to a specific catalog and have unique name and unique ID
+// in the catalog.
 message Id {
-    string namespace = 1;
+    string catalog = 1;
     string name = 2;
     string id = 3;
 }
@@ -101,13 +101,14 @@ message Id {
 //  - User parameters are intended for user and are just transparently passed around
 //  - System parameters are intended to be used by Hive for its internal purposes
 //
-// Original Metastore Database object also had location and owner information.
+// Original Metastore Database object also had owner information.
 // These can be represented using system parameters if needed since the current
-// metastore service does not interpret either Location or Owner info.
+// metastore service does not interpret Owner info.
 message Database {
-    Id                  id = 1;
-    map<string, string> parameters = 2; // Database user parameters
-    map<string, string> system_parameters = 3;
+  Id                  id = 1;
+  string              location = 2;   // Default location of database objects
+  map<string, string> parameters = 3; // Database user parameters
+  map<string, string> system_parameters = 4;
 }
 
 // Create a new database.
@@ -130,7 +131,7 @@ message GetDatabaseResponse {
 // Request to get list of databases
 // If exclude_params is set, result may omit parameters
 message ListDatabasesRequest {
-    string namespace = 1;
+    string catalog = 1;
     string cookie = 2;
     string name_pattern = 3;
     bool   exclude_params = 4;

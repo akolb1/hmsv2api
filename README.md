@@ -18,15 +18,15 @@ Metastore service does not interpret the cookie but may print it in its logs.
 We could call it SessionId but callers may decide to use it for whatever other
 purposes, so using generic term here.
 
-Every object belongs to a namespace. The idea is that operations across
-namespaces are completely independent. They can be forwarded to different storage
+Every object belongs to a catalog. The idea is that operations across
+catalogs are completely independent. They can be forwarded to different storage
 engines.
 
-Namespase is created automatically when an object is placed in a namespace.
-*NOTE - should we explicitely manage namespaces instead?*
+Namespase is created automatically when an object is placed in a catalog.
+*NOTE - should we explicitely manage catalogs instead?*
 
-Objects belong to a specific namespace and have unique name and unique ID
-in the namespace.
+Objects belong to a specific catalog and have unique name and unique ID
+in the catalog.
 
 [metastore gRpc spec](protobuf/metastore.proto)
 
@@ -61,11 +61,11 @@ in the namespace.
 
 ### Id
 
-Objects belong to a specific namespace and have unique name and unique ID
-in the namespace.
+Objects belong to a specific catalog and have unique name and unique ID
+in the catalog.
 
     message Id {
-        string namespace;
+        string catalog;
         string name;
         string id;
     }
@@ -84,6 +84,7 @@ metastore service does n;t interpret either Location or Owner info.
 
     message Database {
         Id id;
+	    string location // Location of Database data
         map<string, string> parameters; // Database parameters
         map<string, string> system_parameters;
     }
@@ -94,8 +95,8 @@ metastore service does n;t interpret either Location or Owner info.
 
 Create a new database.
 
-Request should have the namespace and the name of the database.
-The name should be unique within the namespace
+Request should have the catalog and the name of the database.
+The name should be unique within the catalog
 unique ID is assigned by the service.
 
     message CreateDatabaseRequest {
@@ -125,7 +126,7 @@ Request to get list of databases. If exclude_params is set, result may omit para
 .
 
     message ListDatabasesRequest {
-        string namespace;
+        string catalog;
         string cookie;
         string name_pattern;
         bool   exclude_params;

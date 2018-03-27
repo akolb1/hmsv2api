@@ -29,7 +29,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
 var (
-	filter_Metastore_GetDatabase_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "namespace": 1, "name": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 2, 3, 4}}
+	filter_Metastore_GetDatabase_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "catalog": 1, "name": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 2, 3, 4}}
 )
 
 func request_Metastore_GetDatabase_0(ctx context.Context, marshaler runtime.Marshaler, client MetastoreClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -43,15 +43,15 @@ func request_Metastore_GetDatabase_0(ctx context.Context, marshaler runtime.Mars
 		_   = err
 	)
 
-	val, ok = pathParams["id.namespace"]
+	val, ok = pathParams["id.catalog"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.namespace")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.catalog")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.namespace", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.catalog", val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.namespace", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.catalog", err)
 	}
 
 	val, ok = pathParams["id.name"]
@@ -75,7 +75,7 @@ func request_Metastore_GetDatabase_0(ctx context.Context, marshaler runtime.Mars
 }
 
 var (
-	filter_Metastore_ListDatabases_0 = &utilities.DoubleArray{Encoding: map[string]int{"namespace": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_Metastore_ListDatabases_0 = &utilities.DoubleArray{Encoding: map[string]int{"catalog": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
 func request_Metastore_ListDatabases_0(ctx context.Context, marshaler runtime.Marshaler, client MetastoreClient, req *http.Request, pathParams map[string]string) (Metastore_ListDatabasesClient, runtime.ServerMetadata, error) {
@@ -89,15 +89,15 @@ func request_Metastore_ListDatabases_0(ctx context.Context, marshaler runtime.Ma
 		_   = err
 	)
 
-	val, ok = pathParams["namespace"]
+	val, ok = pathParams["catalog"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "namespace")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "catalog")
 	}
 
-	protoReq.Namespace, err = runtime.String(val)
+	protoReq.Catalog, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "namespace", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "catalog", err)
 	}
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_Metastore_ListDatabases_0); err != nil {
@@ -217,9 +217,9 @@ func RegisterMetastoreHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 }
 
 var (
-	pattern_Metastore_GetDatabase_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"v2", "databases", "id.namespace", "id.name"}, ""))
+	pattern_Metastore_GetDatabase_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"v2", "databases", "id.catalog", "id.name"}, ""))
 
-	pattern_Metastore_ListDatabases_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"dblist", "namespace"}, ""))
+	pattern_Metastore_ListDatabases_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"dblist", "catalog"}, ""))
 )
 
 var (

@@ -29,9 +29,9 @@ func (s *metastoreServer) CreateDabatase(c context.Context,
 	if req.Database == nil || req.Database.Id == nil {
 		return nil, fmt.Errorf("missing Database info")
 	}
-	namespace := req.Database.Id.Namespace
-	if namespace == "" {
-		return nil, fmt.Errorf("missing namespace")
+	catalog := req.Database.Id.Catalog
+	if catalog == "" {
+		return nil, fmt.Errorf("missing catalog")
 	}
 	dbName := req.Database.Id.Name
 	if dbName == "" {
@@ -49,7 +49,7 @@ func (s *metastoreServer) CreateDabatase(c context.Context,
 		return nil, err
 	}
 	err = s.db.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists([]byte(namespace))
+		bucket, err := tx.CreateBucketIfNotExists([]byte(catalog))
 		if err != nil {
 			return err
 		}
@@ -79,16 +79,16 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 	if req.Id == nil {
 		return nil, fmt.Errorf("missing identity info")
 	}
-	namespace := req.Id.Namespace
-	if namespace == "" {
-		return nil, fmt.Errorf("missing namespace")
+	catalog := req.Id.Catalog
+	if catalog == "" {
+		return nil, fmt.Errorf("missing catalog")
 	}
 	dbName := req.Id.Name
 	if dbName == "" {
 		return nil, fmt.Errorf("missing database name")
 	}
 	var database pb.Database
-	bucketName := []byte(namespace)
+	bucketName := []byte(catalog)
 
 	err := s.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(bucketName)
@@ -122,11 +122,11 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 	stream pb.Metastore_ListDatabasesServer) error {
 	log.Println("ListDatabases", req)
-	namespace := req.Namespace
-	if namespace == "" {
-		return fmt.Errorf("empty namespace")
+	catalog := req.Catalog
+	if catalog == "" {
+		return fmt.Errorf("empty catalog")
 	}
-	bucketName := []byte(namespace)
+	bucketName := []byte(catalog)
 
 	err := s.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(bucketName)
@@ -141,13 +141,13 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 				continue
 			}
 			log.Println("send", database.Id.Name)
-			// Database namespace should match request, no need to send it
-			database.Id.Namespace = ""
+			// Database catalog should match request, no need to send it
+			database.Id.Catalog = ""
 			// Do not send parameters if not asked to
 			if req.ExcludeParams {
-			    database.Parameters = nil
-			    database.SystemParameters = nil
-            }
+				database.Parameters = nil
+				database.SystemParameters = nil
+			}
 			if err = stream.Send(database); err != nil {
 				log.Println("err sending ", err)
 				return err
@@ -167,15 +167,15 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 func (s *metastoreServer) DropDatabase(c context.Context,
 	req *pb.DropDatabaseRequest) (*pb.RequestStatus, error) {
 	log.Println("DropDatabase:", req)
-	namespace := req.Id.Namespace
-	if namespace == "" {
-		return nil, fmt.Errorf("missing empty namespace")
+	catalog := req.Id.Catalog
+	if catalog == "" {
+		return nil, fmt.Errorf("missing catalog")
 	}
 	dbName := req.Id.Name
 	if dbName == "" {
 		return nil, fmt.Errorf("missing database name")
 	}
-	bucketName := []byte(namespace)
+	bucketName := []byte(catalog)
 
 	err := s.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket(bucketName)
