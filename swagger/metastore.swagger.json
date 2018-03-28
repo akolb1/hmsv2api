@@ -139,11 +139,37 @@
       "description": "Original Metastore Database object also had owner information.\nThese can be represented using system parameters if needed since the current\nmetastore service does not interpret Owner info.",
       "title": "Database is a container for tables.\nDatabase object has two sets of parameters:\n - User parameters are intended for user and are just transparently passed around\n - System parameters are intended to be used by Hive for its internal purposes"
     },
+    "metastoreFieldSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        }
+      },
+      "description": "FieldSchema defines name and type for each column."
+    },
     "metastoreGetDatabaseResponse": {
       "type": "object",
       "properties": {
         "database": {
           "$ref": "#/definitions/metastoreDatabase"
+        },
+        "status": {
+          "$ref": "#/definitions/metastoreRequestStatus"
+        }
+      }
+    },
+    "metastoreGetTableResponse": {
+      "type": "object",
+      "properties": {
+        "table": {
+          "$ref": "#/definitions/metastoreTable"
         },
         "status": {
           "$ref": "#/definitions/metastoreRequestStatus"
@@ -165,6 +191,41 @@
       },
       "description": "Objects belong to a specific catalog and have unique name and unique ID\nin the catalog."
     },
+    "metastoreInputFormat": {
+      "type": "string",
+      "enum": [
+        "IF_CUSTOM",
+        "IF_SEQUENCE",
+        "IF_TEXT",
+        "IF_HIVE"
+      ],
+      "default": "IF_CUSTOM",
+      "description": "Known Input Formats. CUSTOM means that it should be specified as a string."
+    },
+    "metastoreOrder": {
+      "type": "object",
+      "properties": {
+        "col": {
+          "type": "string"
+        },
+        "ascending": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      },
+      "title": "sort order of a column (column name along with asc/desc)"
+    },
+    "metastoreOutputFormat": {
+      "type": "string",
+      "enum": [
+        "OF_CUSTOM",
+        "OF_SEQUENCE",
+        "OF_IGNORE_KEY",
+        "OF_HIVE"
+      ],
+      "default": "OF_CUSTOM",
+      "description": "Known Output Formats. CUSTOM means that it should be specified as a string."
+    },
     "metastoreRequestStatus": {
       "type": "object",
       "properties": {
@@ -179,6 +240,143 @@
         }
       },
       "title": "General status for results"
+    },
+    "metastoreSerDeInfo": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/metastoreSerdeType"
+        },
+        "name": {
+          "type": "string"
+        },
+        "serializationLib": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "Serialization/Deserialization information"
+    },
+    "metastoreSerdeType": {
+      "type": "string",
+      "enum": [
+        "SERDE_CUSTOM",
+        "SERDE_LAZY_SIMPLE",
+        "SERDE_AVRO",
+        "SERDE_JSON",
+        "SERDE_ORC",
+        "SERDE_REGEX",
+        "SERDE_THRIFT",
+        "SERDE_PARQUET",
+        "SERDE_CSV"
+      ],
+      "default": "SERDE_CUSTOM",
+      "description": "Known SerDes are represented using enum. Unknown ones are represented using strings."
+    },
+    "metastoreStorageDescriptor": {
+      "type": "object",
+      "properties": {
+        "cols": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/metastoreFieldSchema"
+          }
+        },
+        "inputFormat": {
+          "$ref": "#/definitions/metastoreInputFormat"
+        },
+        "inputFormatName": {
+          "type": "string"
+        },
+        "outputFormat": {
+          "$ref": "#/definitions/metastoreOutputFormat"
+        },
+        "outputFormatName": {
+          "type": "string"
+        },
+        "numBuckets": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "serdeInfo": {
+          "$ref": "#/definitions/metastoreSerDeInfo"
+        },
+        "bucketCols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sortCols": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/metastoreOrder"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "system_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "StorageDescriptor holds all the information about physical storage of the data belonging to a table"
+    },
+    "metastoreTable": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/metastoreId"
+        },
+        "db_id": {
+          "$ref": "#/definitions/metastoreId"
+        },
+        "sd": {
+          "$ref": "#/definitions/metastoreStorageDescriptor"
+        },
+        "partitionKeys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/metastoreFieldSchema"
+          }
+        },
+        "tableType": {
+          "$ref": "#/definitions/metastoreTableType"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "system_parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "Table information"
+    },
+    "metastoreTableType": {
+      "type": "string",
+      "enum": [
+        "TTYPE_MANAGED",
+        "TTYPE_EXTERNAL",
+        "TTYPE_INDEX"
+      ],
+      "default": "TTYPE_MANAGED"
     }
   }
 }

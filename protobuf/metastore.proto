@@ -35,14 +35,12 @@
  * We could call it SessionId but callers may decide to use it for whatever other
  * purposes, so using generic term here.
  *
- * Every object belongs to a namespace. The idea is that operations across
- * namespaces are completely independent. They can be forwarded to different storage
+ * Every object belongs to a catalog. The idea is that operations across
+ * catalogs are completely independent. They can be forwarded to different storage
  * engines.
- * Namespase is created automatically when an object is placed in a namespace.
- * NOTE - should we explicitely manage namespaces instead?
  *
- * Objects belong to a specific namespace and have unique name and unique ID
- * in the namespace.
+ * Objects belong to a specific catalog and have unique name and unique ID
+ * in the catalog.
  */
 
 syntax = "proto3";
@@ -73,6 +71,18 @@ service Metastore {
     }
     // Destroy a database
     rpc DropDatabase (DropDatabaseRequest) returns (RequestStatus);
+
+    // Create a new database
+    rpc CreateTable (CreateTableRequest) returns (GetTableResponse);
+
+    // Create a new database
+    rpc GetTable (GetTableRequest) returns (GetTableResponse);
+
+    // Get collection of tables
+    rpc ListTables (ListTablesRequest) returns  (stream Table);
+
+    // Destroy a table
+    rpc DropTable (DropTableRequest) returns (RequestStatus);
 }
 
 // General status for results
@@ -144,4 +154,117 @@ message DropDatabaseRequest {
     string cookie = 2;
 }
 
+// FieldSchema defines name and type for each column.
+message FieldSchema {
+    string name = 1; // name of the field
+    string type = 2; // type of the field.
+    string comment = 3; // User description
+}
 
+// Known SerDes are represented using enum. Unknown ones are represented using strings.
+enum SerdeType {
+    SERDE_CUSTOM = 0;
+    SERDE_LAZY_SIMPLE = 1;
+    SERDE_AVRO = 2;
+    SERDE_JSON = 3;
+    SERDE_ORC = 4;
+    SERDE_REGEX = 5;
+    SERDE_THRIFT = 6;
+    SERDE_PARQUET = 7;
+    SERDE_CSV = 8;
+}
+
+// Known Input Formats. CUSTOM means that it should be specified as a string.
+enum InputFormat {
+    IF_CUSTOM = 0;
+    IF_SEQUENCE = 1;
+    IF_TEXT = 2;
+    IF_HIVE = 3;
+}
+
+// Known Output Formats. CUSTOM means that it should be specified as a string.
+enum OutputFormat {
+    OF_CUSTOM = 0;
+    OF_SEQUENCE = 2;
+    OF_IGNORE_KEY = 3;
+    OF_HIVE = 4;
+}
+
+enum TableType {
+    TTYPE_MANAGED = 0;
+    TTYPE_EXTERNAL = 1;
+    TTYPE_INDEX = 2;
+}
+
+// Serialization/Deserialization information
+message SerDeInfo {
+    SerdeType type = 1;                 // Serde type. If CUSTOM, use the name
+    string name = 2;                    // name of the serde, table name by default
+    string serializationLib = 3;        // usually the class that implements the extractor & loader
+    map<string, string> parameters = 4; // initialization parameters
+}
+
+// sort order of a column (column name along with asc/desc)
+message Order {
+    string col = 1;         // sort column name
+    bool ascending = 2;     // asc(1) or desc(0)
+}
+
+// StorageDescriptor holds all the information about physical storage of the data belonging to a table
+message StorageDescriptor {
+    repeated FieldSchema cols = 1;          // required (refer to types defined above)
+    InputFormat inputFormat = 3;   // Specification of input format. If custom, use inputFormatName.
+    string inputFormatName = 4;    // Name of input format if custom
+    OutputFormat outputFormat = 5; // Specification of input format. If custom, use outputFormatName.
+    string outputFormatName = 6;   // Name of output format if custom
+    int32 numBuckets = 7;                   // this must be specified if there are any dimension columns
+    SerDeInfo serdeInfo = 8;                // serialization and deserialization information
+    repeated string bucketCols = 9;         // reducer grouping columns and clustering columns and bucketing columns`
+    repeated Order sortCols = 10;            // sort order of the data in each bucket
+    map<string, string> parameters = 11;     // any user supplied key value hash
+    map<string, string> system_parameters = 12;    // Internal parameters not settable by user
+}
+
+// Table information
+message Table {
+    Id id = 1;
+    Id db_id = 2;
+    StorageDescriptor sd = 3;               // storage descriptor of the table
+    repeated FieldSchema partitionKeys = 4; // partition keys of the table. only primitive types are supported
+    TableType tableType = 5;                // table type enum, e.g. EXTERNAL_TABLE
+    map<string, string> parameters = 6;     // User-settable parameters
+    map<string, string> system_parameters = 7; // Internal parameters
+}
+
+// Create a new table.
+message CreateTableRequest {
+    Table table = 1;
+    string   cookie = 2;
+}
+
+// Request to get table by its ID.
+message GetTableRequest {
+    Id     id = 1;
+    Id     db_id = 2; // Database ID
+    string cookie = 3;
+}
+
+message GetTableResponse {
+    Table     table = 1;
+    RequestStatus status = 2;
+}
+
+// Request to get list of databases
+// If exclude_params is set, result may omit parameters
+message ListTablesRequest {
+    Id db_id = 1;
+    string cookie = 2;
+}
+
+// Request to drop a database.
+// Dropping a database also drops all objects contained in the database
+message DropTableRequest {
+    Id     id = 1;
+    Id     db_id = 2;
+    string cookie = 3;
+}

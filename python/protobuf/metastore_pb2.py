@@ -3,6 +3,7 @@
 
 import sys
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
+from google.protobuf.internal import enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
@@ -20,10 +21,170 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='metastore.proto',
   package='metastore',
   syntax='proto3',
-  serialized_pb=_b('\n\x0fmetastore.proto\x12\tmetastore\x1a\x1cgoogle/api/annotations.proto\"\x98\x01\n\rRequestStatus\x12/\n\x06status\x18\x01 \x01(\x0e\x32\x1f.metastore.RequestStatus.Status\x12\r\n\x05\x65rror\x18\x02 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"7\n\x06Status\x12\x06\n\x02OK\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x12\x0c\n\x08NOTFOUND\x10\x02\x12\x0c\n\x08\x43ONFLICT\x10\x03\"/\n\x02Id\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\n\n\x02id\x18\x03 \x01(\t\"\xa2\x02\n\x08\x44\x61tabase\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x10\n\x08location\x18\x02 \x01(\t\x12\x37\n\nparameters\x18\x03 \x03(\x0b\x32#.metastore.Database.ParametersEntry\x12\x44\n\x11system_parameters\x18\x04 \x03(\x0b\x32).metastore.Database.SystemParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x37\n\x15SystemParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"N\n\x15\x43reateDatabaseRequest\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\"?\n\x12GetDatabaseRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\"f\n\x13GetDatabaseResponse\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12(\n\x06status\x18\x02 \x01(\x0b\x32\x18.metastore.RequestStatus\"e\n\x14ListDatabasesRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\x12\x14\n\x0cname_pattern\x18\x03 \x01(\t\x12\x16\n\x0e\x65xclude_params\x18\x04 \x01(\x08\"@\n\x13\x44ropDatabaseRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t2\x89\x03\n\tMetastore\x12R\n\x0e\x43reateDabatase\x12 .metastore.CreateDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\x12z\n\x0bGetDatabase\x12\x1d.metastore.GetDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\",\x82\xd3\xe4\x93\x02&\x12$/v2/databases/{id.catalog}/{id.name}\x12\x62\n\rListDatabases\x12\x1f.metastore.ListDatabasesRequest\x1a\x13.metastore.Database\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/dblist/{catalog}0\x01\x12H\n\x0c\x44ropDatabase\x12\x1e.metastore.DropDatabaseRequest\x1a\x18.metastore.RequestStatusB\"\n\x13\x63om.akolb.metastoreB\tMetaStoreP\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0fmetastore.proto\x12\tmetastore\x1a\x1cgoogle/api/annotations.proto\"\x98\x01\n\rRequestStatus\x12/\n\x06status\x18\x01 \x01(\x0e\x32\x1f.metastore.RequestStatus.Status\x12\r\n\x05\x65rror\x18\x02 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"7\n\x06Status\x12\x06\n\x02OK\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x12\x0c\n\x08NOTFOUND\x10\x02\x12\x0c\n\x08\x43ONFLICT\x10\x03\"/\n\x02Id\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\n\n\x02id\x18\x03 \x01(\t\"\xa2\x02\n\x08\x44\x61tabase\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x10\n\x08location\x18\x02 \x01(\t\x12\x37\n\nparameters\x18\x03 \x03(\x0b\x32#.metastore.Database.ParametersEntry\x12\x44\n\x11system_parameters\x18\x04 \x03(\x0b\x32).metastore.Database.SystemParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x37\n\x15SystemParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"N\n\x15\x43reateDatabaseRequest\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\"?\n\x12GetDatabaseRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\"f\n\x13GetDatabaseResponse\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12(\n\x06status\x18\x02 \x01(\x0b\x32\x18.metastore.RequestStatus\"e\n\x14ListDatabasesRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\x12\x14\n\x0cname_pattern\x18\x03 \x01(\t\x12\x16\n\x0e\x65xclude_params\x18\x04 \x01(\x08\"@\n\x13\x44ropDatabaseRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\":\n\x0b\x46ieldSchema\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x0f\n\x07\x63omment\x18\x03 \x01(\t\"\xc4\x01\n\tSerDeInfo\x12\"\n\x04type\x18\x01 \x01(\x0e\x32\x14.metastore.SerdeType\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x18\n\x10serializationLib\x18\x03 \x01(\t\x12\x38\n\nparameters\x18\x04 \x03(\x0b\x32$.metastore.SerDeInfo.ParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\'\n\x05Order\x12\x0b\n\x03\x63ol\x18\x01 \x01(\t\x12\x11\n\tascending\x18\x02 \x01(\x08\"\xba\x04\n\x11StorageDescriptor\x12$\n\x04\x63ols\x18\x01 \x03(\x0b\x32\x16.metastore.FieldSchema\x12+\n\x0binputFormat\x18\x03 \x01(\x0e\x32\x16.metastore.InputFormat\x12\x17\n\x0finputFormatName\x18\x04 \x01(\t\x12-\n\x0coutputFormat\x18\x05 \x01(\x0e\x32\x17.metastore.OutputFormat\x12\x18\n\x10outputFormatName\x18\x06 \x01(\t\x12\x12\n\nnumBuckets\x18\x07 \x01(\x05\x12\'\n\tserdeInfo\x18\x08 \x01(\x0b\x32\x14.metastore.SerDeInfo\x12\x12\n\nbucketCols\x18\t \x03(\t\x12\"\n\x08sortCols\x18\n \x03(\x0b\x32\x10.metastore.Order\x12@\n\nparameters\x18\x0b \x03(\x0b\x32,.metastore.StorageDescriptor.ParametersEntry\x12M\n\x11system_parameters\x18\x0c \x03(\x0b\x32\x32.metastore.StorageDescriptor.SystemParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x37\n\x15SystemParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xa7\x03\n\x05Table\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x1c\n\x05\x64\x62_id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12(\n\x02sd\x18\x03 \x01(\x0b\x32\x1c.metastore.StorageDescriptor\x12-\n\rpartitionKeys\x18\x04 \x03(\x0b\x32\x16.metastore.FieldSchema\x12\'\n\ttableType\x18\x05 \x01(\x0e\x32\x14.metastore.TableType\x12\x34\n\nparameters\x18\x06 \x03(\x0b\x32 .metastore.Table.ParametersEntry\x12\x41\n\x11system_parameters\x18\x07 \x03(\x0b\x32&.metastore.Table.SystemParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x37\n\x15SystemParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"E\n\x12\x43reateTableRequest\x12\x1f\n\x05table\x18\x01 \x01(\x0b\x32\x10.metastore.Table\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\"Z\n\x0fGetTableRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x1c\n\x05\x64\x62_id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"]\n\x10GetTableResponse\x12\x1f\n\x05table\x18\x01 \x01(\x0b\x32\x10.metastore.Table\x12(\n\x06status\x18\x02 \x01(\x0b\x32\x18.metastore.RequestStatus\"A\n\x11ListTablesRequest\x12\x1c\n\x05\x64\x62_id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\"[\n\x10\x44ropTableRequest\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x1c\n\x05\x64\x62_id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t*\xa8\x01\n\tSerdeType\x12\x10\n\x0cSERDE_CUSTOM\x10\x00\x12\x15\n\x11SERDE_LAZY_SIMPLE\x10\x01\x12\x0e\n\nSERDE_AVRO\x10\x02\x12\x0e\n\nSERDE_JSON\x10\x03\x12\r\n\tSERDE_ORC\x10\x04\x12\x0f\n\x0bSERDE_REGEX\x10\x05\x12\x10\n\x0cSERDE_THRIFT\x10\x06\x12\x11\n\rSERDE_PARQUET\x10\x07\x12\r\n\tSERDE_CSV\x10\x08*G\n\x0bInputFormat\x12\r\n\tIF_CUSTOM\x10\x00\x12\x0f\n\x0bIF_SEQUENCE\x10\x01\x12\x0b\n\x07IF_TEXT\x10\x02\x12\x0b\n\x07IF_HIVE\x10\x03*N\n\x0cOutputFormat\x12\r\n\tOF_CUSTOM\x10\x00\x12\x0f\n\x0bOF_SEQUENCE\x10\x02\x12\x11\n\rOF_IGNORE_KEY\x10\x03\x12\x0b\n\x07OF_HIVE\x10\x04*C\n\tTableType\x12\x11\n\rTTYPE_MANAGED\x10\x00\x12\x12\n\x0eTTYPE_EXTERNAL\x10\x01\x12\x0f\n\x0bTTYPE_INDEX\x10\x02\x32\x9d\x05\n\tMetastore\x12R\n\x0e\x43reateDabatase\x12 .metastore.CreateDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\x12z\n\x0bGetDatabase\x12\x1d.metastore.GetDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\",\x82\xd3\xe4\x93\x02&\x12$/v2/databases/{id.catalog}/{id.name}\x12\x62\n\rListDatabases\x12\x1f.metastore.ListDatabasesRequest\x1a\x13.metastore.Database\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/dblist/{catalog}0\x01\x12H\n\x0c\x44ropDatabase\x12\x1e.metastore.DropDatabaseRequest\x1a\x18.metastore.RequestStatus\x12I\n\x0b\x43reateTable\x12\x1d.metastore.CreateTableRequest\x1a\x1b.metastore.GetTableResponse\x12\x43\n\x08GetTable\x12\x1a.metastore.GetTableRequest\x1a\x1b.metastore.GetTableResponse\x12>\n\nListTables\x12\x1c.metastore.ListTablesRequest\x1a\x10.metastore.Table0\x01\x12\x42\n\tDropTable\x12\x1b.metastore.DropTableRequest\x1a\x18.metastore.RequestStatusB\"\n\x13\x63om.akolb.metastoreB\tMetaStoreP\x01\x62\x06proto3')
   ,
   dependencies=[google_dot_api_dot_annotations__pb2.DESCRIPTOR,])
 
+_SERDETYPE = _descriptor.EnumDescriptor(
+  name='SerdeType',
+  full_name='metastore.SerdeType',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='SERDE_CUSTOM', index=0, number=0,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='SERDE_LAZY_SIMPLE', index=1, number=1,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='SERDE_AVRO', index=2, number=2,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='SERDE_JSON', index=3, number=3,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='SERDE_ORC', index=4, number=4,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='SERDE_REGEX', index=5, number=5,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='SERDE_THRIFT', index=6, number=6,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='SERDE_PARQUET', index=7, number=7,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='SERDE_CSV', index=8, number=8,
+      options=None,
+      type=None),
+  ],
+  containing_type=None,
+  options=None,
+  serialized_start=2693,
+  serialized_end=2861,
+)
+_sym_db.RegisterEnumDescriptor(_SERDETYPE)
+
+SerdeType = enum_type_wrapper.EnumTypeWrapper(_SERDETYPE)
+_INPUTFORMAT = _descriptor.EnumDescriptor(
+  name='InputFormat',
+  full_name='metastore.InputFormat',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='IF_CUSTOM', index=0, number=0,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='IF_SEQUENCE', index=1, number=1,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='IF_TEXT', index=2, number=2,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='IF_HIVE', index=3, number=3,
+      options=None,
+      type=None),
+  ],
+  containing_type=None,
+  options=None,
+  serialized_start=2863,
+  serialized_end=2934,
+)
+_sym_db.RegisterEnumDescriptor(_INPUTFORMAT)
+
+InputFormat = enum_type_wrapper.EnumTypeWrapper(_INPUTFORMAT)
+_OUTPUTFORMAT = _descriptor.EnumDescriptor(
+  name='OutputFormat',
+  full_name='metastore.OutputFormat',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='OF_CUSTOM', index=0, number=0,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='OF_SEQUENCE', index=1, number=2,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='OF_IGNORE_KEY', index=2, number=3,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='OF_HIVE', index=3, number=4,
+      options=None,
+      type=None),
+  ],
+  containing_type=None,
+  options=None,
+  serialized_start=2936,
+  serialized_end=3014,
+)
+_sym_db.RegisterEnumDescriptor(_OUTPUTFORMAT)
+
+OutputFormat = enum_type_wrapper.EnumTypeWrapper(_OUTPUTFORMAT)
+_TABLETYPE = _descriptor.EnumDescriptor(
+  name='TableType',
+  full_name='metastore.TableType',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='TTYPE_MANAGED', index=0, number=0,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='TTYPE_EXTERNAL', index=1, number=1,
+      options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='TTYPE_INDEX', index=2, number=2,
+      options=None,
+      type=None),
+  ],
+  containing_type=None,
+  options=None,
+  serialized_start=3016,
+  serialized_end=3083,
+)
+_sym_db.RegisterEnumDescriptor(_TABLETYPE)
+
+TableType = enum_type_wrapper.EnumTypeWrapper(_TABLETYPE)
+SERDE_CUSTOM = 0
+SERDE_LAZY_SIMPLE = 1
+SERDE_AVRO = 2
+SERDE_JSON = 3
+SERDE_ORC = 4
+SERDE_REGEX = 5
+SERDE_THRIFT = 6
+SERDE_PARQUET = 7
+SERDE_CSV = 8
+IF_CUSTOM = 0
+IF_SEQUENCE = 1
+IF_TEXT = 2
+IF_HIVE = 3
+OF_CUSTOM = 0
+OF_SEQUENCE = 2
+OF_IGNORE_KEY = 3
+OF_HIVE = 4
+TTYPE_MANAGED = 0
+TTYPE_EXTERNAL = 1
+TTYPE_INDEX = 2
 
 
 _REQUESTSTATUS_STATUS = _descriptor.EnumDescriptor(
@@ -477,6 +638,704 @@ _DROPDATABASEREQUEST = _descriptor.Descriptor(
   serialized_end=973,
 )
 
+
+_FIELDSCHEMA = _descriptor.Descriptor(
+  name='FieldSchema',
+  full_name='metastore.FieldSchema',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='metastore.FieldSchema.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='type', full_name='metastore.FieldSchema.type', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='comment', full_name='metastore.FieldSchema.comment', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=975,
+  serialized_end=1033,
+)
+
+
+_SERDEINFO_PARAMETERSENTRY = _descriptor.Descriptor(
+  name='ParametersEntry',
+  full_name='metastore.SerDeInfo.ParametersEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='metastore.SerDeInfo.ParametersEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='metastore.SerDeInfo.ParametersEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=449,
+  serialized_end=498,
+)
+
+_SERDEINFO = _descriptor.Descriptor(
+  name='SerDeInfo',
+  full_name='metastore.SerDeInfo',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='type', full_name='metastore.SerDeInfo.type', index=0,
+      number=1, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='name', full_name='metastore.SerDeInfo.name', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='serializationLib', full_name='metastore.SerDeInfo.serializationLib', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='parameters', full_name='metastore.SerDeInfo.parameters', index=3,
+      number=4, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[_SERDEINFO_PARAMETERSENTRY, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1036,
+  serialized_end=1232,
+)
+
+
+_ORDER = _descriptor.Descriptor(
+  name='Order',
+  full_name='metastore.Order',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='col', full_name='metastore.Order.col', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='ascending', full_name='metastore.Order.ascending', index=1,
+      number=2, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1234,
+  serialized_end=1273,
+)
+
+
+_STORAGEDESCRIPTOR_PARAMETERSENTRY = _descriptor.Descriptor(
+  name='ParametersEntry',
+  full_name='metastore.StorageDescriptor.ParametersEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='metastore.StorageDescriptor.ParametersEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='metastore.StorageDescriptor.ParametersEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=449,
+  serialized_end=498,
+)
+
+_STORAGEDESCRIPTOR_SYSTEMPARAMETERSENTRY = _descriptor.Descriptor(
+  name='SystemParametersEntry',
+  full_name='metastore.StorageDescriptor.SystemParametersEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='metastore.StorageDescriptor.SystemParametersEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='metastore.StorageDescriptor.SystemParametersEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=500,
+  serialized_end=555,
+)
+
+_STORAGEDESCRIPTOR = _descriptor.Descriptor(
+  name='StorageDescriptor',
+  full_name='metastore.StorageDescriptor',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='cols', full_name='metastore.StorageDescriptor.cols', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='inputFormat', full_name='metastore.StorageDescriptor.inputFormat', index=1,
+      number=3, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='inputFormatName', full_name='metastore.StorageDescriptor.inputFormatName', index=2,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='outputFormat', full_name='metastore.StorageDescriptor.outputFormat', index=3,
+      number=5, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='outputFormatName', full_name='metastore.StorageDescriptor.outputFormatName', index=4,
+      number=6, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='numBuckets', full_name='metastore.StorageDescriptor.numBuckets', index=5,
+      number=7, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='serdeInfo', full_name='metastore.StorageDescriptor.serdeInfo', index=6,
+      number=8, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='bucketCols', full_name='metastore.StorageDescriptor.bucketCols', index=7,
+      number=9, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='sortCols', full_name='metastore.StorageDescriptor.sortCols', index=8,
+      number=10, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='parameters', full_name='metastore.StorageDescriptor.parameters', index=9,
+      number=11, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='system_parameters', full_name='metastore.StorageDescriptor.system_parameters', index=10,
+      number=12, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[_STORAGEDESCRIPTOR_PARAMETERSENTRY, _STORAGEDESCRIPTOR_SYSTEMPARAMETERSENTRY, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1276,
+  serialized_end=1846,
+)
+
+
+_TABLE_PARAMETERSENTRY = _descriptor.Descriptor(
+  name='ParametersEntry',
+  full_name='metastore.Table.ParametersEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='metastore.Table.ParametersEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='metastore.Table.ParametersEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=449,
+  serialized_end=498,
+)
+
+_TABLE_SYSTEMPARAMETERSENTRY = _descriptor.Descriptor(
+  name='SystemParametersEntry',
+  full_name='metastore.Table.SystemParametersEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='metastore.Table.SystemParametersEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='metastore.Table.SystemParametersEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=500,
+  serialized_end=555,
+)
+
+_TABLE = _descriptor.Descriptor(
+  name='Table',
+  full_name='metastore.Table',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='metastore.Table.id', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='db_id', full_name='metastore.Table.db_id', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='sd', full_name='metastore.Table.sd', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='partitionKeys', full_name='metastore.Table.partitionKeys', index=3,
+      number=4, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='tableType', full_name='metastore.Table.tableType', index=4,
+      number=5, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='parameters', full_name='metastore.Table.parameters', index=5,
+      number=6, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='system_parameters', full_name='metastore.Table.system_parameters', index=6,
+      number=7, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[_TABLE_PARAMETERSENTRY, _TABLE_SYSTEMPARAMETERSENTRY, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1849,
+  serialized_end=2272,
+)
+
+
+_CREATETABLEREQUEST = _descriptor.Descriptor(
+  name='CreateTableRequest',
+  full_name='metastore.CreateTableRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='table', full_name='metastore.CreateTableRequest.table', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='cookie', full_name='metastore.CreateTableRequest.cookie', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2274,
+  serialized_end=2343,
+)
+
+
+_GETTABLEREQUEST = _descriptor.Descriptor(
+  name='GetTableRequest',
+  full_name='metastore.GetTableRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='metastore.GetTableRequest.id', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='db_id', full_name='metastore.GetTableRequest.db_id', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='cookie', full_name='metastore.GetTableRequest.cookie', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2345,
+  serialized_end=2435,
+)
+
+
+_GETTABLERESPONSE = _descriptor.Descriptor(
+  name='GetTableResponse',
+  full_name='metastore.GetTableResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='table', full_name='metastore.GetTableResponse.table', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='status', full_name='metastore.GetTableResponse.status', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2437,
+  serialized_end=2530,
+)
+
+
+_LISTTABLESREQUEST = _descriptor.Descriptor(
+  name='ListTablesRequest',
+  full_name='metastore.ListTablesRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='db_id', full_name='metastore.ListTablesRequest.db_id', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='cookie', full_name='metastore.ListTablesRequest.cookie', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2532,
+  serialized_end=2597,
+)
+
+
+_DROPTABLEREQUEST = _descriptor.Descriptor(
+  name='DropTableRequest',
+  full_name='metastore.DropTableRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='metastore.DropTableRequest.id', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='db_id', full_name='metastore.DropTableRequest.db_id', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='cookie', full_name='metastore.DropTableRequest.cookie', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2599,
+  serialized_end=2690,
+)
+
 _REQUESTSTATUS.fields_by_name['status'].enum_type = _REQUESTSTATUS_STATUS
 _REQUESTSTATUS_STATUS.containing_type = _REQUESTSTATUS
 _DATABASE_PARAMETERSENTRY.containing_type = _DATABASE
@@ -489,6 +1348,35 @@ _GETDATABASEREQUEST.fields_by_name['id'].message_type = _ID
 _GETDATABASERESPONSE.fields_by_name['database'].message_type = _DATABASE
 _GETDATABASERESPONSE.fields_by_name['status'].message_type = _REQUESTSTATUS
 _DROPDATABASEREQUEST.fields_by_name['id'].message_type = _ID
+_SERDEINFO_PARAMETERSENTRY.containing_type = _SERDEINFO
+_SERDEINFO.fields_by_name['type'].enum_type = _SERDETYPE
+_SERDEINFO.fields_by_name['parameters'].message_type = _SERDEINFO_PARAMETERSENTRY
+_STORAGEDESCRIPTOR_PARAMETERSENTRY.containing_type = _STORAGEDESCRIPTOR
+_STORAGEDESCRIPTOR_SYSTEMPARAMETERSENTRY.containing_type = _STORAGEDESCRIPTOR
+_STORAGEDESCRIPTOR.fields_by_name['cols'].message_type = _FIELDSCHEMA
+_STORAGEDESCRIPTOR.fields_by_name['inputFormat'].enum_type = _INPUTFORMAT
+_STORAGEDESCRIPTOR.fields_by_name['outputFormat'].enum_type = _OUTPUTFORMAT
+_STORAGEDESCRIPTOR.fields_by_name['serdeInfo'].message_type = _SERDEINFO
+_STORAGEDESCRIPTOR.fields_by_name['sortCols'].message_type = _ORDER
+_STORAGEDESCRIPTOR.fields_by_name['parameters'].message_type = _STORAGEDESCRIPTOR_PARAMETERSENTRY
+_STORAGEDESCRIPTOR.fields_by_name['system_parameters'].message_type = _STORAGEDESCRIPTOR_SYSTEMPARAMETERSENTRY
+_TABLE_PARAMETERSENTRY.containing_type = _TABLE
+_TABLE_SYSTEMPARAMETERSENTRY.containing_type = _TABLE
+_TABLE.fields_by_name['id'].message_type = _ID
+_TABLE.fields_by_name['db_id'].message_type = _ID
+_TABLE.fields_by_name['sd'].message_type = _STORAGEDESCRIPTOR
+_TABLE.fields_by_name['partitionKeys'].message_type = _FIELDSCHEMA
+_TABLE.fields_by_name['tableType'].enum_type = _TABLETYPE
+_TABLE.fields_by_name['parameters'].message_type = _TABLE_PARAMETERSENTRY
+_TABLE.fields_by_name['system_parameters'].message_type = _TABLE_SYSTEMPARAMETERSENTRY
+_CREATETABLEREQUEST.fields_by_name['table'].message_type = _TABLE
+_GETTABLEREQUEST.fields_by_name['id'].message_type = _ID
+_GETTABLEREQUEST.fields_by_name['db_id'].message_type = _ID
+_GETTABLERESPONSE.fields_by_name['table'].message_type = _TABLE
+_GETTABLERESPONSE.fields_by_name['status'].message_type = _REQUESTSTATUS
+_LISTTABLESREQUEST.fields_by_name['db_id'].message_type = _ID
+_DROPTABLEREQUEST.fields_by_name['id'].message_type = _ID
+_DROPTABLEREQUEST.fields_by_name['db_id'].message_type = _ID
 DESCRIPTOR.message_types_by_name['RequestStatus'] = _REQUESTSTATUS
 DESCRIPTOR.message_types_by_name['Id'] = _ID
 DESCRIPTOR.message_types_by_name['Database'] = _DATABASE
@@ -497,6 +1385,20 @@ DESCRIPTOR.message_types_by_name['GetDatabaseRequest'] = _GETDATABASEREQUEST
 DESCRIPTOR.message_types_by_name['GetDatabaseResponse'] = _GETDATABASERESPONSE
 DESCRIPTOR.message_types_by_name['ListDatabasesRequest'] = _LISTDATABASESREQUEST
 DESCRIPTOR.message_types_by_name['DropDatabaseRequest'] = _DROPDATABASEREQUEST
+DESCRIPTOR.message_types_by_name['FieldSchema'] = _FIELDSCHEMA
+DESCRIPTOR.message_types_by_name['SerDeInfo'] = _SERDEINFO
+DESCRIPTOR.message_types_by_name['Order'] = _ORDER
+DESCRIPTOR.message_types_by_name['StorageDescriptor'] = _STORAGEDESCRIPTOR
+DESCRIPTOR.message_types_by_name['Table'] = _TABLE
+DESCRIPTOR.message_types_by_name['CreateTableRequest'] = _CREATETABLEREQUEST
+DESCRIPTOR.message_types_by_name['GetTableRequest'] = _GETTABLEREQUEST
+DESCRIPTOR.message_types_by_name['GetTableResponse'] = _GETTABLERESPONSE
+DESCRIPTOR.message_types_by_name['ListTablesRequest'] = _LISTTABLESREQUEST
+DESCRIPTOR.message_types_by_name['DropTableRequest'] = _DROPTABLEREQUEST
+DESCRIPTOR.enum_types_by_name['SerdeType'] = _SERDETYPE
+DESCRIPTOR.enum_types_by_name['InputFormat'] = _INPUTFORMAT
+DESCRIPTOR.enum_types_by_name['OutputFormat'] = _OUTPUTFORMAT
+DESCRIPTOR.enum_types_by_name['TableType'] = _TABLETYPE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 RequestStatus = _reflection.GeneratedProtocolMessageType('RequestStatus', (_message.Message,), dict(
@@ -571,6 +1473,116 @@ DropDatabaseRequest = _reflection.GeneratedProtocolMessageType('DropDatabaseRequ
   ))
 _sym_db.RegisterMessage(DropDatabaseRequest)
 
+FieldSchema = _reflection.GeneratedProtocolMessageType('FieldSchema', (_message.Message,), dict(
+  DESCRIPTOR = _FIELDSCHEMA,
+  __module__ = 'metastore_pb2'
+  # @@protoc_insertion_point(class_scope:metastore.FieldSchema)
+  ))
+_sym_db.RegisterMessage(FieldSchema)
+
+SerDeInfo = _reflection.GeneratedProtocolMessageType('SerDeInfo', (_message.Message,), dict(
+
+  ParametersEntry = _reflection.GeneratedProtocolMessageType('ParametersEntry', (_message.Message,), dict(
+    DESCRIPTOR = _SERDEINFO_PARAMETERSENTRY,
+    __module__ = 'metastore_pb2'
+    # @@protoc_insertion_point(class_scope:metastore.SerDeInfo.ParametersEntry)
+    ))
+  ,
+  DESCRIPTOR = _SERDEINFO,
+  __module__ = 'metastore_pb2'
+  # @@protoc_insertion_point(class_scope:metastore.SerDeInfo)
+  ))
+_sym_db.RegisterMessage(SerDeInfo)
+_sym_db.RegisterMessage(SerDeInfo.ParametersEntry)
+
+Order = _reflection.GeneratedProtocolMessageType('Order', (_message.Message,), dict(
+  DESCRIPTOR = _ORDER,
+  __module__ = 'metastore_pb2'
+  # @@protoc_insertion_point(class_scope:metastore.Order)
+  ))
+_sym_db.RegisterMessage(Order)
+
+StorageDescriptor = _reflection.GeneratedProtocolMessageType('StorageDescriptor', (_message.Message,), dict(
+
+  ParametersEntry = _reflection.GeneratedProtocolMessageType('ParametersEntry', (_message.Message,), dict(
+    DESCRIPTOR = _STORAGEDESCRIPTOR_PARAMETERSENTRY,
+    __module__ = 'metastore_pb2'
+    # @@protoc_insertion_point(class_scope:metastore.StorageDescriptor.ParametersEntry)
+    ))
+  ,
+
+  SystemParametersEntry = _reflection.GeneratedProtocolMessageType('SystemParametersEntry', (_message.Message,), dict(
+    DESCRIPTOR = _STORAGEDESCRIPTOR_SYSTEMPARAMETERSENTRY,
+    __module__ = 'metastore_pb2'
+    # @@protoc_insertion_point(class_scope:metastore.StorageDescriptor.SystemParametersEntry)
+    ))
+  ,
+  DESCRIPTOR = _STORAGEDESCRIPTOR,
+  __module__ = 'metastore_pb2'
+  # @@protoc_insertion_point(class_scope:metastore.StorageDescriptor)
+  ))
+_sym_db.RegisterMessage(StorageDescriptor)
+_sym_db.RegisterMessage(StorageDescriptor.ParametersEntry)
+_sym_db.RegisterMessage(StorageDescriptor.SystemParametersEntry)
+
+Table = _reflection.GeneratedProtocolMessageType('Table', (_message.Message,), dict(
+
+  ParametersEntry = _reflection.GeneratedProtocolMessageType('ParametersEntry', (_message.Message,), dict(
+    DESCRIPTOR = _TABLE_PARAMETERSENTRY,
+    __module__ = 'metastore_pb2'
+    # @@protoc_insertion_point(class_scope:metastore.Table.ParametersEntry)
+    ))
+  ,
+
+  SystemParametersEntry = _reflection.GeneratedProtocolMessageType('SystemParametersEntry', (_message.Message,), dict(
+    DESCRIPTOR = _TABLE_SYSTEMPARAMETERSENTRY,
+    __module__ = 'metastore_pb2'
+    # @@protoc_insertion_point(class_scope:metastore.Table.SystemParametersEntry)
+    ))
+  ,
+  DESCRIPTOR = _TABLE,
+  __module__ = 'metastore_pb2'
+  # @@protoc_insertion_point(class_scope:metastore.Table)
+  ))
+_sym_db.RegisterMessage(Table)
+_sym_db.RegisterMessage(Table.ParametersEntry)
+_sym_db.RegisterMessage(Table.SystemParametersEntry)
+
+CreateTableRequest = _reflection.GeneratedProtocolMessageType('CreateTableRequest', (_message.Message,), dict(
+  DESCRIPTOR = _CREATETABLEREQUEST,
+  __module__ = 'metastore_pb2'
+  # @@protoc_insertion_point(class_scope:metastore.CreateTableRequest)
+  ))
+_sym_db.RegisterMessage(CreateTableRequest)
+
+GetTableRequest = _reflection.GeneratedProtocolMessageType('GetTableRequest', (_message.Message,), dict(
+  DESCRIPTOR = _GETTABLEREQUEST,
+  __module__ = 'metastore_pb2'
+  # @@protoc_insertion_point(class_scope:metastore.GetTableRequest)
+  ))
+_sym_db.RegisterMessage(GetTableRequest)
+
+GetTableResponse = _reflection.GeneratedProtocolMessageType('GetTableResponse', (_message.Message,), dict(
+  DESCRIPTOR = _GETTABLERESPONSE,
+  __module__ = 'metastore_pb2'
+  # @@protoc_insertion_point(class_scope:metastore.GetTableResponse)
+  ))
+_sym_db.RegisterMessage(GetTableResponse)
+
+ListTablesRequest = _reflection.GeneratedProtocolMessageType('ListTablesRequest', (_message.Message,), dict(
+  DESCRIPTOR = _LISTTABLESREQUEST,
+  __module__ = 'metastore_pb2'
+  # @@protoc_insertion_point(class_scope:metastore.ListTablesRequest)
+  ))
+_sym_db.RegisterMessage(ListTablesRequest)
+
+DropTableRequest = _reflection.GeneratedProtocolMessageType('DropTableRequest', (_message.Message,), dict(
+  DESCRIPTOR = _DROPTABLEREQUEST,
+  __module__ = 'metastore_pb2'
+  # @@protoc_insertion_point(class_scope:metastore.DropTableRequest)
+  ))
+_sym_db.RegisterMessage(DropTableRequest)
+
 
 DESCRIPTOR.has_options = True
 DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('\n\023com.akolb.metastoreB\tMetaStoreP\001'))
@@ -578,6 +1590,16 @@ _DATABASE_PARAMETERSENTRY.has_options = True
 _DATABASE_PARAMETERSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
 _DATABASE_SYSTEMPARAMETERSENTRY.has_options = True
 _DATABASE_SYSTEMPARAMETERSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
+_SERDEINFO_PARAMETERSENTRY.has_options = True
+_SERDEINFO_PARAMETERSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
+_STORAGEDESCRIPTOR_PARAMETERSENTRY.has_options = True
+_STORAGEDESCRIPTOR_PARAMETERSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
+_STORAGEDESCRIPTOR_SYSTEMPARAMETERSENTRY.has_options = True
+_STORAGEDESCRIPTOR_SYSTEMPARAMETERSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
+_TABLE_PARAMETERSENTRY.has_options = True
+_TABLE_PARAMETERSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
+_TABLE_SYSTEMPARAMETERSENTRY.has_options = True
+_TABLE_SYSTEMPARAMETERSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
 
 _METASTORE = _descriptor.ServiceDescriptor(
   name='Metastore',
@@ -585,8 +1607,8 @@ _METASTORE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=976,
-  serialized_end=1369,
+  serialized_start=3086,
+  serialized_end=3755,
   methods=[
   _descriptor.MethodDescriptor(
     name='CreateDabatase',
@@ -621,6 +1643,42 @@ _METASTORE = _descriptor.ServiceDescriptor(
     index=3,
     containing_service=None,
     input_type=_DROPDATABASEREQUEST,
+    output_type=_REQUESTSTATUS,
+    options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='CreateTable',
+    full_name='metastore.Metastore.CreateTable',
+    index=4,
+    containing_service=None,
+    input_type=_CREATETABLEREQUEST,
+    output_type=_GETTABLERESPONSE,
+    options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetTable',
+    full_name='metastore.Metastore.GetTable',
+    index=5,
+    containing_service=None,
+    input_type=_GETTABLEREQUEST,
+    output_type=_GETTABLERESPONSE,
+    options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='ListTables',
+    full_name='metastore.Metastore.ListTables',
+    index=6,
+    containing_service=None,
+    input_type=_LISTTABLESREQUEST,
+    output_type=_TABLE,
+    options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='DropTable',
+    full_name='metastore.Metastore.DropTable',
+    index=7,
+    containing_service=None,
+    input_type=_DROPTABLEREQUEST,
     output_type=_REQUESTSTATUS,
     options=None,
   ),

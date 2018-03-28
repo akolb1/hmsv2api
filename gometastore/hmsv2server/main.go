@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	port       = flag.Int("port", 10000, "The server port")
+	port       = flag.Int("port", 10010, "The server port")
 	boltDbName = flag.String("dbname", "hms2.db", "db name")
 )
 

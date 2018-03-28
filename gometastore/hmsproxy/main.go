@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	hms_addr = flag.String("hms", "localhost:10000",
+	hmsAddr = flag.String("hms", "localhost:10010",
 		"HMS endpoint")
-	proxy_addr = flag.String("proxy", "localhost:8080", "Proxy endpoint")
+	proxyAddr = flag.String("proxy", "localhost:8080", "Proxy endpoint")
 )
 
 func run() error {
@@ -24,12 +24,12 @@ func run() error {
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err := gw.RegisterMetastoreHandlerFromEndpoint(ctx, mux, *hms_addr, opts)
+	err := gw.RegisterMetastoreHandlerFromEndpoint(ctx, mux, *hmsAddr, opts)
 	if err != nil {
 		return err
 	}
 
-	return http.ListenAndServe(*proxy_addr, mux)
+	return http.ListenAndServe(*proxyAddr, mux)
 }
 
 func main() {

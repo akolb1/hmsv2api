@@ -89,6 +89,15 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 	}
 	var database pb.Database
 	bucketName := []byte(catalog)
+	if err := s.db.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte(catalog))
+		if err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return nil, err
+	}
 
 	err := s.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(bucketName)
@@ -126,7 +135,17 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 	if catalog == "" {
 		return fmt.Errorf("empty catalog")
 	}
+
 	bucketName := []byte(catalog)
+	if err := s.db.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte(catalog))
+		if err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
 
 	err := s.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(bucketName)
@@ -175,17 +194,16 @@ func (s *metastoreServer) DropDatabase(c context.Context,
 	if dbName == "" {
 		return nil, fmt.Errorf("missing database name")
 	}
-	bucketName := []byte(catalog)
 
 	err := s.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket(bucketName)
-		if b == nil {
-			return fmt.Errorf("bucket %s doesn't exist", bucketName)
+		b, err := tx.CreateBucketIfNotExists([]byte(catalog))
+		if err != nil {
+			return err
 		}
 		if data := b.Get([]byte(dbName)); data == nil {
 			return fmt.Errorf("database %s doesn't exist", dbName)
 		}
-		err := b.Delete([]byte(dbName))
+		err = b.Delete([]byte(dbName))
 		if err != nil {
 			return err
 		}

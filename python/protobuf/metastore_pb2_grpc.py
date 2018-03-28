@@ -34,6 +34,26 @@ class MetastoreStub(object):
         request_serializer=metastore__pb2.DropDatabaseRequest.SerializeToString,
         response_deserializer=metastore__pb2.RequestStatus.FromString,
         )
+    self.CreateTable = channel.unary_unary(
+        '/metastore.Metastore/CreateTable',
+        request_serializer=metastore__pb2.CreateTableRequest.SerializeToString,
+        response_deserializer=metastore__pb2.GetTableResponse.FromString,
+        )
+    self.GetTable = channel.unary_unary(
+        '/metastore.Metastore/GetTable',
+        request_serializer=metastore__pb2.GetTableRequest.SerializeToString,
+        response_deserializer=metastore__pb2.GetTableResponse.FromString,
+        )
+    self.ListTables = channel.unary_stream(
+        '/metastore.Metastore/ListTables',
+        request_serializer=metastore__pb2.ListTablesRequest.SerializeToString,
+        response_deserializer=metastore__pb2.Table.FromString,
+        )
+    self.DropTable = channel.unary_unary(
+        '/metastore.Metastore/DropTable',
+        request_serializer=metastore__pb2.DropTableRequest.SerializeToString,
+        response_deserializer=metastore__pb2.RequestStatus.FromString,
+        )
 
 
 class MetastoreServicer(object):
@@ -68,6 +88,34 @@ class MetastoreServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def CreateTable(self, request, context):
+    """Create a new database
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def GetTable(self, request, context):
+    """Create a new database
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def ListTables(self, request, context):
+    """Get collection of tables
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def DropTable(self, request, context):
+    """Destroy a table
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_MetastoreServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -89,6 +137,26 @@ def add_MetastoreServicer_to_server(servicer, server):
       'DropDatabase': grpc.unary_unary_rpc_method_handler(
           servicer.DropDatabase,
           request_deserializer=metastore__pb2.DropDatabaseRequest.FromString,
+          response_serializer=metastore__pb2.RequestStatus.SerializeToString,
+      ),
+      'CreateTable': grpc.unary_unary_rpc_method_handler(
+          servicer.CreateTable,
+          request_deserializer=metastore__pb2.CreateTableRequest.FromString,
+          response_serializer=metastore__pb2.GetTableResponse.SerializeToString,
+      ),
+      'GetTable': grpc.unary_unary_rpc_method_handler(
+          servicer.GetTable,
+          request_deserializer=metastore__pb2.GetTableRequest.FromString,
+          response_serializer=metastore__pb2.GetTableResponse.SerializeToString,
+      ),
+      'ListTables': grpc.unary_stream_rpc_method_handler(
+          servicer.ListTables,
+          request_deserializer=metastore__pb2.ListTablesRequest.FromString,
+          response_serializer=metastore__pb2.Table.SerializeToString,
+      ),
+      'DropTable': grpc.unary_unary_rpc_method_handler(
+          servicer.DropTable,
+          request_deserializer=metastore__pb2.DropTableRequest.FromString,
           response_serializer=metastore__pb2.RequestStatus.SerializeToString,
       ),
   }
