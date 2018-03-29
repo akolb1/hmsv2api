@@ -94,6 +94,7 @@ message RequestStatus {
         ERROR = 1;    // General error
         NOTFOUND = 2; // Requested object not found
         CONFLICT = 3; // Object already exists
+        INTERNAL = 4; // Internal server error
     }
     Status status = 1;
     string error = 2;  // detailed error message
@@ -219,14 +220,14 @@ message Order {
 
 // StorageDescriptor holds all the information about physical storage of the data belonging to a table
 message StorageDescriptor {
-    repeated FieldSchema cols = 1;          // required (refer to types defined above)
-    InputFormat inputFormat = 3;   // Specification of input format. If custom, use inputFormatName.
-    string inputFormatName = 4;    // Name of input format if custom
-    OutputFormat outputFormat = 5; // Specification of input format. If custom, use outputFormatName.
-    string outputFormatName = 6;   // Name of output format if custom
-    int32 numBuckets = 7;                   // this must be specified if there are any dimension columns
-    SerDeInfo serdeInfo = 8;                // serialization and deserialization information
-    repeated string bucketCols = 9;         // reducer grouping columns and clustering columns and bucketing columns`
+    repeated FieldSchema cols = 1;           // required (refer to types defined above)
+    InputFormat inputFormat = 3;             // Specification of input format. If custom, use inputFormatName.
+    string inputFormatName = 4;              // Name of input format if custom
+    OutputFormat outputFormat = 5;           // Specification of input format. If custom, use outputFormatName.
+    string outputFormatName = 6;             // Name of output format if custom
+    int32 numBuckets = 7;                    // this must be specified if there are any dimension columns
+    SerDeInfo serdeInfo = 8;                 // serialization and deserialization information
+    repeated string bucketCols = 9;          // reducer grouping columns and clustering columns and bucketing columns`
     repeated Order sortCols = 10;            // sort order of the data in each bucket
     map<string, string> parameters = 11;     // any user supplied key value hash
     map<string, string> system_parameters = 12;    // Internal parameters not settable by user
@@ -235,12 +236,13 @@ message StorageDescriptor {
 // Table information
 message Table {
     Id id = 1;
-    Id db_id = 2;
-    StorageDescriptor sd = 3;               // storage descriptor of the table
-    repeated FieldSchema partitionKeys = 4; // partition keys of the table. only primitive types are supported
-    TableType tableType = 5;                // table type enum, e.g. EXTERNAL_TABLE
-    map<string, string> parameters = 6;     // User-settable parameters
-    map<string, string> system_parameters = 7; // Internal parameters
+    Id db_id = 2;                              // Database it belongs to
+    uint64 seq_id = 3;                         // Sequential ID within database
+    StorageDescriptor sd = 4;                  // storage descriptor of the table
+    repeated FieldSchema partitionKeys = 5;    // partition keys of the table. only primitive types are supported
+    TableType tableType =6;                    // table type enum, e.g. EXTERNAL_TABLE
+    map<string, string> parameters = 7;        // User-settable parameters
+    map<string, string> system_parameters = 8; // Internal parameters
 }
 
 // Create a new table.

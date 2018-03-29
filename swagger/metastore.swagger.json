@@ -110,7 +110,8 @@
         "OK",
         "ERROR",
         "NOTFOUND",
-        "CONFLICT"
+        "CONFLICT",
+        "INTERNAL"
       ],
       "default": "OK"
     },

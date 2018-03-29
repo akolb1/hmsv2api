@@ -1,4 +1,30 @@
 // Server implementation
+//
+// DB Structure:
+//
+// root+
+//   catalog1+
+//           |
+//           + BYNAME Name -> Id
+//           + BYID   Id -> { Database }
+//           + DB +
+//                |
+//                +<id1>
+//                    BYNAME Name -> Id
+//                    BYID   ID -> { Table }
+//                    TBLS
+//                       + <id1>
+//                            DATA
+//                            PARTS
+//                       + <id2>
+//                            DATA
+//                            PARTS
+//                |
+//                + <id2>
+//                    DATA
+//                    TBLS
+//
+
 package main
 
 import (
@@ -6,19 +32,18 @@ import (
 	"fmt"
 	"log"
 
-	"math/rand"
-	"time"
-
 	pb "github.com/akolb1/hmsv2api/gometastore/protobuf"
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
-	"github.com/oklog/ulid"
+	"github.com/imdario/go-ulid"
+	"strings"
 )
 
-var (
-	nameIdBucket = "NAMEID"
-	idNameBucket = "IDNAME"
-	dbBucketName = "DB"
+const (
+	bynameHdr = "BYNAME"
+	byIDHdr   = "BYID"
+	dbHdr     = "DB"
+	tblsHdr   = "TBLS"
 )
 
 type metastoreServer struct {
@@ -45,44 +70,69 @@ func (s *metastoreServer) CreateDabatase(c context.Context,
 	}
 	database := req.Database
 	// Create unique ID if it isn's specified
-	if database.Id.Id == "" {
-		database.Id.Id = getULID()
-	}
+	database.Id.Id = getULID()
+	id := database.Id.Id
+	log.Println("Generated id", id)
 
 	err := s.db.Update(func(tx *bolt.Tx) error {
 		catBucket, err := tx.CreateBucketIfNotExists([]byte(catalog))
 		if err != nil {
 			return err
 		}
-		nameMap, err := catBucket.CreateBucketIfNotExists([]byte(nameIdBucket))
+		nameMap, err := catBucket.CreateBucketIfNotExists([]byte(bynameHdr))
 		if err != nil {
 			return err
 		}
-		idMap, err := catBucket.CreateBucketIfNotExists([]byte(idNameBucket))
+		// Do we have DB with this name?
+		if r := nameMap.Get([]byte(dbName)); r != nil {
+			// Table alreday exists
+			return fmt.Errorf("database %s already exists", dbName)
+		}
+
+		idMap, err := catBucket.CreateBucketIfNotExists([]byte(byIDHdr))
 		if err != nil {
 			return err
 		}
-		dbBucket, err := catBucket.CreateBucketIfNotExists([]byte(dbBucketName))
+		dbBucket, err := catBucket.CreateBucketIfNotExists([]byte(dbHdr))
 		if err != nil {
 			return err
 		}
-		// Put mapping of name to ID and reverse mapping
-		err = nameMap.Put([]byte(database.Id.Name), []byte(database.Id.Id))
+		// Create structure for the DB needed for tables
+		dbDataBucket, err := dbBucket.CreateBucketIfNotExists([]byte(id))
 		if err != nil {
 			return err
 		}
-		err = idMap.Put([]byte(database.Id.Id), []byte(database.Id.Name))
+		_, err = dbDataBucket.CreateBucketIfNotExists([]byte(bynameHdr))
 		if err != nil {
 			return err
 		}
-		database.SeqId, _ = catBucket.NextSequence();
+		_, err = dbDataBucket.CreateBucketIfNotExists([]byte(byIDHdr))
+		if err != nil {
+			return err
+		}
+		_, err = dbDataBucket.CreateBucketIfNotExists([]byte(tblsHdr))
+		if err != nil {
+			return err
+		}
+
+		// Put mapping of name to ID
+		err = nameMap.Put([]byte(dbName), []byte(id))
+		if err != nil {
+			return err
+		}
+
+		// Assign unique per-catalog ID
+		database.SeqId, _ = catBucket.NextSequence()
+
+		// Store database info in idMap
 		data, err := proto.Marshal(database)
 		if err != nil {
 			log.Println("failed to deserialize", err)
 			return err
 		}
 
-		err = dbBucket.Put([]byte(dbName), data)
+		log.Println(id, "->", dbName)
+		err = idMap.Put([]byte(id), data)
 		if err != nil {
 			return err
 		}
@@ -113,9 +163,11 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 		return nil, fmt.Errorf("missing catalog")
 	}
 	dbName := req.Id.Name
-	if dbName == "" {
-		return nil, fmt.Errorf("missing database name")
+	id := req.Id.Id
+	if dbName == "" && id == "" {
+		return nil, fmt.Errorf("missing database name or id")
 	}
+
 	var database pb.Database
 	bucketName := []byte(catalog)
 	if err := s.db.Update(func(tx *bolt.Tx) error {
@@ -129,19 +181,30 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 	}
 
 	err := s.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket(bucketName)
-		if bucket == nil {
+		catalogBucket := tx.Bucket(bucketName)
+		if catalogBucket == nil {
 			return fmt.Errorf("bucket %s doesn't exist", bucketName)
 		}
-		dbBucket := bucket.Bucket([]byte(dbBucketName))
-		// Compat code
-		if dbBucket == nil {
-			return fmt.Errorf("can't find any databases")
+		idBucket := catalogBucket.Bucket([]byte(byIDHdr))
+		if idBucket == nil {
+			return fmt.Errorf("corrupt catalog - missing ID map")
+		}
+		idBytes := []byte(id)
+		if id == "" {
+			// Locate ID by name
+			nameIdBucket := catalogBucket.Bucket([]byte(bynameHdr))
+			if nameIdBucket == nil {
+				return fmt.Errorf("corrupt catalog - missing NAME map")
+			}
+			idBytes = nameIdBucket.Get([]byte(dbName))
+			if idBytes == nil {
+				return fmt.Errorf("database %s doesn't exist", dbName)
+			}
 		}
 
-		data := dbBucket.Get([]byte(dbName))
+		data := idBucket.Get(idBytes)
 		if data == nil {
-			return fmt.Errorf("database %s doesn't exist", dbName)
+			return fmt.Errorf("corrupt catalog - missing db %s", string(idBytes))
 		}
 		err := proto.Unmarshal(data, &database)
 		if err != nil {
@@ -183,16 +246,16 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 	}
 
 	err := s.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(bucketName)
-		if b == nil {
+		catalogBucket := tx.Bucket(bucketName)
+		if catalogBucket == nil {
 			return fmt.Errorf("bucket %s doesn't exist", bucketName)
 		}
-		dbBucket := b.Bucket([]byte(dbBucketName))
-		if dbBucket == nil {
+		idMap := catalogBucket.Bucket([]byte(byIDHdr))
+		if idMap == nil {
 			return nil
 		}
 
-		dbBucket.ForEach(func(k, v []byte) error {
+		idMap.ForEach(func(k, v []byte) error {
 			database := new(pb.Database)
 			err := proto.Unmarshal(v, database)
 			if err != nil {
@@ -226,6 +289,9 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 func (s *metastoreServer) DropDatabase(c context.Context,
 	req *pb.DropDatabaseRequest) (*pb.RequestStatus, error) {
 	log.Println("DropDatabase:", req)
+	if req.Id == nil {
+		return nil, fmt.Errorf("missing identity info")
+	}
 	catalog := req.Id.Catalog
 	if catalog == "" {
 		return nil, fmt.Errorf("missing catalog")
@@ -236,23 +302,29 @@ func (s *metastoreServer) DropDatabase(c context.Context,
 	}
 
 	err := s.db.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte(catalog))
-		if err != nil {
-			return err
+		catalogBucket := tx.Bucket([]byte(catalog))
+		if catalogBucket == nil {
+			return fmt.Errorf("bucket %s doesn't exist", catalog)
 		}
-		dbBucket := b.Bucket([]byte(dbBucketName))
-		// Compat code
-		if dbBucket == nil {
-			return fmt.Errorf("can't find any databases")
+		idMap := catalogBucket.Bucket([]byte(byIDHdr))
+		if idMap == nil {
+			return fmt.Errorf("corrupd database: missing ID map")
 		}
-
-		if data := dbBucket.Get([]byte(dbName)); data == nil {
+		nameMap := catalogBucket.Bucket([]byte(bynameHdr))
+		if nameMap == nil {
+			return fmt.Errorf("corrupd database: missing name map")
+		}
+		idBytes := nameMap.Get([]byte(dbName))
+		if idBytes == nil {
 			return fmt.Errorf("database %s doesn't exist", dbName)
 		}
-		err = dbBucket.Delete([]byte(dbName))
-		if err != nil {
-			return err
+		// Remove info from this DB
+		nameMap.Delete([]byte(dbName))
+		idMap.Delete(idBytes)
+		if dbInfo := catalogBucket.Bucket([]byte(dbHdr)); dbInfo != nil {
+			dbInfo.DeleteBucket(idBytes)
 		}
+
 		return nil
 	})
 
@@ -266,7 +338,5 @@ func (s *metastoreServer) DropDatabase(c context.Context,
 
 // getULID returns a unique ID.
 func getULID() string {
-	t := time.Unix(1000000, 0)
-	entropy := rand.New(rand.NewSource(t.UnixNano()))
-	return ulid.MustNew(ulid.Timestamp(t), entropy).String()
+	return strings.TrimRight(ulid.New().String(), "\u0000")
 }
