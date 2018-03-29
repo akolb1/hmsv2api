@@ -29,7 +29,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
 var (
-	filter_Metastore_GetDatabase_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "catalog": 1, "name": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 2, 3, 4}}
+	filter_Metastore_GetDatabase_0 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "catalog": 1}, Base: []int{1, 1, 1, 0}, Check: []int{0, 1, 2, 3}}
 )
 
 func request_Metastore_GetDatabase_0(ctx context.Context, marshaler runtime.Marshaler, client MetastoreClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -52,17 +52,6 @@ func request_Metastore_GetDatabase_0(ctx context.Context, marshaler runtime.Mars
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.catalog", err)
-	}
-
-	val, ok = pathParams["id.name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.name")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.name", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.name", err)
 	}
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_Metastore_GetDatabase_0); err != nil {
@@ -217,9 +206,9 @@ func RegisterMetastoreHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 }
 
 var (
-	pattern_Metastore_GetDatabase_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3}, []string{"v2", "databases", "id.catalog", "id.name"}, ""))
+	pattern_Metastore_GetDatabase_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v2", "database", "id.catalog"}, ""))
 
-	pattern_Metastore_ListDatabases_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"dblist", "catalog"}, ""))
+	pattern_Metastore_ListDatabases_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v2", "dblist", "catalog"}, ""))
 )
 
 var (

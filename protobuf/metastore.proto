@@ -26,7 +26,9 @@
  *
  * The API also introduces the notion of an object ID - globally unique string
  * associated with the object. While object name can change (e.g. with
- * rename operation), identity of the object never changes.
+ * rename operation), identity of the object never changes. The lookup can be done
+ * either by name or by ID. The intention is to have cacheable objects which do not
+ * change on renames.
  *
  * Cookie is supposed to be used to associate multiple requests to a single session.
  * The value of the cookie is likely to be printed in logs so it shouldn't contain
@@ -39,8 +41,6 @@
  * catalogs are completely independent. They can be forwarded to different storage
  * engines.
  *
- * Objects belong to a specific catalog and have unique name and unique ID
- * in the catalog.
  */
 
 syntax = "proto3";
@@ -60,18 +60,19 @@ service Metastore {
     // Get database information
     rpc GetDatabase (GetDatabaseRequest) returns  (GetDatabaseResponse) {
         option (google.api.http) = {
-           get: "/v2/databases/{id.catalog}/{id.name}"
+           get: "/v2/database/{id.catalog}"
         };
     }
     // Get collection of databases
     rpc ListDatabases (ListDatabasesRequest) returns  (stream Database) {
         option (google.api.http) = {
-	       get: "/dblist/{catalog}"
+	       get: "/v2/dblist/{catalog}"
 	};
     }
     // Destroy a database
     rpc DropDatabase (DropDatabaseRequest) returns (RequestStatus);
 
+    /*
     // Create a new database
     rpc CreateTable (CreateTableRequest) returns (GetTableResponse);
 
@@ -83,6 +84,7 @@ service Metastore {
 
     // Destroy a table
     rpc DropTable (DropTableRequest) returns (RequestStatus);
+    */
 }
 
 // General status for results
@@ -99,7 +101,8 @@ message RequestStatus {
 }
 
 // Objects belong to a specific catalog and have unique name and unique ID
-// in the catalog.
+// in the catalog. Both name and ID are just sequence of bytes - there are no
+// assumptions about encoding or length.
 message Id {
     string catalog = 1;
     string name = 2;
@@ -111,14 +114,18 @@ message Id {
 //  - User parameters are intended for user and are just transparently passed around
 //  - System parameters are intended to be used by Hive for its internal purposes
 //
+// seq_id is a numeric ID which is unique within a catalog. It can be used to track
+// new databases in the catalog
+//
 // Original Metastore Database object also had owner information.
 // These can be represented using system parameters if needed since the current
 // metastore service does not interpret Owner info.
 message Database {
   Id                  id = 1;
-  string              location = 2;   // Default location of database objects
-  map<string, string> parameters = 3; // Database user parameters
-  map<string, string> system_parameters = 4;
+  uint64              seq_id = 2;      // Unique sequence ID within calalog
+  string              location = 3;   // Default location of database objects
+  map<string, string> parameters = 4; // Database user parameters
+  map<string, string> system_parameters = 5; // System parameters
 }
 
 // Create a new database.

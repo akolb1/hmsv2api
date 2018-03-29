@@ -9,7 +9,9 @@ operations.
  
 The API also introduces the notion of an object ID - globally unique string
 associated with the object. While object name can change (e.g. with
-rename operation), identity of the object never changes.
+rename operation), identity of the object never changes. The lookup can be done
+either by name or by ID. The intention is to have cacheable objects which do not
+change on renames.
 
 Cookie is supposed to be used to associate multiple requests to a single session.
 The value of the cookie is likely to be printed in logs so it shouldn't contain
@@ -22,13 +24,8 @@ Every object belongs to a catalog. The idea is that operations across
 catalogs are completely independent. They can be forwarded to different storage
 engines.
 
-Namespase is created automatically when an object is placed in a catalog.
-*NOTE - should we explicitely manage catalogs instead?*
-
-Objects belong to a specific catalog and have unique name and unique ID
-in the catalog.
-
-[metastore gRpc spec](protobuf/metastore.proto)
+- [metastore gRpc spec](protobuf/metastore.proto)
+- [Swagger spec](swagger/metastore.swagger.json)
 
 ## Service
 
@@ -62,7 +59,10 @@ in the catalog.
 ### Id
 
 Objects belong to a specific catalog and have unique name and unique ID
-in the catalog.
+in the catalog. Both name and ID are just sequence of bytes - there are no
+assumptions about encoding or length.
+
+*NOTE*: _May be we should limit the name length to prevent DOS type attacks_ 
 
     message Id {
         string catalog;
@@ -78,13 +78,17 @@ Database object has two sets of parameters:
 - User parameters are intended for user and are just transparently passed around
 - System parameters are intended to be used by Hive for its internal purposes
 
+seq_id is a numeric ID which is unique within a catalog. It can be used to track
+new databases in the catalog
+
 Original Metastore Database object also had location and owner information.
 These can be represented using parameters if needed since the current
 metastore service does n;t interpret either Location or Owner info.
 
     message Database {
         Id id;
-	    string location // Location of Database data
+        uint64 seq_id = 2;              // Unique sequence ID within calalog
+	    string location                 // Location of Database data
         map<string, string> parameters; // Database parameters
         map<string, string> system_parameters;
     }

@@ -15,6 +15,12 @@ import (
 	"github.com/oklog/ulid"
 )
 
+var (
+	nameIdBucket = "NAMEID"
+	idNameBucket = "IDNAME"
+	dbBucketName = "DB"
+)
+
 type metastoreServer struct {
 	db *bolt.DB
 }
@@ -43,17 +49,40 @@ func (s *metastoreServer) CreateDabatase(c context.Context,
 		database.Id.Id = getULID()
 	}
 
-	data, err := proto.Marshal(database)
-	if err != nil {
-		log.Println("failed to deserialize", err)
-		return nil, err
-	}
-	err = s.db.Update(func(tx *bolt.Tx) error {
-		bucket, err := tx.CreateBucketIfNotExists([]byte(catalog))
+	err := s.db.Update(func(tx *bolt.Tx) error {
+		catBucket, err := tx.CreateBucketIfNotExists([]byte(catalog))
 		if err != nil {
 			return err
 		}
-		err = bucket.Put([]byte(dbName), data)
+		nameMap, err := catBucket.CreateBucketIfNotExists([]byte(nameIdBucket))
+		if err != nil {
+			return err
+		}
+		idMap, err := catBucket.CreateBucketIfNotExists([]byte(idNameBucket))
+		if err != nil {
+			return err
+		}
+		dbBucket, err := catBucket.CreateBucketIfNotExists([]byte(dbBucketName))
+		if err != nil {
+			return err
+		}
+		// Put mapping of name to ID and reverse mapping
+		err = nameMap.Put([]byte(database.Id.Name), []byte(database.Id.Id))
+		if err != nil {
+			return err
+		}
+		err = idMap.Put([]byte(database.Id.Id), []byte(database.Id.Name))
+		if err != nil {
+			return err
+		}
+		database.SeqId, _ = catBucket.NextSequence();
+		data, err := proto.Marshal(database)
+		if err != nil {
+			log.Println("failed to deserialize", err)
+			return err
+		}
+
+		err = dbBucket.Put([]byte(dbName), data)
 		if err != nil {
 			return err
 		}
@@ -104,7 +133,13 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 		if bucket == nil {
 			return fmt.Errorf("bucket %s doesn't exist", bucketName)
 		}
-		data := bucket.Get([]byte(dbName))
+		dbBucket := bucket.Bucket([]byte(dbBucketName))
+		// Compat code
+		if dbBucket == nil {
+			return fmt.Errorf("can't find any databases")
+		}
+
+		data := dbBucket.Get([]byte(dbName))
 		if data == nil {
 			return fmt.Errorf("database %s doesn't exist", dbName)
 		}
@@ -152,12 +187,16 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 		if b == nil {
 			return fmt.Errorf("bucket %s doesn't exist", bucketName)
 		}
-		c := b.Cursor()
-		for k, v := c.First(); k != nil; k, v = c.Next() {
+		dbBucket := b.Bucket([]byte(dbBucketName))
+		if dbBucket == nil {
+			return nil
+		}
+
+		dbBucket.ForEach(func(k, v []byte) error {
 			database := new(pb.Database)
 			err := proto.Unmarshal(v, database)
 			if err != nil {
-				continue
+				return nil
 			}
 			log.Println("send", database.Id.Name)
 			// Database catalog should match request, no need to send it
@@ -171,7 +210,8 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 				log.Println("err sending ", err)
 				return err
 			}
-		}
+			return nil
+		})
 		return nil
 	})
 
@@ -200,10 +240,16 @@ func (s *metastoreServer) DropDatabase(c context.Context,
 		if err != nil {
 			return err
 		}
-		if data := b.Get([]byte(dbName)); data == nil {
+		dbBucket := b.Bucket([]byte(dbBucketName))
+		// Compat code
+		if dbBucket == nil {
+			return fmt.Errorf("can't find any databases")
+		}
+
+		if data := dbBucket.Get([]byte(dbName)); data == nil {
 			return fmt.Errorf("database %s doesn't exist", dbName)
 		}
-		err = b.Delete([]byte(dbName))
+		err = dbBucket.Delete([]byte(dbName))
 		if err != nil {
 			return err
 		}
