@@ -32,11 +32,12 @@ import (
 	"fmt"
 	"log"
 
+	"strings"
+
 	pb "github.com/akolb1/hmsv2api/gometastore/protobuf"
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
 	"github.com/imdario/go-ulid"
-	"strings"
 )
 
 const (
@@ -181,7 +182,7 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 	err := s.db.View(func(tx *bolt.Tx) error {
 		catalogBucket := tx.Bucket(bucketName)
 		if catalogBucket == nil {
-			return fmt.Errorf("bucket %s doesn't exist", bucketName)
+			return fmt.Errorf("bucket %s doesn't exist", catalog)
 		}
 		idBucket := catalogBucket.Bucket([]byte(byIDHdr))
 		if idBucket == nil {
@@ -338,11 +339,11 @@ func (s *metastoreServer) DropDatabase(c context.Context,
 
 func (s *metastoreServer) CreateTable(c context.Context,
 	req *pb.CreateTableRequest) (*pb.GetTableResponse, error) {
-    log.Println("CreateTable:", req)
-    if req.Table == nil || req.Table.Id == nil {
-        return nil, fmt.Errorf("missing Table info")
-    }
-    if req.Table.DbId == nil {
+	log.Println("CreateTable:", req)
+	if req.Table == nil || req.Table.Id == nil {
+		return nil, fmt.Errorf("missing Table info")
+	}
+	if req.Table.DbId == nil {
 		return nil, fmt.Errorf("missing Db info")
 	}
 	catalog := req.Table.Id.Catalog
@@ -403,9 +404,16 @@ func (s *metastoreServer) CreateTable(c context.Context,
 		}
 		tblIdBytes := byNameBucket.Get([]byte(tableName))
 		if tblIdBytes != nil {
-			return fmt.Errorf("table %s/%s/%s already exists", catalog, dbName, tableName)
+			return fmt.Errorf("table %s:%s.%s already exists", catalog, dbName, tableName)
 		}
-		data, err := proto.Marshal(table)
+		err := byNameBucket.Put([]byte(tableName), []byte(id))
+		if err != nil {
+			return err
+		}
+        // Assign unique per-catalog ID
+        table.SeqId, _ = dbBucket.NextSequence()
+
+        data, err := proto.Marshal(table)
 		if err != nil {
 			return err
 		}
@@ -428,10 +436,101 @@ func (s *metastoreServer) CreateTable(c context.Context,
 
 	return &pb.GetTableResponse{
 		Status: &pb.RequestStatus{Status: pb.RequestStatus_OK},
-		Table: table,
+		Table:  table,
 	}, nil
 }
 
+func (s *metastoreServer) GetTable(c context.Context,
+	req *pb.GetTableRequest) (*pb.GetTableResponse, error) {
+	log.Println("GetTable:", req)
+
+	if req.Id == nil {
+		return nil, fmt.Errorf("missing identity info")
+	}
+	tableName := req.Id.Name
+	if tableName == "" {
+		return nil, fmt.Errorf("missing table name")
+	}
+
+	catalog := req.Id.Catalog
+	if catalog == "" {
+		return nil, fmt.Errorf("missing catalog")
+	}
+	if req.DbId == nil {
+		return nil, fmt.Errorf("missing DB info")
+	}
+	if req.DbId.Name == "" && req.DbId.Id == "" {
+		return nil, fmt.Errorf("empty DB info")
+	}
+	dbName := req.DbId.Name
+	if dbName == "" {
+		return nil, fmt.Errorf("missing db name")
+	}
+
+	var table pb.Table
+
+	err := s.db.View(func(tx *bolt.Tx) error {
+        catalogBucket := tx.Bucket([]byte(catalog))
+        if catalogBucket == nil {
+            return fmt.Errorf("bucket %s doesn't exist", catalog)
+        }
+
+        // Locate ID by name
+        nameIdBucket := catalogBucket.Bucket([]byte(bynameHdr))
+        if nameIdBucket == nil {
+            return fmt.Errorf("corrupt catalog - missing NAME map")
+        }
+        idBytesDb := nameIdBucket.Get([]byte(dbName))
+        if idBytesDb == nil {
+            return fmt.Errorf("database %s doesn't exist", dbName)
+        }
+        dbInfoBucket := catalogBucket.Bucket([]byte(dbHdr))
+        if dbInfoBucket == nil {
+            return fmt.Errorf("corrupt catalog %s: no DB info", catalog)
+        }
+        dbBucket := dbInfoBucket.Bucket(idBytesDb)
+        if dbBucket == nil {
+            return fmt.Errorf("corrupt catalog %s/%s: no DB info", catalog, dbName)
+        }
+        byNameBucket := dbBucket.Bucket([]byte(bynameHdr))
+        if byNameBucket == nil {
+            return fmt.Errorf("corrupt catalog %s/%s: no BYNAME info", catalog, dbName)
+        }
+        byIdBucket := dbBucket.Bucket([]byte(byIDHdr))
+        if byIdBucket == nil {
+            return fmt.Errorf("corrupt catalog %s/%s: no BYID info", catalog, dbName)
+        }
+        tblIdBytes := byNameBucket.Get([]byte(tableName))
+        if tblIdBytes == nil {
+            return fmt.Errorf("table %s:%s.%s does not exist", catalog, dbName, tableName)
+        }
+        data := byIdBucket.Get(tblIdBytes)
+        if data == nil {
+            return fmt.Errorf("catalog corrupted: table %s:%s.%s does not exist",
+                catalog, dbName, tableName)
+        }
+        if err := proto.Unmarshal(data, &table); err != nil {
+            return err
+        } else {
+            return nil
+        }
+
+        return nil
+	})
+
+	if err != nil {
+		log.Println("failed to get table:", err)
+		return &pb.GetTableResponse{
+			Status: &pb.RequestStatus{Status: pb.RequestStatus_ERROR, Error: err.Error()},
+		}, nil
+	}
+
+	return &pb.GetTableResponse{
+		Status: &pb.RequestStatus{Status: pb.RequestStatus_OK},
+		Table:  &table,
+	}, nil
+
+}
 
 // getULID returns a unique ID.
 func getULID() string {

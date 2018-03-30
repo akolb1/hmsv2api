@@ -101,6 +101,61 @@
           "Metastore"
         ]
       }
+    },
+    "/v2/table/{id.catalog}/{db_id.name}/{id.name}": {
+      "get": {
+        "summary": "Get table information",
+        "operationId": "GetTable",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/metastoreGetTableResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.catalog",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "db_id.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "db_id.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "cookie",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Metastore"
+        ]
+      }
     }
   },
   "definitions": {

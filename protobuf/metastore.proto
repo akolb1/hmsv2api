@@ -67,7 +67,7 @@ service Metastore {
     rpc ListDatabases (ListDatabasesRequest) returns  (stream Database) {
         option (google.api.http) = {
 	       get: "/v2/dblist/{catalog}"
-	};
+	    };
     }
     // Destroy a database
     rpc DropDatabase (DropDatabaseRequest) returns (RequestStatus);
@@ -75,10 +75,14 @@ service Metastore {
     // Create a new table
     rpc CreateTable (CreateTableRequest) returns (GetTableResponse);
 
-    /*
     // Get table information
-    rpc GetTable (GetTableRequest) returns (GetTableResponse);
+    rpc GetTable (GetTableRequest) returns (GetTableResponse) {
+        option (google.api.http) = {
+	       get: "/v2/table/{id.catalog}/{db_id.name}/{id.name}"
+	    };
+    }
 
+    /*
     // Get collection of tables
     rpc ListTables (ListTablesRequest) returns  (stream Table);
 

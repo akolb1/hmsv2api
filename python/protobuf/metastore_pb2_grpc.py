@@ -39,6 +39,11 @@ class MetastoreStub(object):
         request_serializer=metastore__pb2.CreateTableRequest.SerializeToString,
         response_deserializer=metastore__pb2.GetTableResponse.FromString,
         )
+    self.GetTable = channel.unary_unary(
+        '/metastore.Metastore/GetTable',
+        request_serializer=metastore__pb2.GetTableRequest.SerializeToString,
+        response_deserializer=metastore__pb2.GetTableResponse.FromString,
+        )
 
 
 class MetastoreServicer(object):
@@ -80,6 +85,13 @@ class MetastoreServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def GetTable(self, request, context):
+    """Get table information
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_MetastoreServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -106,6 +118,11 @@ def add_MetastoreServicer_to_server(servicer, server):
       'CreateTable': grpc.unary_unary_rpc_method_handler(
           servicer.CreateTable,
           request_deserializer=metastore__pb2.CreateTableRequest.FromString,
+          response_serializer=metastore__pb2.GetTableResponse.SerializeToString,
+      ),
+      'GetTable': grpc.unary_unary_rpc_method_handler(
+          servicer.GetTable,
+          request_deserializer=metastore__pb2.GetTableRequest.FromString,
           response_serializer=metastore__pb2.GetTableResponse.SerializeToString,
       ),
   }
