@@ -72,11 +72,11 @@ service Metastore {
     // Destroy a database
     rpc DropDatabase (DropDatabaseRequest) returns (RequestStatus);
 
-    /*
-    // Create a new database
+    // Create a new table
     rpc CreateTable (CreateTableRequest) returns (GetTableResponse);
 
-    // Create a new database
+    /*
+    // Get table information
     rpc GetTable (GetTableRequest) returns (GetTableResponse);
 
     // Get collection of tables
@@ -209,6 +209,7 @@ message SerDeInfo {
     SerdeType type = 1;                 // Serde type. If CUSTOM, use the name
     string name = 2;                    // name of the serde, table name by default
     string serializationLib = 3;        // usually the class that implements the extractor & loader
+                                        // NOTE: Should we enum this as well?
     map<string, string> parameters = 4; // initialization parameters
 }
 
@@ -221,6 +222,7 @@ message Order {
 // StorageDescriptor holds all the information about physical storage of the data belonging to a table
 message StorageDescriptor {
     repeated FieldSchema cols = 1;           // required (refer to types defined above)
+    string location = 2;                     // Object location
     InputFormat inputFormat = 3;             // Specification of input format. If custom, use inputFormatName.
     string inputFormatName = 4;              // Name of input format if custom
     OutputFormat outputFormat = 5;           // Specification of input format. If custom, use outputFormatName.
