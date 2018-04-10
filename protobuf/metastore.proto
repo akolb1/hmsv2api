@@ -82,10 +82,10 @@ service Metastore {
 	    };
     }
 
-    /*
     // Get collection of tables
     rpc ListTables (ListTablesRequest) returns  (stream Table);
 
+    /*
     // Destroy a table
     rpc DropTable (DropTableRequest) returns (RequestStatus);
     */
@@ -98,7 +98,8 @@ message RequestStatus {
         ERROR = 1;    // General error
         NOTFOUND = 2; // Requested object not found
         CONFLICT = 3; // Object already exists
-        INTERNAL = 4; // Internal server error
+        BUSY     = 4; // Object is busy/used and can't be accessed/destroyed
+        INTERNAL = 5; // Internal server error
     }
     Status status = 1;
     string error = 2;  // detailed error message
@@ -160,7 +161,8 @@ message ListDatabasesRequest {
 }
 
 // Request to drop a database.
-// Dropping a database also drops all objects contained in the database
+// Dropping a database also drops all objects contained in the database.
+// TODO: Add flag to prohibit dropping non-empty databases
 message DropDatabaseRequest {
     Id     id = 1;
     string cookie = 2;
@@ -246,7 +248,7 @@ message Table {
     uint64 seq_id = 3;                         // Sequential ID within database
     StorageDescriptor sd = 4;                  // storage descriptor of the table
     repeated FieldSchema partitionKeys = 5;    // partition keys of the table. only primitive types are supported
-    TableType tableType =6;                    // table type enum, e.g. EXTERNAL_TABLE
+    TableType tableType = 6;                   // table type enum, e.g. EXTERNAL_TABLE
     map<string, string> parameters = 7;        // User-settable parameters
     map<string, string> system_parameters = 8; // Internal parameters
 }
@@ -276,8 +278,9 @@ message ListTablesRequest {
     string cookie = 2;
 }
 
-// Request to drop a database.
-// Dropping a database also drops all objects contained in the database
+// Request to drop a table.
+// Dropping a table also drops all objects contained in the table
+// TODO: Add flag to prohibit dropping of non-empty table
 message DropTableRequest {
     Id     id = 1;
     Id     db_id = 2;

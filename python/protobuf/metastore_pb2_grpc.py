@@ -44,6 +44,11 @@ class MetastoreStub(object):
         request_serializer=metastore__pb2.GetTableRequest.SerializeToString,
         response_deserializer=metastore__pb2.GetTableResponse.FromString,
         )
+    self.ListTables = channel.unary_stream(
+        '/metastore.Metastore/ListTables',
+        request_serializer=metastore__pb2.ListTablesRequest.SerializeToString,
+        response_deserializer=metastore__pb2.Table.FromString,
+        )
 
 
 class MetastoreServicer(object):
@@ -92,6 +97,13 @@ class MetastoreServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def ListTables(self, request, context):
+    """Get collection of tables
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_MetastoreServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -124,6 +136,11 @@ def add_MetastoreServicer_to_server(servicer, server):
           servicer.GetTable,
           request_deserializer=metastore__pb2.GetTableRequest.FromString,
           response_serializer=metastore__pb2.GetTableResponse.SerializeToString,
+      ),
+      'ListTables': grpc.unary_stream_rpc_method_handler(
+          servicer.ListTables,
+          request_deserializer=metastore__pb2.ListTablesRequest.FromString,
+          response_serializer=metastore__pb2.Table.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

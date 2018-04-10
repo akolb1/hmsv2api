@@ -25,6 +25,8 @@
 //                    TBLS
 //
 
+// TODO: Do not store table catalog
+
 package main
 
 import (
@@ -235,7 +237,7 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 
 	bucketName := []byte(catalog)
 	if err := s.db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(catalog))
+		_, err := tx.CreateBucketIfNotExists(bucketName)
 		if err != nil {
 			return err
 		}
@@ -278,7 +280,7 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 	})
 
 	if err != nil {
-		log.Println("failed to list databasew:", err)
+		log.Println("failed to list databases:", err)
 		return err
 	}
 
@@ -410,10 +412,10 @@ func (s *metastoreServer) CreateTable(c context.Context,
 		if err != nil {
 			return err
 		}
-        // Assign unique per-catalog ID
-        table.SeqId, _ = dbBucket.NextSequence()
+		// Assign unique per-catalog ID
+		table.SeqId, _ = dbBucket.NextSequence()
 
-        data, err := proto.Marshal(table)
+		data, err := proto.Marshal(table)
 		if err != nil {
 			return err
 		}
@@ -470,52 +472,52 @@ func (s *metastoreServer) GetTable(c context.Context,
 	var table pb.Table
 
 	err := s.db.View(func(tx *bolt.Tx) error {
-        catalogBucket := tx.Bucket([]byte(catalog))
-        if catalogBucket == nil {
-            return fmt.Errorf("bucket %s doesn't exist", catalog)
-        }
+		catalogBucket := tx.Bucket([]byte(catalog))
+		if catalogBucket == nil {
+			return fmt.Errorf("bucket %s doesn't exist", catalog)
+		}
 
-        // Locate ID by name
-        nameIdBucket := catalogBucket.Bucket([]byte(bynameHdr))
-        if nameIdBucket == nil {
-            return fmt.Errorf("corrupt catalog - missing NAME map")
-        }
-        idBytesDb := nameIdBucket.Get([]byte(dbName))
-        if idBytesDb == nil {
-            return fmt.Errorf("database %s doesn't exist", dbName)
-        }
-        dbInfoBucket := catalogBucket.Bucket([]byte(dbHdr))
-        if dbInfoBucket == nil {
-            return fmt.Errorf("corrupt catalog %s: no DB info", catalog)
-        }
-        dbBucket := dbInfoBucket.Bucket(idBytesDb)
-        if dbBucket == nil {
-            return fmt.Errorf("corrupt catalog %s/%s: no DB info", catalog, dbName)
-        }
-        byNameBucket := dbBucket.Bucket([]byte(bynameHdr))
-        if byNameBucket == nil {
-            return fmt.Errorf("corrupt catalog %s/%s: no BYNAME info", catalog, dbName)
-        }
-        byIdBucket := dbBucket.Bucket([]byte(byIDHdr))
-        if byIdBucket == nil {
-            return fmt.Errorf("corrupt catalog %s/%s: no BYID info", catalog, dbName)
-        }
-        tblIdBytes := byNameBucket.Get([]byte(tableName))
-        if tblIdBytes == nil {
-            return fmt.Errorf("table %s:%s.%s does not exist", catalog, dbName, tableName)
-        }
-        data := byIdBucket.Get(tblIdBytes)
-        if data == nil {
-            return fmt.Errorf("catalog corrupted: table %s:%s.%s does not exist",
-                catalog, dbName, tableName)
-        }
-        if err := proto.Unmarshal(data, &table); err != nil {
-            return err
-        } else {
-            return nil
-        }
+		// Locate ID by name
+		nameIdBucket := catalogBucket.Bucket([]byte(bynameHdr))
+		if nameIdBucket == nil {
+			return fmt.Errorf("corrupt catalog - missing NAME map")
+		}
+		idBytesDb := nameIdBucket.Get([]byte(dbName))
+		if idBytesDb == nil {
+			return fmt.Errorf("database %s doesn't exist", dbName)
+		}
+		dbInfoBucket := catalogBucket.Bucket([]byte(dbHdr))
+		if dbInfoBucket == nil {
+			return fmt.Errorf("corrupt catalog %s: no DB info", catalog)
+		}
+		dbBucket := dbInfoBucket.Bucket(idBytesDb)
+		if dbBucket == nil {
+			return fmt.Errorf("corrupt catalog %s/%s: no DB info", catalog, dbName)
+		}
+		byNameBucket := dbBucket.Bucket([]byte(bynameHdr))
+		if byNameBucket == nil {
+			return fmt.Errorf("corrupt catalog %s/%s: no BYNAME info", catalog, dbName)
+		}
+		byIdBucket := dbBucket.Bucket([]byte(byIDHdr))
+		if byIdBucket == nil {
+			return fmt.Errorf("corrupt catalog %s/%s: no BYID info", catalog, dbName)
+		}
+		tblIdBytes := byNameBucket.Get([]byte(tableName))
+		if tblIdBytes == nil {
+			return fmt.Errorf("table %s:%s.%s does not exist", catalog, dbName, tableName)
+		}
+		data := byIdBucket.Get(tblIdBytes)
+		if data == nil {
+			return fmt.Errorf("catalog corrupted: table %s:%s.%s does not exist",
+				catalog, dbName, tableName)
+		}
+		if err := proto.Unmarshal(data, &table); err != nil {
+			return err
+		} else {
+			return nil
+		}
 
-        return nil
+		return nil
 	})
 
 	if err != nil {
@@ -529,7 +531,73 @@ func (s *metastoreServer) GetTable(c context.Context,
 		Status: &pb.RequestStatus{Status: pb.RequestStatus_OK},
 		Table:  &table,
 	}, nil
+}
 
+func (s *metastoreServer) ListTables(req *pb.ListTablesRequest,
+	stream pb.Metastore_ListTablesServer) error {
+	log.Println("ListTables", req)
+	if req.DbId == nil {
+		return fmt.Errorf("Missing db ID")
+	}
+	catalog := req.DbId.Catalog
+	if catalog == "" {
+		return fmt.Errorf("missing catalog")
+	}
+	dbName := req.DbId.Name
+	if dbName == "" {
+		return fmt.Errorf("missing db name")
+	}
+
+	err := s.db.View(func(tx *bolt.Tx) error {
+		catalogBucket := tx.Bucket([]byte(catalog))
+		if catalogBucket == nil {
+			return fmt.Errorf("bucket %s doesn't exist", catalog)
+		}
+
+		// Locate ID by name
+		nameIdBucket := catalogBucket.Bucket([]byte(bynameHdr))
+		if nameIdBucket == nil {
+			return fmt.Errorf("corrupt catalog - missing NAME map")
+		}
+		idBytesDb := nameIdBucket.Get([]byte(dbName))
+		if idBytesDb == nil {
+			return fmt.Errorf("database %s doesn't exist", dbName)
+		}
+		dbInfoBucket := catalogBucket.Bucket([]byte(dbHdr))
+		if dbInfoBucket == nil {
+			return fmt.Errorf("corrupt catalog %s: no DB info", catalog)
+		}
+		dbBucket := dbInfoBucket.Bucket(idBytesDb)
+		if dbBucket == nil {
+			return fmt.Errorf("corrupt catalog %s/%s: no DB info", catalog, dbName)
+		}
+		byIdBucket := dbBucket.Bucket([]byte(byIDHdr))
+		if byIdBucket == nil {
+			return fmt.Errorf("corrupt catalog %s/%s: no BYNAME info", catalog, dbName)
+		}
+		byIdBucket.ForEach(func(k, v []byte) error {
+			table := new(pb.Table)
+			if err := proto.Unmarshal(v, table); err != nil {
+				return nil
+			}
+			log.Println("send", table.Id.Name)
+			// table.Id.Catalog = ""
+			if err := stream.Send(table); err != nil {
+				log.Println("err sending ", err)
+				return err
+			}
+			return nil
+		})
+
+		return nil
+	})
+
+	if err != nil {
+		log.Println("failed to list tables:", err)
+		return err
+	}
+
+	return err
 }
 
 // getULID returns a unique ID.

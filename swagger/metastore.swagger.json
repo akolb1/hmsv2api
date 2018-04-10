@@ -166,6 +166,7 @@
         "ERROR",
         "NOTFOUND",
         "CONFLICT",
+        "BUSY",
         "INTERNAL"
       ],
       "default": "OK"
