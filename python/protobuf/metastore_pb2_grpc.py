@@ -49,6 +49,11 @@ class MetastoreStub(object):
         request_serializer=metastore__pb2.ListTablesRequest.SerializeToString,
         response_deserializer=metastore__pb2.Table.FromString,
         )
+    self.DropTable = channel.unary_unary(
+        '/metastore.Metastore/DropTable',
+        request_serializer=metastore__pb2.DropTableRequest.SerializeToString,
+        response_deserializer=metastore__pb2.RequestStatus.FromString,
+        )
 
 
 class MetastoreServicer(object):
@@ -104,6 +109,13 @@ class MetastoreServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def DropTable(self, request, context):
+    """Destroy a table
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_MetastoreServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -141,6 +153,11 @@ def add_MetastoreServicer_to_server(servicer, server):
           servicer.ListTables,
           request_deserializer=metastore__pb2.ListTablesRequest.FromString,
           response_serializer=metastore__pb2.Table.SerializeToString,
+      ),
+      'DropTable': grpc.unary_unary_rpc_method_handler(
+          servicer.DropTable,
+          request_deserializer=metastore__pb2.DropTableRequest.FromString,
+          response_serializer=metastore__pb2.RequestStatus.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

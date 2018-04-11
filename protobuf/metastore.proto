@@ -37,11 +37,10 @@
  * We could call it SessionId but callers may decide to use it for whatever other
  * purposes, so using generic term here.
  *
- * Every object belongs to a catalog. The idea is that operations across
- * catalogs are completely independent. They can be forwarded to different storage
- * engines.
- *
  */
+
+// TODO: Keep catalog for DB only
+// TODO: Drop db name from table
 
 syntax = "proto3";
 
@@ -85,10 +84,8 @@ service Metastore {
     // Get collection of tables
     rpc ListTables (ListTablesRequest) returns  (stream Table);
 
-    /*
     // Destroy a table
     rpc DropTable (DropTableRequest) returns (RequestStatus);
-    */
 }
 
 // General status for results
