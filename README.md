@@ -25,6 +25,10 @@ All Java work required to use the new API is elsewhere.
 
     go get github.com/akolb1/hmsv2api/gometastore/...
     
+## Prerequisites
+
+This project uses gRPC version 3 and needs Version 3 protoc compiler in your path.
+    
 ## Running server and proxy
 
     $ hmsv2server -h
