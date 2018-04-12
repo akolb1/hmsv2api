@@ -245,7 +245,7 @@
           }
         }
       },
-      "description": "Database is a container for tables.\n\nDatabase object has two sets of parameters:\n - User parameters are intended for user and are just transparently passed around\n - System parameters are intended to be used by Hive for its internal purposes\nseq_id is a numeric ID which is unique within a catalog. It can be used to track\nnew databases in the catalog\nOriginal Metastore Database object also had owner information.\nThese can be represented using system parameters if needed since the current\nmetastore service does not interpret Owner info."
+      "description": "Database is a container for tables.\n\nDatabase object has two sets of parameters:\n - User parameters are intended for user and are just transparently passed around\n - System parameters are intended to be used by Hive for its internal purposes\n\nseq_id is a numeric ID which is unique within a catalog. It can be used to track\nnew databases in the catalog\nOriginal Metastore Database object also had owner information.\nThese can be represented using system parameters if needed since the current\nmetastore service does not interpret Owner info."
     },
     "metastoreFieldSchema": {
       "type": "object",

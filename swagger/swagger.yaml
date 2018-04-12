@@ -2,7 +2,11 @@
 swagger: 2.0
 info:
   version: 1.0
-  title: HMS V2 API
+  title: Hive Metastore Api
+  contact:
+    name: Hive Metastore Project
+    url: https://github.com/akolb1/hmsv2api
+    email: akolb1@google.com
 schemes:
 - http
 - https
@@ -11,39 +15,11 @@ consumes:
 produces:
 - application/json
 paths:
-  /v2/database/{catalog}:
+  /v2/db/{catalog}:
     get:
       tags:
       - Metastore
-      summary: Get database information
-      operationId: GetDatabase
-      parameters:
-      - name: catalog
-        in: path
-        required: true
-        type: string
-      - name: id.name
-        in: query
-        required: false
-        type: string
-      - name: id.id
-        in: query
-        required: false
-        type: string
-      - name: cookie
-        in: query
-        required: false
-        type: string
-      responses:
-        200:
-          description:
-          schema:
-            $ref: '#/definitions/metastoreGetDatabaseResponse'
-  /v2/dblist/{catalog}:
-    get:
-      tags:
-      - Metastore
-      summary: Get collection of databases
+      summary: Return all databases in a catalog
       operationId: ListDatabases
       parameters:
       - name: catalog
@@ -68,6 +44,62 @@ paths:
           description: (streaming responses)
           schema:
             $ref: '#/definitions/metastoreDatabase'
+  /v2/db/{catalog}/{id.name}:
+    get:
+      tags:
+      - Metastore
+      summary: Get database information
+      operationId: GetDatabase
+      parameters:
+      - name: catalog
+        in: path
+        required: true
+        type: string
+      - name: id.name
+        in: path
+        required: true
+        type: string
+      - name: id.id
+        in: query
+        required: false
+        type: string
+      - name: cookie
+        in: query
+        required: false
+        type: string
+      responses:
+        200:
+          description:
+          schema:
+            $ref: '#/definitions/metastoreGetDatabaseResponse'
+  /v2/table/{catalog}/{db_id.name}:
+    get:
+      tags:
+      - Metastore
+      summary: Get all tables from a database
+      operationId: ListTables
+      parameters:
+      - name: catalog
+        in: path
+        required: true
+        type: string
+      - name: db_id.name
+        in: path
+        required: true
+        type: string
+      - name: db_id.id
+        in: query
+        required: false
+        type: string
+      - name: cookie
+        in: query
+        required: false
+        type: string
+      responses:
+        200:
+          description: (streaming responses)
+          schema:
+            $ref: '#/definitions/metastoreTable'
   /v2/table/{catalog}/{db_id.name}/{id.name}:
     get:
       tags:
@@ -108,13 +140,13 @@ definitions:
   RequestStatusStatus:
     type: string
     enum:
-    - OK
-    - ERROR
-    - NOTFOUND
-    - CONFLICT
-    - BUSY
-    - INTERNAL
-    default: OK
+    - STATUS_OK
+    - STATUS_ERROR
+    - STATUS_NOTFOUND
+    - STATUS_CONFLICT
+    - STATUS_BUSY
+    - STATUS_INTERNAL_ERR
+    default: STATUS_OK
   metastoreDatabase:
     type: object
     properties:
@@ -133,15 +165,15 @@ definitions:
         type: object
         additionalProperties:
           type: string
-    title: |-
+    description: |-
       Database is a container for tables.
+
       Database object has two sets of parameters:
        - User parameters are intended for user and are just transparently passed around
        - System parameters are intended to be used by Hive for its internal purposes
-    description: |-
+
       seq_id is a numeric ID which is unique within a catalog. It can be used to track
       new databases in the catalog
-
       Original Metastore Database object also had owner information.
       These can be represented using system parameters if needed since the current
       metastore service does not interpret Owner info.
@@ -188,7 +220,6 @@ definitions:
         parameters:
           key: parameters
       status:
-        cookie: cookie
         error: error
         status: {}
   metastoreGetTableResponse:
@@ -249,7 +280,6 @@ definitions:
         parameters:
           key: parameters
       status:
-        cookie: cookie
         error: error
         status: {}
   metastoreId:
@@ -261,8 +291,12 @@ definitions:
         type: string
     description: |-
       Objects have unique name and unique ID.
+
+      Name of the object can change but ID never changes. This allows caching of objects
+      by ID.
       Both name and ID are just sequence of bytes - there are no
       assumptions about encoding or length.
+      Implementations may enforce specific assumptions.
     example:
       name: name
       id: id
@@ -303,11 +337,11 @@ definitions:
         $ref: '#/definitions/RequestStatusStatus'
       error:
         type: string
-      cookie:
-        type: string
-    title: General status for results
+    description: |-
+      General status for results.
+
+      All non-streaming requests should return RequestStatus.
     example:
-      cookie: cookie
       error: error
       status: {}
   metastoreSerDeInfo:
@@ -497,3 +531,6 @@ definitions:
     - TTYPE_EXTERNAL
     - TTYPE_INDEX
     default: TTYPE_MANAGED
+externalDocs:
+  description: Metastore API V2 Documentation
+  url: https://github.com/akolb1/hmsv2api

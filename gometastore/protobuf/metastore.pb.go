@@ -270,6 +270,7 @@ func (m *Id) GetId() string {
 // Database object has two sets of parameters:
 //  - User parameters are intended for user and are just transparently passed around
 //  - System parameters are intended to be used by Hive for its internal purposes
+//
 // seq_id is a numeric ID which is unique within a catalog. It can be used to track
 // new databases in the catalog
 // Original Metastore Database object also had owner information.
