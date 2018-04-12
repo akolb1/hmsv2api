@@ -35,3 +35,6 @@ doc: $(PROTO)
 protobuf: $(SWAGGER)
 	protoc $(INCLUDES) $(PROTO) --go_out=plugins=grpc:$(GOPROTO) && \
     protoc $(INCLUDES) --grpc-gateway_out=logtostderr=true:$(GOPROTO) ${PROTO}
+
+install:
+	go get github.com/akolb1/hmsv2api/gometastore/...
