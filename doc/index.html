@@ -321,7 +321,7 @@
 
       
         <h3 id="metastore.CreateDatabaseRequest">CreateDatabaseRequest</h3>
-        <p>Create a new database.</p>
+        <p>Create a new database.</p><p>If database.Id.id is empty, it will be assigned a unique ID</p><p>database.seq_id is assigned when database is created</p>
 
         
           <table class="field-table">
@@ -402,7 +402,7 @@
         
       
         <h3 id="metastore.Database">Database</h3>
-        <p>Database is a container for tables.</p><p>Database object has two sets of parameters:</p><p>- User parameters are intended for user and are just transparently passed around</p><p>- System parameters are intended to be used by Hive for its internal purposes</p><p>seq_id is a numeric ID which is unique within a catalog. It can be used to track</p><p>new databases in the catalog</p><p>Original Metastore Database object also had owner information.</p><p>These can be represented using system parameters if needed since the current</p><p>metastore service does not interpret Owner info.</p>
+        <p>Database is a container for tables.</p><p>Database object has two sets of parameters:</p><p>- User parameters are intended for user and are just transparently passed around</p><p>- System parameters are intended to be used by Hive for its internal purposes</p><p>Database has two IDs:</p><p>- Id.id is assigned during database creation and it is a unique and stable ID. WHile database</p><p>name can change, the id can't, so clients can cache Database by ID.</p><p>- seq_id is assigned during database creation. It should be a unique ID within the catalog.</p><p>The intention is having an incrementing integer value for each new database. It is not</p><p>guaranteed to be monotonous.</p><p>Original Metastore Database object also had owner information.</p><p>These can be represented using system parameters if needed since the current</p><p>metastore service does not interpret Owner info.</p>
 
         
           <table class="field-table">
@@ -631,7 +631,7 @@
         
       
         <h3 id="metastore.GetDatabaseRequest">GetDatabaseRequest</h3>
-        <p>Request to get database by its ID.</p>
+        <p>Request to get database by its ID.</p><p>Database can be located by either part of the ID. If id.id is specified, it will be used first,</p><p>otherwise iid.name is used. One of these must be specified.</p>
 
         
           <table class="field-table">
@@ -668,7 +668,7 @@
         
       
         <h3 id="metastore.GetDatabaseResponse">GetDatabaseResponse</h3>
-        <p></p>
+        <p>Result of GetDatabase request</p><p>The result consists of the database information (which may be empty in case of failure)</p><p>and request status.</p><p>TODO: specify error cases</p>
 
         
           <table class="field-table">

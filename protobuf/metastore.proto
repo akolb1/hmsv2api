@@ -146,8 +146,13 @@ message Id {
 //  - User parameters are intended for user and are just transparently passed around
 //  - System parameters are intended to be used by Hive for its internal purposes
 //
-// seq_id is a numeric ID which is unique within a catalog. It can be used to track
-// new databases in the catalog
+// Database has two IDs:
+// - Id.id is assigned during database creation and it is a unique and stable ID. WHile database
+//   name can change, the id can't, so clients can cache Database by ID.
+// - seq_id is assigned during database creation. It should be a unique ID within the catalog.
+//   The intention is having an incrementing integer value for each new database. It is not
+//   guaranteed to be monotonous.
+//
 // Original Metastore Database object also had owner information.
 // These can be represented using system parameters if needed since the current
 // metastore service does not interpret Owner info.
@@ -160,6 +165,9 @@ message Database {
 }
 
 // Create a new database.
+//
+// If database.Id.id is empty, it will be assigned a unique ID
+// database.seq_id is assigned when database is created
 message CreateDatabaseRequest {
     string catalog = 1;     // Catalog this database belongs to
     Database database = 2;  // Database object
@@ -167,12 +175,20 @@ message CreateDatabaseRequest {
 }
 
 // Request to get database by its ID.
+//
+// Database can be located by either part of the ID. If id.id is specified, it will be used first,
+// otherwise iid.name is used. One of these must be specified.
 message GetDatabaseRequest {
     string catalog = 1;  // Catalog this database belongs to
     Id     id = 2;       // Database ID. Database can be found by name or id/
     string cookie = 3;   // Session cookie
 }
 
+// Result of GetDatabase request
+//
+// The result consists of the database information (which may be empty in case of failure)
+// and request status.
+// TODO: specify error cases
 message GetDatabaseResponse {
     Database      database = 1;
     RequestStatus status = 2;

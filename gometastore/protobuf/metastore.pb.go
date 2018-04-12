@@ -271,8 +271,13 @@ func (m *Id) GetId() string {
 //  - User parameters are intended for user and are just transparently passed around
 //  - System parameters are intended to be used by Hive for its internal purposes
 //
-// seq_id is a numeric ID which is unique within a catalog. It can be used to track
-// new databases in the catalog
+// Database has two IDs:
+// - Id.id is assigned during database creation and it is a unique and stable ID. WHile database
+//   name can change, the id can't, so clients can cache Database by ID.
+// - seq_id is assigned during database creation. It should be a unique ID within the catalog.
+//   The intention is having an incrementing integer value for each new database. It is not
+//   guaranteed to be monotonous.
+//
 // Original Metastore Database object also had owner information.
 // These can be represented using system parameters if needed since the current
 // metastore service does not interpret Owner info.
@@ -325,6 +330,9 @@ func (m *Database) GetSystemParameters() map[string]string {
 }
 
 // Create a new database.
+//
+// If database.Id.id is empty, it will be assigned a unique ID
+// database.seq_id is assigned when database is created
 type CreateDatabaseRequest struct {
 	Catalog  string    `protobuf:"bytes,1,opt,name=catalog" json:"catalog,omitempty"`
 	Database *Database `protobuf:"bytes,2,opt,name=database" json:"database,omitempty"`
@@ -358,6 +366,9 @@ func (m *CreateDatabaseRequest) GetCookie() string {
 }
 
 // Request to get database by its ID.
+//
+// Database can be located by either part of the ID. If id.id is specified, it will be used first,
+// otherwise iid.name is used. One of these must be specified.
 type GetDatabaseRequest struct {
 	Catalog string `protobuf:"bytes,1,opt,name=catalog" json:"catalog,omitempty"`
 	Id      *Id    `protobuf:"bytes,2,opt,name=id" json:"id,omitempty"`
@@ -390,6 +401,11 @@ func (m *GetDatabaseRequest) GetCookie() string {
 	return ""
 }
 
+// Result of GetDatabase request
+//
+// The result consists of the database information (which may be empty in case of failure)
+// and request status.
+// TODO: specify error cases
 type GetDatabaseResponse struct {
 	Database *Database      `protobuf:"bytes,1,opt,name=database" json:"database,omitempty"`
 	Status   *RequestStatus `protobuf:"bytes,2,opt,name=status" json:"status,omitempty"`

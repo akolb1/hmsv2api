@@ -245,7 +245,7 @@
           }
         }
       },
-      "description": "Database is a container for tables.\n\nDatabase object has two sets of parameters:\n - User parameters are intended for user and are just transparently passed around\n - System parameters are intended to be used by Hive for its internal purposes\n\nseq_id is a numeric ID which is unique within a catalog. It can be used to track\nnew databases in the catalog\nOriginal Metastore Database object also had owner information.\nThese can be represented using system parameters if needed since the current\nmetastore service does not interpret Owner info."
+      "description": "Database is a container for tables.\n\nDatabase object has two sets of parameters:\n - User parameters are intended for user and are just transparently passed around\n - System parameters are intended to be used by Hive for its internal purposes\n\nDatabase has two IDs:\n- Id.id is assigned during database creation and it is a unique and stable ID. WHile database\n  name can change, the id can't, so clients can cache Database by ID.\n- seq_id is assigned during database creation. It should be a unique ID within the catalog.\n  The intention is having an incrementing integer value for each new database. It is not\n  guaranteed to be monotonous.\n\nOriginal Metastore Database object also had owner information.\nThese can be represented using system parameters if needed since the current\nmetastore service does not interpret Owner info."
     },
     "metastoreFieldSchema": {
       "type": "object",
@@ -271,7 +271,9 @@
         "status": {
           "$ref": "#/definitions/metastoreRequestStatus"
         }
-      }
+      },
+      "description": "The result consists of the database information (which may be empty in case of failure)\nand request status.\nTODO: specify error cases",
+      "title": "Result of GetDatabase request"
     },
     "metastoreGetTableResponse": {
       "type": "object",
