@@ -34,3 +34,16 @@ cd ${TOP} &&
   --python_out=python/protobuf \
   --grpc_python_out=python/protobuf \
   protobuf/metastore.proto
+
+# Generate Docs
+cd ${TOP} && protoc \
+    -I protobuf \
+    -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+    --doc_out=doc --doc_opt=markdown,README.md \
+    protobuf/metastore.proto
+
+cd ${TOP} && protoc \
+    -I protobuf \
+    -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+    --doc_out=doc --doc_opt=html,index.html \
+    protobuf/metastore.proto

@@ -240,6 +240,7 @@ func (m *RequestStatus) GetCookie() string {
 }
 
 // Objects have unique name and unique ID.
+//
 // Both name and ID are just sequence of bytes - there are no
 // assumptions about encoding or length.
 type Id struct {
@@ -267,13 +268,12 @@ func (m *Id) GetId() string {
 }
 
 // Database is a container for tables.
+//
 // Database object has two sets of parameters:
 //  - User parameters are intended for user and are just transparently passed around
 //  - System parameters are intended to be used by Hive for its internal purposes
-//
 // seq_id is a numeric ID which is unique within a catalog. It can be used to track
 // new databases in the catalog
-//
 // Original Metastore Database object also had owner information.
 // These can be represented using system parameters if needed since the current
 // metastore service does not interpret Owner info.

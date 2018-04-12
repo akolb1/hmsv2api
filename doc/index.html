@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Protocol Documentation</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic"/>
+    <style>
+      body {
+        width: 60em;
+        margin: 1em auto;
+        color: #222;
+        font-family: "Ubuntu", sans-serif;
+        padding-bottom: 4em;
+      }
+
+      h1 {
+        font-weight: normal;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+      }
+
+      h2 {
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+        margin: 1.5em 0;
+      }
+
+      h3 {
+        font-weight: normal;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+      }
+
+      a {
+        text-decoration: none;
+        color: #567e25;
+      }
+
+      table {
+        width: 100%;
+        font-size: 80%;
+        border-collapse: collapse;
+      }
+
+      thead {
+        font-weight: 700;
+        background-color: #dcdcdc;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: #fbfbfb;
+      }
+
+      td {
+        border: 1px solid #ccc;
+        padding: 0.5ex 2ex;
+      }
+
+      td p {
+        text-indent: 1em;
+        margin: 0;
+      }
+
+      td p:nth-child(1) {
+        text-indent: 0;  
+      }
+
+       
+      .field-table td:nth-child(1) {  
+        width: 10em;
+      }
+      .field-table td:nth-child(2) {  
+        width: 10em;
+      }
+      .field-table td:nth-child(3) {  
+        width: 6em;
+      }
+      .field-table td:nth-child(4) {  
+        width: auto;
+      }
+
+       
+      .extension-table td:nth-child(1) {  
+        width: 10em;
+      }
+      .extension-table td:nth-child(2) {  
+        width: 10em;
+      }
+      .extension-table td:nth-child(3) {  
+        width: 10em;
+      }
+      .extension-table td:nth-child(4) {  
+        width: 5em;
+      }
+      .extension-table td:nth-child(5) {  
+        width: auto;
+      }
+
+       
+      .enum-table td:nth-child(1) {  
+        width: 10em;
+      }
+      .enum-table td:nth-child(2) {  
+        width: 10em;
+      }
+      .enum-table td:nth-child(3) {  
+        width: auto;
+      }
+
+       
+      .scalar-value-types-table tr {
+        height: 3em;
+      }
+
+       
+      #toc-container ul {
+        list-style-type: none;
+        padding-left: 1em;
+        line-height: 180%;
+        margin: 0;
+      }
+      #toc > li > a {
+        font-weight: bold;
+      }
+
+       
+      .file-heading {
+        width: 100%;
+        display: table;
+        border-bottom: 1px solid #aaa;
+        margin: 4em 0 1.5em 0;
+      }
+      .file-heading h2 {
+        border: none;
+        display: table-cell;
+      }
+      .file-heading a {
+        text-align: right;
+        display: table-cell;
+      }
+
+       
+      .badge {
+        width: 1.6em;
+        height: 1.6em;
+        display: inline-block;
+
+        line-height: 1.6em;
+        text-align: center;
+        font-weight: bold;
+        font-size: 60%;
+
+        color: #89ba48;
+        background-color: #dff0c8;
+
+        margin: 0.5ex 1em 0.5ex -1em;
+        border: 1px solid #fbfbfb;
+        border-radius: 1ex;
+      }
+    </style>
+
+    
+    <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+  </head>
+
+  <body>
+
+    <h1 id="title">Protocol Documentation</h1>
+
+    <h2>Table of Contents</h2>
+
+    <div id="toc-container">
+      <ul id="toc">
+        
+          
+          <li>
+            <a href="#metastore.proto">metastore.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#metastore.CreateDatabaseRequest"><span class="badge">M</span>CreateDatabaseRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.CreateTableRequest"><span class="badge">M</span>CreateTableRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.Database"><span class="badge">M</span>Database</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.Database.ParametersEntry"><span class="badge">M</span>Database.ParametersEntry</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.Database.SystemParametersEntry"><span class="badge">M</span>Database.SystemParametersEntry</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.DropDatabaseRequest"><span class="badge">M</span>DropDatabaseRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.DropTableRequest"><span class="badge">M</span>DropTableRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.FieldSchema"><span class="badge">M</span>FieldSchema</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.GetDatabaseRequest"><span class="badge">M</span>GetDatabaseRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.GetDatabaseResponse"><span class="badge">M</span>GetDatabaseResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.GetTableRequest"><span class="badge">M</span>GetTableRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.GetTableResponse"><span class="badge">M</span>GetTableResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.Id"><span class="badge">M</span>Id</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.ListDatabasesRequest"><span class="badge">M</span>ListDatabasesRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.ListTablesRequest"><span class="badge">M</span>ListTablesRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.Order"><span class="badge">M</span>Order</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.RequestStatus"><span class="badge">M</span>RequestStatus</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.SerDeInfo"><span class="badge">M</span>SerDeInfo</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.SerDeInfo.ParametersEntry"><span class="badge">M</span>SerDeInfo.ParametersEntry</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.StorageDescriptor"><span class="badge">M</span>StorageDescriptor</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.StorageDescriptor.ParametersEntry"><span class="badge">M</span>StorageDescriptor.ParametersEntry</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.StorageDescriptor.SystemParametersEntry"><span class="badge">M</span>StorageDescriptor.SystemParametersEntry</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.Table"><span class="badge">M</span>Table</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.Table.ParametersEntry"><span class="badge">M</span>Table.ParametersEntry</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.Table.SystemParametersEntry"><span class="badge">M</span>Table.SystemParametersEntry</a>
+                </li>
+              
+              
+                <li>
+                  <a href="#metastore.InputFormat"><span class="badge">E</span>InputFormat</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.OutputFormat"><span class="badge">E</span>OutputFormat</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.RequestStatus.Status"><span class="badge">E</span>RequestStatus.Status</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.SerdeType"><span class="badge">E</span>SerdeType</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.TableType"><span class="badge">E</span>TableType</a>
+                </li>
+              
+              
+              
+                <li>
+                  <a href="#metastore.Metastore"><span class="badge">S</span>Metastore</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+        <li><a href="#scalar-value-types">Scalar Value Types</a></li>
+      </ul>
+    </div>
+
+    
+      
+      <div class="file-heading">
+        <h2 id="metastore.proto">metastore.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="metastore.CreateDatabaseRequest">CreateDatabaseRequest</h3>
+        <p>Create a new database.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>catalog</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>database</td>
+                  <td><a href="#metastore.Database">Database</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cookie</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.CreateTableRequest">CreateTableRequest</h3>
+        <p>Create a new table.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>catalog</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>db_id</td>
+                  <td><a href="#metastore.Id">Id</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>table</td>
+                  <td><a href="#metastore.Table">Table</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cookie</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.Database">Database</h3>
+        <p>Database is a container for tables.</p><p>Database object has two sets of parameters:</p><p>- User parameters are intended for user and are just transparently passed around</p><p>- System parameters are intended to be used by Hive for its internal purposes</p><p>seq_id is a numeric ID which is unique within a catalog. It can be used to track</p><p>new databases in the catalog</p><p>Original Metastore Database object also had owner information.</p><p>These can be represented using system parameters if needed since the current</p><p>metastore service does not interpret Owner info.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#metastore.Id">Id</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>seq_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Unique sequence ID within calalog </p></td>
+                </tr>
+              
+                <tr>
+                  <td>location</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Default location of database objects </p></td>
+                </tr>
+              
+                <tr>
+                  <td>parameters</td>
+                  <td><a href="#metastore.Database.ParametersEntry">Database.ParametersEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>Database user parameters </p></td>
+                </tr>
+              
+                <tr>
+                  <td>system_parameters</td>
+                  <td><a href="#metastore.Database.SystemParametersEntry">Database.SystemParametersEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>System parameters </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.Database.ParametersEntry">Database.ParametersEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.Database.SystemParametersEntry">Database.SystemParametersEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.DropDatabaseRequest">DropDatabaseRequest</h3>
+        <p>Request to drop a database.</p><p>Dropping a database also drops all objects contained in the database.</p><p>TODO: Add flag to prohibit dropping non-empty databases</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>catalog</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#metastore.Id">Id</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cookie</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.DropTableRequest">DropTableRequest</h3>
+        <p>Request to drop a table.</p><p>Dropping a table also drops all objects contained in the table</p><p>TODO: Add flag to prohibit dropping of non-empty table</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>catalog</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>db_id</td>
+                  <td><a href="#metastore.Id">Id</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#metastore.Id">Id</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cookie</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.FieldSchema">FieldSchema</h3>
+        <p>FieldSchema defines name and type for each column.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>name of the field </p></td>
+                </tr>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>type of the field. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>comment</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>User description </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.GetDatabaseRequest">GetDatabaseRequest</h3>
+        <p>Request to get database by its ID.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>catalog</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#metastore.Id">Id</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cookie</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.GetDatabaseResponse">GetDatabaseResponse</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>database</td>
+                  <td><a href="#metastore.Database">Database</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#metastore.RequestStatus">RequestStatus</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.GetTableRequest">GetTableRequest</h3>
+        <p>Request to get table by its ID.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>catalog</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>db_id</td>
+                  <td><a href="#metastore.Id">Id</a></td>
+                  <td></td>
+                  <td><p>Database ID </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#metastore.Id">Id</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cookie</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.GetTableResponse">GetTableResponse</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>table</td>
+                  <td><a href="#metastore.Table">Table</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#metastore.RequestStatus">RequestStatus</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.Id">Id</h3>
+        <p>Objects have unique name and unique ID.</p><p>Both name and ID are just sequence of bytes - there are no</p><p>assumptions about encoding or length.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.ListDatabasesRequest">ListDatabasesRequest</h3>
+        <p>Request to get list of databases</p><p>If exclude_params is set, result may omit parameters</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>catalog</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cookie</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name_pattern</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>exclude_params</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.ListTablesRequest">ListTablesRequest</h3>
+        <p>Request to get list of databases</p><p>If exclude_params is set, result may omit parameters</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>catalog</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>db_id</td>
+                  <td><a href="#metastore.Id">Id</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cookie</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.Order">Order</h3>
+        <p>sort order of a column (column name along with asc/desc)</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>col</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>sort column name </p></td>
+                </tr>
+              
+                <tr>
+                  <td>ascending</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>asc(1) or desc(0) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.RequestStatus">RequestStatus</h3>
+        <p>General status for results</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#metastore.RequestStatus.Status">RequestStatus.Status</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>error</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>detailed error message </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cookie</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>copied from request </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.SerDeInfo">SerDeInfo</h3>
+        <p>Serialization/Deserialization information</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>type</td>
+                  <td><a href="#metastore.SerdeType">SerdeType</a></td>
+                  <td></td>
+                  <td><p>Serde type. If CUSTOM, use the name </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>name of the serde, table name by default </p></td>
+                </tr>
+              
+                <tr>
+                  <td>serializationLib</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>usually the class that implements the extractor &amp; loader </p></td>
+                </tr>
+              
+                <tr>
+                  <td>parameters</td>
+                  <td><a href="#metastore.SerDeInfo.ParametersEntry">SerDeInfo.ParametersEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>NOTE: Should we enum this as well?
+
+initialization parameters </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.SerDeInfo.ParametersEntry">SerDeInfo.ParametersEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.StorageDescriptor">StorageDescriptor</h3>
+        <p>StorageDescriptor holds all the information about physical storage of the data belonging to a table</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>cols</td>
+                  <td><a href="#metastore.FieldSchema">FieldSchema</a></td>
+                  <td>repeated</td>
+                  <td><p>required (refer to types defined above) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>location</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Object location </p></td>
+                </tr>
+              
+                <tr>
+                  <td>inputFormat</td>
+                  <td><a href="#metastore.InputFormat">InputFormat</a></td>
+                  <td></td>
+                  <td><p>Specification of input format. If custom, use inputFormatName. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>inputFormatName</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Name of input format if custom </p></td>
+                </tr>
+              
+                <tr>
+                  <td>outputFormat</td>
+                  <td><a href="#metastore.OutputFormat">OutputFormat</a></td>
+                  <td></td>
+                  <td><p>Specification of input format. If custom, use outputFormatName. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>outputFormatName</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Name of output format if custom </p></td>
+                </tr>
+              
+                <tr>
+                  <td>numBuckets</td>
+                  <td><a href="#int32">int32</a></td>
+                  <td></td>
+                  <td><p>this must be specified if there are any dimension columns </p></td>
+                </tr>
+              
+                <tr>
+                  <td>serdeInfo</td>
+                  <td><a href="#metastore.SerDeInfo">SerDeInfo</a></td>
+                  <td></td>
+                  <td><p>serialization and deserialization information </p></td>
+                </tr>
+              
+                <tr>
+                  <td>bucketCols</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>reducer grouping columns and clustering columns and bucketing columns` </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sortCols</td>
+                  <td><a href="#metastore.Order">Order</a></td>
+                  <td>repeated</td>
+                  <td><p>sort order of the data in each bucket </p></td>
+                </tr>
+              
+                <tr>
+                  <td>parameters</td>
+                  <td><a href="#metastore.StorageDescriptor.ParametersEntry">StorageDescriptor.ParametersEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>any user supplied key value hash </p></td>
+                </tr>
+              
+                <tr>
+                  <td>system_parameters</td>
+                  <td><a href="#metastore.StorageDescriptor.SystemParametersEntry">StorageDescriptor.SystemParametersEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>Internal parameters not settable by user </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.StorageDescriptor.ParametersEntry">StorageDescriptor.ParametersEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.StorageDescriptor.SystemParametersEntry">StorageDescriptor.SystemParametersEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.Table">Table</h3>
+        <p>Table information</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#metastore.Id">Id</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>seq_id</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Sequential ID within database </p></td>
+                </tr>
+              
+                <tr>
+                  <td>sd</td>
+                  <td><a href="#metastore.StorageDescriptor">StorageDescriptor</a></td>
+                  <td></td>
+                  <td><p>storage descriptor of the table </p></td>
+                </tr>
+              
+                <tr>
+                  <td>partitionKeys</td>
+                  <td><a href="#metastore.FieldSchema">FieldSchema</a></td>
+                  <td>repeated</td>
+                  <td><p>partition keys of the table. only primitive types are supported </p></td>
+                </tr>
+              
+                <tr>
+                  <td>tableType</td>
+                  <td><a href="#metastore.TableType">TableType</a></td>
+                  <td></td>
+                  <td><p>table type enum, e.g. EXTERNAL_TABLE </p></td>
+                </tr>
+              
+                <tr>
+                  <td>parameters</td>
+                  <td><a href="#metastore.Table.ParametersEntry">Table.ParametersEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>User-settable parameters </p></td>
+                </tr>
+              
+                <tr>
+                  <td>system_parameters</td>
+                  <td><a href="#metastore.Table.SystemParametersEntry">Table.SystemParametersEntry</a></td>
+                  <td>repeated</td>
+                  <td><p>Internal parameters </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.Table.ParametersEntry">Table.ParametersEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.Table.SystemParametersEntry">Table.SystemParametersEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+
+      
+        <h3 id="metastore.InputFormat">InputFormat</h3>
+        <p>Known Input Formats. CUSTOM means that it should be specified as a string.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>IF_CUSTOM</td>
+                <td>0</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>IF_SEQUENCE</td>
+                <td>1</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>IF_TEXT</td>
+                <td>2</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>IF_HIVE</td>
+                <td>3</td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+        <h3 id="metastore.OutputFormat">OutputFormat</h3>
+        <p>Known Output Formats. CUSTOM means that it should be specified as a string.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>OF_CUSTOM</td>
+                <td>0</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>OF_SEQUENCE</td>
+                <td>2</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>OF_IGNORE_KEY</td>
+                <td>3</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>OF_HIVE</td>
+                <td>4</td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+        <h3 id="metastore.RequestStatus.Status">RequestStatus.Status</h3>
+        <p></p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>OK</td>
+                <td>0</td>
+                <td><p>successful request</p></td>
+              </tr>
+            
+              <tr>
+                <td>ERROR</td>
+                <td>1</td>
+                <td><p>General error</p></td>
+              </tr>
+            
+              <tr>
+                <td>NOTFOUND</td>
+                <td>2</td>
+                <td><p>Requested object not found</p></td>
+              </tr>
+            
+              <tr>
+                <td>CONFLICT</td>
+                <td>3</td>
+                <td><p>Object already exists</p></td>
+              </tr>
+            
+              <tr>
+                <td>BUSY</td>
+                <td>4</td>
+                <td><p>Object is busy/used and can&#39;t be accessed/destroyed</p></td>
+              </tr>
+            
+              <tr>
+                <td>INTERNAL</td>
+                <td>5</td>
+                <td><p>Internal server error</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+        <h3 id="metastore.SerdeType">SerdeType</h3>
+        <p>Known SerDes are represented using enum. Unknown ones are represented using strings.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>SERDE_CUSTOM</td>
+                <td>0</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>SERDE_LAZY_SIMPLE</td>
+                <td>1</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>SERDE_AVRO</td>
+                <td>2</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>SERDE_JSON</td>
+                <td>3</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>SERDE_ORC</td>
+                <td>4</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>SERDE_REGEX</td>
+                <td>5</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>SERDE_THRIFT</td>
+                <td>6</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>SERDE_PARQUET</td>
+                <td>7</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>SERDE_CSV</td>
+                <td>8</td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+        <h3 id="metastore.TableType">TableType</h3>
+        <p></p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>TTYPE_MANAGED</td>
+                <td>0</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>TTYPE_EXTERNAL</td>
+                <td>1</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>TTYPE_INDEX</td>
+                <td>2</td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      
+
+      
+        <h3 id="metastore.Metastore">Metastore</h3>
+        <p>Metastore service</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>CreateDabatase</td>
+                <td><a href="#metastore.CreateDatabaseRequest">CreateDatabaseRequest</a></td>
+                <td><a href="#metastore.GetDatabaseResponse">GetDatabaseResponse</a></td>
+                <td><p>Create a new database</p></td>
+              </tr>
+            
+              <tr>
+                <td>GetDatabase</td>
+                <td><a href="#metastore.GetDatabaseRequest">GetDatabaseRequest</a></td>
+                <td><a href="#metastore.GetDatabaseResponse">GetDatabaseResponse</a></td>
+                <td><p>Get database information</p></td>
+              </tr>
+            
+              <tr>
+                <td>ListDatabases</td>
+                <td><a href="#metastore.ListDatabasesRequest">ListDatabasesRequest</a></td>
+                <td><a href="#metastore.Database">Database</a></td>
+                <td><p>Get collection of databases</p></td>
+              </tr>
+            
+              <tr>
+                <td>DropDatabase</td>
+                <td><a href="#metastore.DropDatabaseRequest">DropDatabaseRequest</a></td>
+                <td><a href="#metastore.RequestStatus">RequestStatus</a></td>
+                <td><p>Destroy a database</p></td>
+              </tr>
+            
+              <tr>
+                <td>CreateTable</td>
+                <td><a href="#metastore.CreateTableRequest">CreateTableRequest</a></td>
+                <td><a href="#metastore.GetTableResponse">GetTableResponse</a></td>
+                <td><p>Create a new table</p></td>
+              </tr>
+            
+              <tr>
+                <td>GetTable</td>
+                <td><a href="#metastore.GetTableRequest">GetTableRequest</a></td>
+                <td><a href="#metastore.GetTableResponse">GetTableResponse</a></td>
+                <td><p>Get table information</p></td>
+              </tr>
+            
+              <tr>
+                <td>ListTables</td>
+                <td><a href="#metastore.ListTablesRequest">ListTablesRequest</a></td>
+                <td><a href="#metastore.Table">Table</a></td>
+                <td><p>Get collection of tables</p></td>
+              </tr>
+            
+              <tr>
+                <td>DropTable</td>
+                <td><a href="#metastore.DropTableRequest">DropTableRequest</a></td>
+                <td><a href="#metastore.RequestStatus">RequestStatus</a></td>
+                <td><p>Destroy a table</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+    
+
+    <h2 id="scalar-value-types">Scalar Value Types</h2>
+    <table class="scalar-value-types-table">
+      <thead>
+        <tr><td>.proto Type</td><td>Notes</td><td>C++ Type</td><td>Java Type</td><td>Python Type</td></tr>
+      </thead>
+      <tbody>
+        
+          <tr id="double">
+            <td>double</td>
+            <td></td>
+            <td>double</td>
+            <td>double</td>
+            <td>float</td>
+          </tr>
+        
+          <tr id="float">
+            <td>float</td>
+            <td></td>
+            <td>float</td>
+            <td>float</td>
+            <td>float</td>
+          </tr>
+        
+          <tr id="int32">
+            <td>int32</td>
+            <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead.</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>int</td>
+          </tr>
+        
+          <tr id="int64">
+            <td>int64</td>
+            <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead.</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>int/long</td>
+          </tr>
+        
+          <tr id="uint32">
+            <td>uint32</td>
+            <td>Uses variable-length encoding.</td>
+            <td>uint32</td>
+            <td>int</td>
+            <td>int/long</td>
+          </tr>
+        
+          <tr id="uint64">
+            <td>uint64</td>
+            <td>Uses variable-length encoding.</td>
+            <td>uint64</td>
+            <td>long</td>
+            <td>int/long</td>
+          </tr>
+        
+          <tr id="sint32">
+            <td>sint32</td>
+            <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s.</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>int</td>
+          </tr>
+        
+          <tr id="sint64">
+            <td>sint64</td>
+            <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s.</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>int/long</td>
+          </tr>
+        
+          <tr id="fixed32">
+            <td>fixed32</td>
+            <td>Always four bytes. More efficient than uint32 if values are often greater than 2^28.</td>
+            <td>uint32</td>
+            <td>int</td>
+            <td>int</td>
+          </tr>
+        
+          <tr id="fixed64">
+            <td>fixed64</td>
+            <td>Always eight bytes. More efficient than uint64 if values are often greater than 2^56.</td>
+            <td>uint64</td>
+            <td>long</td>
+            <td>int/long</td>
+          </tr>
+        
+          <tr id="sfixed32">
+            <td>sfixed32</td>
+            <td>Always four bytes.</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>int</td>
+          </tr>
+        
+          <tr id="sfixed64">
+            <td>sfixed64</td>
+            <td>Always eight bytes.</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>int/long</td>
+          </tr>
+        
+          <tr id="bool">
+            <td>bool</td>
+            <td></td>
+            <td>bool</td>
+            <td>boolean</td>
+            <td>boolean</td>
+          </tr>
+        
+          <tr id="string">
+            <td>string</td>
+            <td>A string must always contain UTF-8 encoded or 7-bit ASCII text.</td>
+            <td>string</td>
+            <td>String</td>
+            <td>str/unicode</td>
+          </tr>
+        
+          <tr id="bytes">
+            <td>bytes</td>
+            <td>May contain any arbitrary sequence of bytes.</td>
+            <td>string</td>
+            <td>ByteString</td>
+            <td>str</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </body>
+</html>
+
