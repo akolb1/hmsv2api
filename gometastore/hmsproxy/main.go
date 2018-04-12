@@ -1,3 +1,5 @@
+//go:generate protoc -I../../protobuf -I ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis -I ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway ../../protobuf/metastore.proto --grpc-gateway_out=logtostderr=true:../protobuf
+
 package main
 
 import (

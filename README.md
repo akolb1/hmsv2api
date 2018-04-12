@@ -23,18 +23,18 @@ All Java work required to use the new API is elsewhere.
 
 ## Installation
 
-    go get go get -v github.com/akolb1/hmsv2api/gometastore/...
+    go get github.com/akolb1/hmsv2api/gometastore/...
     
 ## Running server and proxy
 
-    $ ./gometastore/hmsv2server/hmsv2server -h
+    $ hmsv2server -h
     Usage of ./gometastore/hmsv2server/hmsv2server:
       -dbname string
             db name (default "hms2.db")
       -port int
             The server port (default 10010)
             
-    $ ./gometastore/hmsproxy/hmsproxy -h
+    $ hmsproxy -h
     Usage of ./gometastore/hmsproxy/hmsproxy:
       -hms string
             HMS endpoint (default "localhost:10010")
@@ -48,6 +48,9 @@ All Java work required to use the new API is elsewhere.
 The definition is in [protobuf/metastore.proto](protobuf/metastore.proto).
 After any changes, please run
 
-    bin/genproto.sh
+    make proto
     
 to regenerate all auto-generated files. 
+To regenerate documentation use
+
+    make doc

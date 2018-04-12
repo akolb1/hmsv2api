@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# This is obsolete, use makefile instead
+
 myhome=$(git rev-parse --show-toplevel)
 TOP=${myhome}
 PR=protobuf/metastore.proto
