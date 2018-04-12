@@ -2,6 +2,7 @@
 
 myhome=$(git rev-parse --show-toplevel)
 TOP=${myhome}
+PR=protobuf/metastore.proto
 
 GOPATH=~/go
 INCLUDES="-I protobuf"
@@ -12,19 +13,19 @@ INCLUDES+=" -I ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway"
 # Generate Go stubs
 cd ${TOP} && protoc \
     ${INCLUDES} \
-    protobuf/metastore.proto --go_out=plugins=grpc:gometastore/protobuf
+    ${PROTO} --go_out=plugins=grpc:gometastore/protobuf
 
 # Generate reverse proxy
 cd ${TOP} && protoc \
       ${INCLUDES} \
       --grpc-gateway_out=logtostderr=true:gometastore/protobuf \
-      protobuf/metastore.proto
+      ${PROTO}
 
 # Generate Swagger
 cd ${TOP} && protoc \
     ${INCLUDES} \
     --swagger_out=logtostderr=true:swagger \
-    protobuf/metastore.proto
+    ${PROTO}
 
 # Generate Python stubs
 cd ${TOP} &&
@@ -32,15 +33,15 @@ cd ${TOP} &&
   ${INCLUDES} \
   --python_out=python/protobuf \
   --grpc_python_out=python/protobuf \
-  protobuf/metastore.proto
+  ${PROTO}
 
 # Generate Docs
 cd ${TOP} && protoc \
   ${INCLUDES} \
     --doc_out=doc --doc_opt=markdown,README.md \
-    protobuf/metastore.proto
+    ${PROTO}
 
 cd ${TOP} && protoc \
   ${INCLUDES} \
     --doc_out=doc --doc_opt=html,index.html \
-    protobuf/metastore.proto
+    ${PROTO}

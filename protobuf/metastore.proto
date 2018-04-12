@@ -71,7 +71,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 // any sensitive information.
 // Metastore service does not interpret the cookie but may print it in its logs.
 // We could call it SessionId but callers may decide to use it for whatever other
-//purposes, so using generic term here.
+// purposes, so using generic term here.
 service Metastore {
     // Create a new database.
     rpc CreateDabatase (CreateDatabaseRequest) returns (GetDatabaseResponse);
