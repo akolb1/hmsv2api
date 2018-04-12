@@ -1,8 +1,13 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "metastore.proto",
-    "version": "version not set"
+    "title": "Hive Metastore Api",
+    "version": "1.0",
+    "contact": {
+      "name": "Hive Metastore Project",
+      "url": "https://github.com/akolb1/hmsv2api",
+      "email": "akolb1@google.com"
+    }
   },
   "schemes": [
     "http",
@@ -15,52 +20,9 @@
     "application/json"
   ],
   "paths": {
-    "/v2/database/{catalog}": {
+    "/v2/db/{catalog}": {
       "get": {
-        "summary": "Get database information",
-        "operationId": "GetDatabase",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/metastoreGetDatabaseResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "catalog",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.name",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "id.id",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "cookie",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Metastore"
-        ]
-      }
-    },
-    "/v2/dblist/{catalog}": {
-      "get": {
-        "summary": "Get collection of databases",
+        "summary": "Return all databases in a catalog",
         "operationId": "ListDatabases",
         "responses": {
           "200": {
@@ -95,6 +57,92 @@
             "required": false,
             "type": "boolean",
             "format": "boolean"
+          }
+        ],
+        "tags": [
+          "Metastore"
+        ]
+      }
+    },
+    "/v2/db/{catalog}/{id.name}": {
+      "get": {
+        "summary": "Get database information",
+        "operationId": "GetDatabase",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/metastoreGetDatabaseResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "catalog",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "cookie",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Metastore"
+        ]
+      }
+    },
+    "/v2/table/{catalog}/{db_id.name}": {
+      "get": {
+        "summary": "Get all tables from a database",
+        "operationId": "ListTables",
+        "responses": {
+          "200": {
+            "description": "(streaming responses)",
+            "schema": {
+              "$ref": "#/definitions/metastoreTable"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "catalog",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "db_id.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "db_id.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "cookie",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -162,14 +210,14 @@
     "RequestStatusStatus": {
       "type": "string",
       "enum": [
-        "OK",
-        "ERROR",
-        "NOTFOUND",
-        "CONFLICT",
-        "BUSY",
-        "INTERNAL"
+        "STATUS_OK",
+        "STATUS_ERROR",
+        "STATUS_NOTFOUND",
+        "STATUS_CONFLICT",
+        "STATUS_BUSY",
+        "STATUS_INTERNAL_ERR"
       ],
-      "default": "OK"
+      "default": "STATUS_OK"
     },
     "metastoreDatabase": {
       "type": "object",
@@ -246,7 +294,7 @@
           "type": "string"
         }
       },
-      "description": "Objects have unique name and unique ID.\n\nBoth name and ID are just sequence of bytes - there are no\nassumptions about encoding or length."
+      "description": "Objects have unique name and unique ID.\n\nName of the object can change but ID never changes. This allows caching of objects\nby ID.\nBoth name and ID are just sequence of bytes - there are no\nassumptions about encoding or length.\nImplementations may enforce specific assumptions."
     },
     "metastoreInputFormat": {
       "type": "string",
@@ -291,12 +339,9 @@
         },
         "error": {
           "type": "string"
-        },
-        "cookie": {
-          "type": "string"
         }
       },
-      "title": "General status for results"
+      "description": "General status for results.\n\nAll non-streaming requests should return RequestStatus."
     },
     "metastoreSerDeInfo": {
       "type": "object",
@@ -440,5 +485,9 @@
       ],
       "default": "TTYPE_MANAGED"
     }
+  },
+  "externalDocs": {
+    "description": "Metastore API V2 Documentation",
+    "url": "https://github.com/akolb1/hmsv2api"
   }
 }

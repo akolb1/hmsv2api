@@ -317,7 +317,7 @@
       <div class="file-heading">
         <h2 id="metastore.proto">metastore.proto</h2><a href="#title">Top</a>
       </div>
-      <p></p>
+      <p>Some notes on protobuf proto3</p><p>- It supports maps that are extensively used here</p><p>- All fields are optional</p>
 
       
         <h3 id="metastore.CreateDatabaseRequest">CreateDatabaseRequest</h3>
@@ -334,21 +334,21 @@
                   <td>catalog</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Catalog this database belongs to </p></td>
                 </tr>
               
                 <tr>
                   <td>database</td>
                   <td><a href="#metastore.Database">Database</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Database object </p></td>
                 </tr>
               
                 <tr>
                   <td>cookie</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Session cookie </p></td>
                 </tr>
               
             </tbody>
@@ -415,7 +415,7 @@
                   <td>id</td>
                   <td><a href="#metastore.Id">Id</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Unique database ID </p></td>
                 </tr>
               
                 <tr>
@@ -443,7 +443,7 @@
                   <td>system_parameters</td>
                   <td><a href="#metastore.Database.SystemParametersEntry">Database.SystemParametersEntry</a></td>
                   <td>repeated</td>
-                  <td><p>System parameters </p></td>
+                  <td><p>System parameters (can&#39;t be set by user) </p></td>
                 </tr>
               
             </tbody>
@@ -644,21 +644,21 @@
                   <td>catalog</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Catalog this database belongs to </p></td>
                 </tr>
               
                 <tr>
                   <td>id</td>
                   <td><a href="#metastore.Id">Id</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Database ID. Database can be found by name or id/ </p></td>
                 </tr>
               
                 <tr>
                   <td>cookie</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Session cookie </p></td>
                 </tr>
               
             </tbody>
@@ -772,7 +772,7 @@
         
       
         <h3 id="metastore.Id">Id</h3>
-        <p>Objects have unique name and unique ID.</p><p>Both name and ID are just sequence of bytes - there are no</p><p>assumptions about encoding or length.</p>
+        <p>Objects have unique name and unique ID.</p><p>Name of the object can change but ID never changes. This allows caching of objects</p><p>by ID.</p><p>Both name and ID are just sequence of bytes - there are no</p><p>assumptions about encoding or length.</p><p>Implementations may enforce specific assumptions.</p>
 
         
           <table class="field-table">
@@ -785,14 +785,14 @@
                   <td>name</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Object name </p></td>
                 </tr>
               
                 <tr>
                   <td>id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>Permanent object ID </p></td>
                 </tr>
               
             </tbody>
@@ -913,7 +913,7 @@
         
       
         <h3 id="metastore.RequestStatus">RequestStatus</h3>
-        <p>General status for results</p>
+        <p>General status for results.</p><p>All non-streaming requests should return RequestStatus.</p>
 
         
           <table class="field-table">
@@ -926,7 +926,7 @@
                   <td>status</td>
                   <td><a href="#metastore.RequestStatus.Status">RequestStatus.Status</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>request status </p></td>
                 </tr>
               
                 <tr>
@@ -934,13 +934,6 @@
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>detailed error message </p></td>
-                </tr>
-              
-                <tr>
-                  <td>cookie</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>copied from request </p></td>
                 </tr>
               
             </tbody>
@@ -1391,37 +1384,37 @@ initialization parameters </p></td>
           <tbody>
             
               <tr>
-                <td>OK</td>
+                <td>STATUS_OK</td>
                 <td>0</td>
                 <td><p>successful request</p></td>
               </tr>
             
               <tr>
-                <td>ERROR</td>
+                <td>STATUS_ERROR</td>
                 <td>1</td>
                 <td><p>General error</p></td>
               </tr>
             
               <tr>
-                <td>NOTFOUND</td>
+                <td>STATUS_NOTFOUND</td>
                 <td>2</td>
                 <td><p>Requested object not found</p></td>
               </tr>
             
               <tr>
-                <td>CONFLICT</td>
+                <td>STATUS_CONFLICT</td>
                 <td>3</td>
                 <td><p>Object already exists</p></td>
               </tr>
             
               <tr>
-                <td>BUSY</td>
+                <td>STATUS_BUSY</td>
                 <td>4</td>
                 <td><p>Object is busy/used and can&#39;t be accessed/destroyed</p></td>
               </tr>
             
               <tr>
-                <td>INTERNAL</td>
+                <td>STATUS_INTERNAL_ERR</td>
                 <td>5</td>
                 <td><p>Internal server error</p></td>
               </tr>
@@ -1528,7 +1521,7 @@ initialization parameters </p></td>
 
       
         <h3 id="metastore.Metastore">Metastore</h3>
-        <p>Metastore service</p>
+        <p>Metastore service</p><p>This API is different from traditional metastore API. It separates all</p><p>metadata-only operations and does not include any filesystem operations.</p><p>The assumption is that some other service or the client deals with file system</p><p>operations.</p><p>This API also uses cookies to associates requests with a session.</p><p>The value of the cookie is likely to be printed in logs so it shouldn't contain</p><p>any sensitive information.</p><p>Metastore service does not interpret the cookie but may print it in its logs.</p><p>We could call it SessionId but callers may decide to use it for whatever other</p><p>purposes, so using generic term here.</p>
         <table class="enum-table">
           <thead>
             <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
@@ -1539,7 +1532,7 @@ initialization parameters </p></td>
                 <td>CreateDabatase</td>
                 <td><a href="#metastore.CreateDatabaseRequest">CreateDatabaseRequest</a></td>
                 <td><a href="#metastore.GetDatabaseResponse">GetDatabaseResponse</a></td>
-                <td><p>Create a new database</p></td>
+                <td><p>Create a new database.</p></td>
               </tr>
             
               <tr>
@@ -1553,14 +1546,14 @@ initialization parameters </p></td>
                 <td>ListDatabases</td>
                 <td><a href="#metastore.ListDatabasesRequest">ListDatabasesRequest</a></td>
                 <td><a href="#metastore.Database">Database</a></td>
-                <td><p>Get collection of databases</p></td>
+                <td><p>Return all databases in a catalog</p></td>
               </tr>
             
               <tr>
                 <td>DropDatabase</td>
                 <td><a href="#metastore.DropDatabaseRequest">DropDatabaseRequest</a></td>
                 <td><a href="#metastore.RequestStatus">RequestStatus</a></td>
-                <td><p>Destroy a database</p></td>
+                <td><p>Destroy the database</p></td>
               </tr>
             
               <tr>
@@ -1581,7 +1574,7 @@ initialization parameters </p></td>
                 <td>ListTables</td>
                 <td><a href="#metastore.ListTablesRequest">ListTablesRequest</a></td>
                 <td><a href="#metastore.Table">Table</a></td>
-                <td><p>Get collection of tables</p></td>
+                <td><p>Get all tables from a database</p></td>
               </tr>
             
               <tr>

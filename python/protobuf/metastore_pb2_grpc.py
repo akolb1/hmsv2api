@@ -6,6 +6,18 @@ import metastore_pb2 as metastore__pb2
 
 class MetastoreStub(object):
   """Metastore service
+
+  This API is different from traditional metastore API. It separates all
+  metadata-only operations and does not include any filesystem operations.
+  The assumption is that some other service or the client deals with file system
+  operations.
+
+  This API also uses cookies to associates requests with a session.
+  The value of the cookie is likely to be printed in logs so it shouldn't contain
+  any sensitive information.
+  Metastore service does not interpret the cookie but may print it in its logs.
+  We could call it SessionId but callers may decide to use it for whatever other
+  purposes, so using generic term here.
   """
 
   def __init__(self, channel):
@@ -58,10 +70,22 @@ class MetastoreStub(object):
 
 class MetastoreServicer(object):
   """Metastore service
+
+  This API is different from traditional metastore API. It separates all
+  metadata-only operations and does not include any filesystem operations.
+  The assumption is that some other service or the client deals with file system
+  operations.
+
+  This API also uses cookies to associates requests with a session.
+  The value of the cookie is likely to be printed in logs so it shouldn't contain
+  any sensitive information.
+  Metastore service does not interpret the cookie but may print it in its logs.
+  We could call it SessionId but callers may decide to use it for whatever other
+  purposes, so using generic term here.
   """
 
   def CreateDabatase(self, request, context):
-    """Create a new database
+    """Create a new database.
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -75,14 +99,14 @@ class MetastoreServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def ListDatabases(self, request, context):
-    """Get collection of databases
+    """Return all databases in a catalog
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def DropDatabase(self, request, context):
-    """Destroy a database
+    """Destroy the database
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
@@ -103,7 +127,7 @@ class MetastoreServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def ListTables(self, request, context):
-    """Get collection of tables
+    """Get all tables from a database
     """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')

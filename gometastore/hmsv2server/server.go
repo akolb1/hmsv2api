@@ -51,7 +51,6 @@ func newServer(db *bolt.DB) *metastoreServer {
 
 // Table ops
 
-
 // getULID returns a unique ID.
 func getULID() string {
 	return strings.TrimRight(ulid.New().String(), "\u0000")

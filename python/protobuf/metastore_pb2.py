@@ -15,15 +15,16 @@ _sym_db = _symbol_database.Default()
 
 
 from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
+from protoc_gen_swagger.options import annotations_pb2 as protoc__gen__swagger_dot_options_dot_annotations__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='metastore.proto',
   package='metastore',
   syntax='proto3',
-  serialized_pb=_b('\n\x0fmetastore.proto\x12\tmetastore\x1a\x1cgoogle/api/annotations.proto\"\xb0\x01\n\rRequestStatus\x12/\n\x06status\x18\x01 \x01(\x0e\x32\x1f.metastore.RequestStatus.Status\x12\r\n\x05\x65rror\x18\x02 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"O\n\x06Status\x12\x06\n\x02OK\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x12\x0c\n\x08NOTFOUND\x10\x02\x12\x0c\n\x08\x43ONFLICT\x10\x03\x12\x08\n\x04\x42USY\x10\x04\x12\x0c\n\x08INTERNAL\x10\x05\"\x1e\n\x02Id\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\t\"\xb2\x02\n\x08\x44\x61tabase\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06seq_id\x18\x02 \x01(\x04\x12\x10\n\x08location\x18\x03 \x01(\t\x12\x37\n\nparameters\x18\x04 \x03(\x0b\x32#.metastore.Database.ParametersEntry\x12\x44\n\x11system_parameters\x18\x05 \x03(\x0b\x32).metastore.Database.SystemParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x37\n\x15SystemParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"_\n\x15\x43reateDatabaseRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12%\n\x08\x64\x61tabase\x18\x02 \x01(\x0b\x32\x13.metastore.Database\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"P\n\x12GetDatabaseRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x19\n\x02id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"f\n\x13GetDatabaseResponse\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12(\n\x06status\x18\x02 \x01(\x0b\x32\x18.metastore.RequestStatus\"e\n\x14ListDatabasesRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\x12\x14\n\x0cname_pattern\x18\x03 \x01(\t\x12\x16\n\x0e\x65xclude_params\x18\x04 \x01(\x08\"Q\n\x13\x44ropDatabaseRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x19\n\x02id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\":\n\x0b\x46ieldSchema\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x0f\n\x07\x63omment\x18\x03 \x01(\t\"\xc4\x01\n\tSerDeInfo\x12\"\n\x04type\x18\x01 \x01(\x0e\x32\x14.metastore.SerdeType\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x18\n\x10serializationLib\x18\x03 \x01(\t\x12\x38\n\nparameters\x18\x04 \x03(\x0b\x32$.metastore.SerDeInfo.ParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\'\n\x05Order\x12\x0b\n\x03\x63ol\x18\x01 \x01(\t\x12\x11\n\tascending\x18\x02 \x01(\x08\"\xcc\x04\n\x11StorageDescriptor\x12$\n\x04\x63ols\x18\x01 \x03(\x0b\x32\x16.metastore.FieldSchema\x12\x10\n\x08location\x18\x02 \x01(\t\x12+\n\x0binputFormat\x18\x03 \x01(\x0e\x32\x16.metastore.InputFormat\x12\x17\n\x0finputFormatName\x18\x04 \x01(\t\x12-\n\x0coutputFormat\x18\x05 \x01(\x0e\x32\x17.metastore.OutputFormat\x12\x18\n\x10outputFormatName\x18\x06 \x01(\t\x12\x12\n\nnumBuckets\x18\x07 \x01(\x05\x12\'\n\tserdeInfo\x18\x08 \x01(\x0b\x32\x14.metastore.SerDeInfo\x12\x12\n\nbucketCols\x18\t \x03(\t\x12\"\n\x08sortCols\x18\n \x03(\x0b\x32\x10.metastore.Order\x12@\n\nparameters\x18\x0b \x03(\x0b\x32,.metastore.StorageDescriptor.ParametersEntry\x12M\n\x11system_parameters\x18\x0c \x03(\x0b\x32\x32.metastore.StorageDescriptor.SystemParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x37\n\x15SystemParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x99\x03\n\x05Table\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06seq_id\x18\x03 \x01(\x04\x12(\n\x02sd\x18\x04 \x01(\x0b\x32\x1c.metastore.StorageDescriptor\x12-\n\rpartitionKeys\x18\x05 \x03(\x0b\x32\x16.metastore.FieldSchema\x12\'\n\ttableType\x18\x06 \x01(\x0e\x32\x14.metastore.TableType\x12\x34\n\nparameters\x18\x07 \x03(\x0b\x32 .metastore.Table.ParametersEntry\x12\x41\n\x11system_parameters\x18\x08 \x03(\x0b\x32&.metastore.Table.SystemParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x37\n\x15SystemParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"t\n\x12\x43reateTableRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x1c\n\x05\x64\x62_id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x1f\n\x05table\x18\x03 \x01(\x0b\x32\x10.metastore.Table\x12\x0e\n\x06\x63ookie\x18\x04 \x01(\t\"k\n\x0fGetTableRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x1c\n\x05\x64\x62_id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x19\n\x02id\x18\x03 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x04 \x01(\t\"]\n\x10GetTableResponse\x12\x1f\n\x05table\x18\x01 \x01(\x0b\x32\x10.metastore.Table\x12(\n\x06status\x18\x02 \x01(\x0b\x32\x18.metastore.RequestStatus\"R\n\x11ListTablesRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x1c\n\x05\x64\x62_id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"l\n\x10\x44ropTableRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x1c\n\x05\x64\x62_id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x19\n\x02id\x18\x03 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x04 \x01(\t*\xa8\x01\n\tSerdeType\x12\x10\n\x0cSERDE_CUSTOM\x10\x00\x12\x15\n\x11SERDE_LAZY_SIMPLE\x10\x01\x12\x0e\n\nSERDE_AVRO\x10\x02\x12\x0e\n\nSERDE_JSON\x10\x03\x12\r\n\tSERDE_ORC\x10\x04\x12\x0f\n\x0bSERDE_REGEX\x10\x05\x12\x10\n\x0cSERDE_THRIFT\x10\x06\x12\x11\n\rSERDE_PARQUET\x10\x07\x12\r\n\tSERDE_CSV\x10\x08*G\n\x0bInputFormat\x12\r\n\tIF_CUSTOM\x10\x00\x12\x0f\n\x0bIF_SEQUENCE\x10\x01\x12\x0b\n\x07IF_TEXT\x10\x02\x12\x0b\n\x07IF_HIVE\x10\x03*N\n\x0cOutputFormat\x12\r\n\tOF_CUSTOM\x10\x00\x12\x0f\n\x0bOF_SEQUENCE\x10\x02\x12\x11\n\rOF_IGNORE_KEY\x10\x03\x12\x0b\n\x07OF_HIVE\x10\x04*C\n\tTableType\x12\x11\n\rTTYPE_MANAGED\x10\x00\x12\x12\n\x0eTTYPE_EXTERNAL\x10\x01\x12\x0f\n\x0bTTYPE_INDEX\x10\x02\x32\xc6\x05\n\tMetastore\x12R\n\x0e\x43reateDabatase\x12 .metastore.CreateDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\x12l\n\x0bGetDatabase\x12\x1d.metastore.GetDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/v2/database/{catalog}\x12\x65\n\rListDatabases\x12\x1f.metastore.ListDatabasesRequest\x1a\x13.metastore.Database\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/v2/dblist/{catalog}0\x01\x12H\n\x0c\x44ropDatabase\x12\x1e.metastore.DropDatabaseRequest\x1a\x18.metastore.RequestStatus\x12I\n\x0b\x43reateTable\x12\x1d.metastore.CreateTableRequest\x1a\x1b.metastore.GetTableResponse\x12w\n\x08GetTable\x12\x1a.metastore.GetTableRequest\x1a\x1b.metastore.GetTableResponse\"2\x82\xd3\xe4\x93\x02,\x12*/v2/table/{catalog}/{db_id.name}/{id.name}\x12>\n\nListTables\x12\x1c.metastore.ListTablesRequest\x1a\x10.metastore.Table0\x01\x12\x42\n\tDropTable\x12\x1b.metastore.DropTableRequest\x1a\x18.metastore.RequestStatusB\"\n\x13\x63om.akolb.metastoreB\tMetaStoreP\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0fmetastore.proto\x12\tmetastore\x1a\x1cgoogle/api/annotations.proto\x1a,protoc-gen-swagger/options/annotations.proto\"\xce\x01\n\rRequestStatus\x12/\n\x06status\x18\x01 \x01(\x0e\x32\x1f.metastore.RequestStatus.Status\x12\r\n\x05\x65rror\x18\x02 \x01(\t\"}\n\x06Status\x12\r\n\tSTATUS_OK\x10\x00\x12\x10\n\x0cSTATUS_ERROR\x10\x01\x12\x13\n\x0fSTATUS_NOTFOUND\x10\x02\x12\x13\n\x0fSTATUS_CONFLICT\x10\x03\x12\x0f\n\x0bSTATUS_BUSY\x10\x04\x12\x17\n\x13STATUS_INTERNAL_ERR\x10\x05\"\x1e\n\x02Id\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\t\"\xb2\x02\n\x08\x44\x61tabase\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06seq_id\x18\x02 \x01(\x04\x12\x10\n\x08location\x18\x03 \x01(\t\x12\x37\n\nparameters\x18\x04 \x03(\x0b\x32#.metastore.Database.ParametersEntry\x12\x44\n\x11system_parameters\x18\x05 \x03(\x0b\x32).metastore.Database.SystemParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x37\n\x15SystemParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"_\n\x15\x43reateDatabaseRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12%\n\x08\x64\x61tabase\x18\x02 \x01(\x0b\x32\x13.metastore.Database\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"P\n\x12GetDatabaseRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x19\n\x02id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"f\n\x13GetDatabaseResponse\x12%\n\x08\x64\x61tabase\x18\x01 \x01(\x0b\x32\x13.metastore.Database\x12(\n\x06status\x18\x02 \x01(\x0b\x32\x18.metastore.RequestStatus\"e\n\x14ListDatabasesRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x0e\n\x06\x63ookie\x18\x02 \x01(\t\x12\x14\n\x0cname_pattern\x18\x03 \x01(\t\x12\x16\n\x0e\x65xclude_params\x18\x04 \x01(\x08\"Q\n\x13\x44ropDatabaseRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x19\n\x02id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\":\n\x0b\x46ieldSchema\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12\x0f\n\x07\x63omment\x18\x03 \x01(\t\"\xc4\x01\n\tSerDeInfo\x12\"\n\x04type\x18\x01 \x01(\x0e\x32\x14.metastore.SerdeType\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x18\n\x10serializationLib\x18\x03 \x01(\t\x12\x38\n\nparameters\x18\x04 \x03(\x0b\x32$.metastore.SerDeInfo.ParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\'\n\x05Order\x12\x0b\n\x03\x63ol\x18\x01 \x01(\t\x12\x11\n\tascending\x18\x02 \x01(\x08\"\xcc\x04\n\x11StorageDescriptor\x12$\n\x04\x63ols\x18\x01 \x03(\x0b\x32\x16.metastore.FieldSchema\x12\x10\n\x08location\x18\x02 \x01(\t\x12+\n\x0binputFormat\x18\x03 \x01(\x0e\x32\x16.metastore.InputFormat\x12\x17\n\x0finputFormatName\x18\x04 \x01(\t\x12-\n\x0coutputFormat\x18\x05 \x01(\x0e\x32\x17.metastore.OutputFormat\x12\x18\n\x10outputFormatName\x18\x06 \x01(\t\x12\x12\n\nnumBuckets\x18\x07 \x01(\x05\x12\'\n\tserdeInfo\x18\x08 \x01(\x0b\x32\x14.metastore.SerDeInfo\x12\x12\n\nbucketCols\x18\t \x03(\t\x12\"\n\x08sortCols\x18\n \x03(\x0b\x32\x10.metastore.Order\x12@\n\nparameters\x18\x0b \x03(\x0b\x32,.metastore.StorageDescriptor.ParametersEntry\x12M\n\x11system_parameters\x18\x0c \x03(\x0b\x32\x32.metastore.StorageDescriptor.SystemParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x37\n\x15SystemParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x99\x03\n\x05Table\x12\x19\n\x02id\x18\x01 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06seq_id\x18\x03 \x01(\x04\x12(\n\x02sd\x18\x04 \x01(\x0b\x32\x1c.metastore.StorageDescriptor\x12-\n\rpartitionKeys\x18\x05 \x03(\x0b\x32\x16.metastore.FieldSchema\x12\'\n\ttableType\x18\x06 \x01(\x0e\x32\x14.metastore.TableType\x12\x34\n\nparameters\x18\x07 \x03(\x0b\x32 .metastore.Table.ParametersEntry\x12\x41\n\x11system_parameters\x18\x08 \x03(\x0b\x32&.metastore.Table.SystemParametersEntry\x1a\x31\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x37\n\x15SystemParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"t\n\x12\x43reateTableRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x1c\n\x05\x64\x62_id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x1f\n\x05table\x18\x03 \x01(\x0b\x32\x10.metastore.Table\x12\x0e\n\x06\x63ookie\x18\x04 \x01(\t\"k\n\x0fGetTableRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x1c\n\x05\x64\x62_id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x19\n\x02id\x18\x03 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x04 \x01(\t\"]\n\x10GetTableResponse\x12\x1f\n\x05table\x18\x01 \x01(\x0b\x32\x10.metastore.Table\x12(\n\x06status\x18\x02 \x01(\x0b\x32\x18.metastore.RequestStatus\"R\n\x11ListTablesRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x1c\n\x05\x64\x62_id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x03 \x01(\t\"l\n\x10\x44ropTableRequest\x12\x0f\n\x07\x63\x61talog\x18\x01 \x01(\t\x12\x1c\n\x05\x64\x62_id\x18\x02 \x01(\x0b\x32\r.metastore.Id\x12\x19\n\x02id\x18\x03 \x01(\x0b\x32\r.metastore.Id\x12\x0e\n\x06\x63ookie\x18\x04 \x01(\t*\xa8\x01\n\tSerdeType\x12\x10\n\x0cSERDE_CUSTOM\x10\x00\x12\x15\n\x11SERDE_LAZY_SIMPLE\x10\x01\x12\x0e\n\nSERDE_AVRO\x10\x02\x12\x0e\n\nSERDE_JSON\x10\x03\x12\r\n\tSERDE_ORC\x10\x04\x12\x0f\n\x0bSERDE_REGEX\x10\x05\x12\x10\n\x0cSERDE_THRIFT\x10\x06\x12\x11\n\rSERDE_PARQUET\x10\x07\x12\r\n\tSERDE_CSV\x10\x08*G\n\x0bInputFormat\x12\r\n\tIF_CUSTOM\x10\x00\x12\x0f\n\x0bIF_SEQUENCE\x10\x01\x12\x0b\n\x07IF_TEXT\x10\x02\x12\x0b\n\x07IF_HIVE\x10\x03*N\n\x0cOutputFormat\x12\r\n\tOF_CUSTOM\x10\x00\x12\x0f\n\x0bOF_SEQUENCE\x10\x02\x12\x11\n\rOF_IGNORE_KEY\x10\x03\x12\x0b\n\x07OF_HIVE\x10\x04*C\n\tTableType\x12\x11\n\rTTYPE_MANAGED\x10\x00\x12\x12\n\x0eTTYPE_EXTERNAL\x10\x01\x12\x0f\n\x0bTTYPE_INDEX\x10\x02\x32\xf0\x05\n\tMetastore\x12R\n\x0e\x43reateDabatase\x12 .metastore.CreateDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\x12p\n\x0bGetDatabase\x12\x1d.metastore.GetDatabaseRequest\x1a\x1e.metastore.GetDatabaseResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/v2/db/{catalog}/{id.name}\x12\x61\n\rListDatabases\x12\x1f.metastore.ListDatabasesRequest\x1a\x13.metastore.Database\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v2/db/{catalog}0\x01\x12H\n\x0c\x44ropDatabase\x12\x1e.metastore.DropDatabaseRequest\x1a\x18.metastore.RequestStatus\x12I\n\x0b\x43reateTable\x12\x1d.metastore.CreateTableRequest\x1a\x1b.metastore.GetTableResponse\x12w\n\x08GetTable\x12\x1a.metastore.GetTableRequest\x1a\x1b.metastore.GetTableResponse\"2\x82\xd3\xe4\x93\x02,\x12*/v2/table/{catalog}/{db_id.name}/{id.name}\x12h\n\nListTables\x12\x1c.metastore.ListTablesRequest\x1a\x10.metastore.Table\"(\x82\xd3\xe4\x93\x02\"\x12 /v2/table/{catalog}/{db_id.name}0\x01\x12\x42\n\tDropTable\x12\x1b.metastore.DropTableRequest\x1a\x18.metastore.RequestStatusB\xd8\x01\n\x13\x63om.akolb.metastoreB\tMetaStoreP\x01\x92\x41\xb2\x01\x12j\n\x12Hive Metastore Api\"O\n\x16Hive Metastore Project\x12\"https://github.com/akolb1/hmsv2api\x1a\x11\x61kolb1@google.com2\x03\x31.0rD\n\x1eMetastore API V2 Documentation\x12\"https://github.com/akolb1/hmsv2apib\x06proto3')
   ,
-  dependencies=[google_dot_api_dot_annotations__pb2.DESCRIPTOR,])
+  dependencies=[google_dot_api_dot_annotations__pb2.DESCRIPTOR,protoc__gen__swagger_dot_options_dot_annotations__pb2.DESCRIPTOR,])
 
 _SERDETYPE = _descriptor.EnumDescriptor(
   name='SerdeType',
@@ -70,8 +71,8 @@ _SERDETYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=2869,
-  serialized_end=3037,
+  serialized_start=2945,
+  serialized_end=3113,
 )
 _sym_db.RegisterEnumDescriptor(_SERDETYPE)
 
@@ -101,8 +102,8 @@ _INPUTFORMAT = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=3039,
-  serialized_end=3110,
+  serialized_start=3115,
+  serialized_end=3186,
 )
 _sym_db.RegisterEnumDescriptor(_INPUTFORMAT)
 
@@ -132,8 +133,8 @@ _OUTPUTFORMAT = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=3112,
-  serialized_end=3190,
+  serialized_start=3188,
+  serialized_end=3266,
 )
 _sym_db.RegisterEnumDescriptor(_OUTPUTFORMAT)
 
@@ -159,8 +160,8 @@ _TABLETYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=3192,
-  serialized_end=3259,
+  serialized_start=3268,
+  serialized_end=3335,
 )
 _sym_db.RegisterEnumDescriptor(_TABLETYPE)
 
@@ -194,34 +195,34 @@ _REQUESTSTATUS_STATUS = _descriptor.EnumDescriptor(
   file=DESCRIPTOR,
   values=[
     _descriptor.EnumValueDescriptor(
-      name='OK', index=0, number=0,
+      name='STATUS_OK', index=0, number=0,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='ERROR', index=1, number=1,
+      name='STATUS_ERROR', index=1, number=1,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='NOTFOUND', index=2, number=2,
+      name='STATUS_NOTFOUND', index=2, number=2,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='CONFLICT', index=3, number=3,
+      name='STATUS_CONFLICT', index=3, number=3,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='BUSY', index=4, number=4,
+      name='STATUS_BUSY', index=4, number=4,
       options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='INTERNAL', index=5, number=5,
+      name='STATUS_INTERNAL_ERR', index=5, number=5,
       options=None,
       type=None),
   ],
   containing_type=None,
   options=None,
-  serialized_start=158,
-  serialized_end=237,
+  serialized_start=188,
+  serialized_end=313,
 )
 _sym_db.RegisterEnumDescriptor(_REQUESTSTATUS_STATUS)
 
@@ -247,13 +248,6 @@ _REQUESTSTATUS = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='cookie', full_name='metastore.RequestStatus.cookie', index=2,
-      number=3, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -267,8 +261,8 @@ _REQUESTSTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=61,
-  serialized_end=237,
+  serialized_start=107,
+  serialized_end=313,
 )
 
 
@@ -305,8 +299,8 @@ _ID = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=239,
-  serialized_end=269,
+  serialized_start=315,
+  serialized_end=345,
 )
 
 
@@ -343,8 +337,8 @@ _DATABASE_PARAMETERSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=472,
-  serialized_end=521,
+  serialized_start=548,
+  serialized_end=597,
 )
 
 _DATABASE_SYSTEMPARAMETERSENTRY = _descriptor.Descriptor(
@@ -380,8 +374,8 @@ _DATABASE_SYSTEMPARAMETERSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=523,
-  serialized_end=578,
+  serialized_start=599,
+  serialized_end=654,
 )
 
 _DATABASE = _descriptor.Descriptor(
@@ -438,8 +432,8 @@ _DATABASE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=272,
-  serialized_end=578,
+  serialized_start=348,
+  serialized_end=654,
 )
 
 
@@ -483,8 +477,8 @@ _CREATEDATABASEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=580,
-  serialized_end=675,
+  serialized_start=656,
+  serialized_end=751,
 )
 
 
@@ -528,8 +522,8 @@ _GETDATABASEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=677,
-  serialized_end=757,
+  serialized_start=753,
+  serialized_end=833,
 )
 
 
@@ -566,8 +560,8 @@ _GETDATABASERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=759,
-  serialized_end=861,
+  serialized_start=835,
+  serialized_end=937,
 )
 
 
@@ -618,8 +612,8 @@ _LISTDATABASESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=863,
-  serialized_end=964,
+  serialized_start=939,
+  serialized_end=1040,
 )
 
 
@@ -663,8 +657,8 @@ _DROPDATABASEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=966,
-  serialized_end=1047,
+  serialized_start=1042,
+  serialized_end=1123,
 )
 
 
@@ -708,8 +702,8 @@ _FIELDSCHEMA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1049,
-  serialized_end=1107,
+  serialized_start=1125,
+  serialized_end=1183,
 )
 
 
@@ -746,8 +740,8 @@ _SERDEINFO_PARAMETERSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=472,
-  serialized_end=521,
+  serialized_start=548,
+  serialized_end=597,
 )
 
 _SERDEINFO = _descriptor.Descriptor(
@@ -797,8 +791,8 @@ _SERDEINFO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1110,
-  serialized_end=1306,
+  serialized_start=1186,
+  serialized_end=1382,
 )
 
 
@@ -835,8 +829,8 @@ _ORDER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1308,
-  serialized_end=1347,
+  serialized_start=1384,
+  serialized_end=1423,
 )
 
 
@@ -873,8 +867,8 @@ _STORAGEDESCRIPTOR_PARAMETERSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=472,
-  serialized_end=521,
+  serialized_start=548,
+  serialized_end=597,
 )
 
 _STORAGEDESCRIPTOR_SYSTEMPARAMETERSENTRY = _descriptor.Descriptor(
@@ -910,8 +904,8 @@ _STORAGEDESCRIPTOR_SYSTEMPARAMETERSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=523,
-  serialized_end=578,
+  serialized_start=599,
+  serialized_end=654,
 )
 
 _STORAGEDESCRIPTOR = _descriptor.Descriptor(
@@ -1017,8 +1011,8 @@ _STORAGEDESCRIPTOR = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1350,
-  serialized_end=1938,
+  serialized_start=1426,
+  serialized_end=2014,
 )
 
 
@@ -1055,8 +1049,8 @@ _TABLE_PARAMETERSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=472,
-  serialized_end=521,
+  serialized_start=548,
+  serialized_end=597,
 )
 
 _TABLE_SYSTEMPARAMETERSENTRY = _descriptor.Descriptor(
@@ -1092,8 +1086,8 @@ _TABLE_SYSTEMPARAMETERSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=523,
-  serialized_end=578,
+  serialized_start=599,
+  serialized_end=654,
 )
 
 _TABLE = _descriptor.Descriptor(
@@ -1164,8 +1158,8 @@ _TABLE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1941,
-  serialized_end=2350,
+  serialized_start=2017,
+  serialized_end=2426,
 )
 
 
@@ -1216,8 +1210,8 @@ _CREATETABLEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2352,
-  serialized_end=2468,
+  serialized_start=2428,
+  serialized_end=2544,
 )
 
 
@@ -1268,8 +1262,8 @@ _GETTABLEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2470,
-  serialized_end=2577,
+  serialized_start=2546,
+  serialized_end=2653,
 )
 
 
@@ -1306,8 +1300,8 @@ _GETTABLERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2579,
-  serialized_end=2672,
+  serialized_start=2655,
+  serialized_end=2748,
 )
 
 
@@ -1351,8 +1345,8 @@ _LISTTABLESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2674,
-  serialized_end=2756,
+  serialized_start=2750,
+  serialized_end=2832,
 )
 
 
@@ -1403,8 +1397,8 @@ _DROPTABLEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2758,
-  serialized_end=2866,
+  serialized_start=2834,
+  serialized_end=2942,
 )
 
 _REQUESTSTATUS.fields_by_name['status'].enum_type = _REQUESTSTATUS_STATUS
@@ -1656,7 +1650,7 @@ _sym_db.RegisterMessage(DropTableRequest)
 
 
 DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('\n\023com.akolb.metastoreB\tMetaStoreP\001'))
+DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('\n\023com.akolb.metastoreB\tMetaStoreP\001\222A\262\001\022j\n\022Hive Metastore Api\"O\n\026Hive Metastore Project\022\"https://github.com/akolb1/hmsv2api\032\021akolb1@google.com2\0031.0rD\n\036Metastore API V2 Documentation\022\"https://github.com/akolb1/hmsv2api'))
 _DATABASE_PARAMETERSENTRY.has_options = True
 _DATABASE_PARAMETERSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
 _DATABASE_SYSTEMPARAMETERSENTRY.has_options = True
@@ -1678,8 +1672,8 @@ _METASTORE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=3262,
-  serialized_end=3972,
+  serialized_start=3338,
+  serialized_end=4090,
   methods=[
   _descriptor.MethodDescriptor(
     name='CreateDabatase',
@@ -1697,7 +1691,7 @@ _METASTORE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_GETDATABASEREQUEST,
     output_type=_GETDATABASERESPONSE,
-    options=_descriptor._ParseOptions(descriptor_pb2.MethodOptions(), _b('\202\323\344\223\002\030\022\026/v2/database/{catalog}')),
+    options=_descriptor._ParseOptions(descriptor_pb2.MethodOptions(), _b('\202\323\344\223\002\034\022\032/v2/db/{catalog}/{id.name}')),
   ),
   _descriptor.MethodDescriptor(
     name='ListDatabases',
@@ -1706,7 +1700,7 @@ _METASTORE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_LISTDATABASESREQUEST,
     output_type=_DATABASE,
-    options=_descriptor._ParseOptions(descriptor_pb2.MethodOptions(), _b('\202\323\344\223\002\026\022\024/v2/dblist/{catalog}')),
+    options=_descriptor._ParseOptions(descriptor_pb2.MethodOptions(), _b('\202\323\344\223\002\022\022\020/v2/db/{catalog}')),
   ),
   _descriptor.MethodDescriptor(
     name='DropDatabase',
@@ -1742,7 +1736,7 @@ _METASTORE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_LISTTABLESREQUEST,
     output_type=_TABLE,
-    options=None,
+    options=_descriptor._ParseOptions(descriptor_pb2.MethodOptions(), _b('\202\323\344\223\002\"\022 /v2/table/{catalog}/{db_id.name}')),
   ),
   _descriptor.MethodDescriptor(
     name='DropTable',

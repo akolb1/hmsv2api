@@ -16,32 +16,16 @@
  * limitations under the License.
  */
 
-/*
- * Hive Metastore API definition.
- *
- * This API is different from traditional metastore API. It separates all
- * metadata-only operations and does not include any filesystem operations.
- * The assumption is that some other service or the client deals with file system
- * operations.
- *
- * The API also introduces the notion of an object ID - globally unique string
- * associated with the object. While object name can change (e.g. with
- * rename operation), identity of the object never changes. The lookup can be done
- * either by name or by ID. The intention is to have cacheable objects which do not
- * change on renames.
- *
- * Cookie is supposed to be used to associate multiple requests to a single session.
- * The value of the cookie is likely to be printed in logs so it shouldn't contain
- * any sensitive information.
- * Metastore service does not interpret the cookie but may print it in its logs.
- * We could call it SessionId but callers may decide to use it for whatever other
- * purposes, so using generic term here.
- *
- */
+// Hive Metastore API definitions.
+//
+// TODO: Add catalog API
 
-// TODO: Keep catalog for DB only
-// TODO: Drop db name from table
-
+//
+// Some notes on protobuf proto3
+//
+// - It supports maps that are extensively used here
+// - All fields are optional
+//
 syntax = "proto3";
 
 option java_multiple_files = true;
@@ -50,25 +34,61 @@ option java_outer_classname = "MetaStore";
 
 package metastore;
 
+//
+// We use https://github.com/grpc-ecosystem/grpc-gateway to automatically generate
+// HTTP - gRPC gateway stubs and swagger definitions. The following imports come from
+// grpc-ecosystem.
 import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+// Swagger definitions using grpc-ecosystem options
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+  info: {
+    title: "Hive Metastore Api";
+    version: "1.0";
+    contact: {
+        name: "Hive Metastore Project";
+        url: "https://github.com/akolb1/hmsv2api";
+        email: "akolb1@google.com";
+    };
+  };
+  external_docs: {
+    url: "https://github.com/akolb1/hmsv2api";
+    description: "Metastore API V2 Documentation";
+  }
+};
+
 
 // Metastore service
+//
+// This API is different from traditional metastore API. It separates all
+// metadata-only operations and does not include any filesystem operations.
+// The assumption is that some other service or the client deals with file system
+// operations.
+//
+// This API also uses cookies to associates requests with a session.
+// The value of the cookie is likely to be printed in logs so it shouldn't contain
+// any sensitive information.
+// Metastore service does not interpret the cookie but may print it in its logs.
+// We could call it SessionId but callers may decide to use it for whatever other
+//purposes, so using generic term here.
 service Metastore {
-    // Create a new database
+    // Create a new database.
     rpc CreateDabatase (CreateDatabaseRequest) returns (GetDatabaseResponse);
+
     // Get database information
     rpc GetDatabase (GetDatabaseRequest) returns  (GetDatabaseResponse) {
         option (google.api.http) = {
-           get: "/v2/database/{catalog}"
+           get: "/v2/db/{catalog}/{id.name}"
         };
     }
-    // Get collection of databases
+    // Return all databases in a catalog
     rpc ListDatabases (ListDatabasesRequest) returns  (stream Database) {
         option (google.api.http) = {
-	       get: "/v2/dblist/{catalog}"
+	       get: "/v2/db/{catalog}"
 	    };
     }
-    // Destroy a database
+    // Destroy the database
     rpc DropDatabase (DropDatabaseRequest) returns (RequestStatus);
 
     // Create a new table
@@ -81,35 +101,43 @@ service Metastore {
 	    };
     }
 
-    // Get collection of tables
-    rpc ListTables (ListTablesRequest) returns  (stream Table);
+    // Get all tables from a database
+    rpc ListTables (ListTablesRequest) returns  (stream Table) {
+        option (google.api.http) = {
+	       get: "/v2/table/{catalog}/{db_id.name}"
+	    };
+    }
 
     // Destroy a table
     rpc DropTable (DropTableRequest) returns (RequestStatus);
 }
 
-// General status for results
+// General status for results.
+//
+// All non-streaming requests should return RequestStatus.
 message RequestStatus {
     enum Status {
-        OK = 0;       // successful request
-        ERROR = 1;    // General error
-        NOTFOUND = 2; // Requested object not found
-        CONFLICT = 3; // Object already exists
-        BUSY     = 4; // Object is busy/used and can't be accessed/destroyed
-        INTERNAL = 5; // Internal server error
+        STATUS_OK           = 0; // successful request
+        STATUS_ERROR        = 1; // General error
+        STATUS_NOTFOUND     = 2; // Requested object not found
+        STATUS_CONFLICT     = 3; // Object already exists
+        STATUS_BUSY         = 4; // Object is busy/used and can't be accessed/destroyed
+        STATUS_INTERNAL_ERR = 5; // Internal server error
     }
-    Status status = 1;
+    Status status = 1; // request status
     string error = 2;  // detailed error message
-    string cookie = 3; // copied from request
 }
 
 // Objects have unique name and unique ID.
 //
+// Name of the object can change but ID never changes. This allows caching of objects
+// by ID.
 // Both name and ID are just sequence of bytes - there are no
 // assumptions about encoding or length.
+// Implementations may enforce specific assumptions.
 message Id {
-    string name = 1;
-    string id = 2;
+    string name = 1;  // Object name
+    string id = 2;    // Permanent object ID
 }
 
 // Database is a container for tables.
@@ -123,25 +151,25 @@ message Id {
 // These can be represented using system parameters if needed since the current
 // metastore service does not interpret Owner info.
 message Database {
-  Id                  id = 1;
+  Id                  id = 1;          // Unique database ID
   uint64              seq_id = 2;      // Unique sequence ID within calalog
-  string              location = 3;   // Default location of database objects
-  map<string, string> parameters = 4; // Database user parameters
-  map<string, string> system_parameters = 5; // System parameters
+  string              location = 3;    // Default location of database objects
+  map<string, string> parameters = 4;  // Database user parameters
+  map<string, string> system_parameters = 5; // System parameters (can't be set by user)
 }
 
 // Create a new database.
 message CreateDatabaseRequest {
-    string catalog = 1;
-    Database database = 2;
-    string   cookie = 3;
+    string catalog = 1;     // Catalog this database belongs to
+    Database database = 2;  // Database object
+    string   cookie = 3;    // Session cookie
 }
 
 // Request to get database by its ID.
 message GetDatabaseRequest {
-    string catalog = 1;
-    Id     id = 2;
-    string cookie = 3;
+    string catalog = 1;  // Catalog this database belongs to
+    Id     id = 2;       // Database ID. Database can be found by name or id/
+    string cookie = 3;   // Session cookie
 }
 
 message GetDatabaseResponse {

@@ -48,7 +48,10 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## metastore.proto
+Some notes on protobuf proto3
 
+- It supports maps that are extensively used here
+- All fields are optional
 
 
 <a name="metastore.CreateDatabaseRequest"/>
@@ -59,9 +62,9 @@ Create a new database.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| catalog | [string](#string) |  |  |
-| database | [Database](#metastore.Database) |  |  |
-| cookie | [string](#string) |  |  |
+| catalog | [string](#string) |  | Catalog this database belongs to |
+| database | [Database](#metastore.Database) |  | Database object |
+| cookie | [string](#string) |  | Session cookie |
 
 
 
@@ -103,11 +106,11 @@ metastore service does not interpret Owner info.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [Id](#metastore.Id) |  |  |
+| id | [Id](#metastore.Id) |  | Unique database ID |
 | seq_id | [uint64](#uint64) |  | Unique sequence ID within calalog |
 | location | [string](#string) |  | Default location of database objects |
 | parameters | [Database.ParametersEntry](#metastore.Database.ParametersEntry) | repeated | Database user parameters |
-| system_parameters | [Database.SystemParametersEntry](#metastore.Database.SystemParametersEntry) | repeated | System parameters |
+| system_parameters | [Database.SystemParametersEntry](#metastore.Database.SystemParametersEntry) | repeated | System parameters (can&#39;t be set by user) |
 
 
 
@@ -210,9 +213,9 @@ Request to get database by its ID.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| catalog | [string](#string) |  |  |
-| id | [Id](#metastore.Id) |  |  |
-| cookie | [string](#string) |  |  |
+| catalog | [string](#string) |  | Catalog this database belongs to |
+| id | [Id](#metastore.Id) |  | Database ID. Database can be found by name or id/ |
+| cookie | [string](#string) |  | Session cookie |
 
 
 
@@ -274,14 +277,17 @@ Request to get table by its ID.
 ### Id
 Objects have unique name and unique ID.
 
+Name of the object can change but ID never changes. This allows caching of objects
+by ID.
 Both name and ID are just sequence of bytes - there are no
 assumptions about encoding or length.
+Implementations may enforce specific assumptions.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| name | [string](#string) |  |  |
-| id | [string](#string) |  |  |
+| name | [string](#string) |  | Object name |
+| id | [string](#string) |  | Permanent object ID |
 
 
 
@@ -344,14 +350,15 @@ sort order of a column (column name along with asc/desc)
 <a name="metastore.RequestStatus"/>
 
 ### RequestStatus
-General status for results
+General status for results.
+
+All non-streaming requests should return RequestStatus.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| status | [RequestStatus.Status](#metastore.RequestStatus.Status) |  |  |
+| status | [RequestStatus.Status](#metastore.RequestStatus.Status) |  | request status |
 | error | [string](#string) |  | detailed error message |
-| cookie | [string](#string) |  | copied from request |
 
 
 
@@ -542,12 +549,12 @@ Known Output Formats. CUSTOM means that it should be specified as a string.
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| OK | 0 | successful request |
-| ERROR | 1 | General error |
-| NOTFOUND | 2 | Requested object not found |
-| CONFLICT | 3 | Object already exists |
-| BUSY | 4 | Object is busy/used and can&#39;t be accessed/destroyed |
-| INTERNAL | 5 | Internal server error |
+| STATUS_OK | 0 | successful request |
+| STATUS_ERROR | 1 | General error |
+| STATUS_NOTFOUND | 2 | Requested object not found |
+| STATUS_CONFLICT | 3 | Object already exists |
+| STATUS_BUSY | 4 | Object is busy/used and can&#39;t be accessed/destroyed |
+| STATUS_INTERNAL_ERR | 5 | Internal server error |
 
 
 
@@ -592,15 +599,27 @@ Known SerDes are represented using enum. Unknown ones are represented using stri
 ### Metastore
 Metastore service
 
+This API is different from traditional metastore API. It separates all
+metadata-only operations and does not include any filesystem operations.
+The assumption is that some other service or the client deals with file system
+operations.
+
+This API also uses cookies to associates requests with a session.
+The value of the cookie is likely to be printed in logs so it shouldn&#39;t contain
+any sensitive information.
+Metastore service does not interpret the cookie but may print it in its logs.
+We could call it SessionId but callers may decide to use it for whatever other
+purposes, so using generic term here.
+
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| CreateDabatase | [CreateDatabaseRequest](#metastore.CreateDatabaseRequest) | [GetDatabaseResponse](#metastore.CreateDatabaseRequest) | Create a new database |
+| CreateDabatase | [CreateDatabaseRequest](#metastore.CreateDatabaseRequest) | [GetDatabaseResponse](#metastore.CreateDatabaseRequest) | Create a new database. |
 | GetDatabase | [GetDatabaseRequest](#metastore.GetDatabaseRequest) | [GetDatabaseResponse](#metastore.GetDatabaseRequest) | Get database information |
-| ListDatabases | [ListDatabasesRequest](#metastore.ListDatabasesRequest) | [Database](#metastore.ListDatabasesRequest) | Get collection of databases |
-| DropDatabase | [DropDatabaseRequest](#metastore.DropDatabaseRequest) | [RequestStatus](#metastore.DropDatabaseRequest) | Destroy a database |
+| ListDatabases | [ListDatabasesRequest](#metastore.ListDatabasesRequest) | [Database](#metastore.ListDatabasesRequest) | Return all databases in a catalog |
+| DropDatabase | [DropDatabaseRequest](#metastore.DropDatabaseRequest) | [RequestStatus](#metastore.DropDatabaseRequest) | Destroy the database |
 | CreateTable | [CreateTableRequest](#metastore.CreateTableRequest) | [GetTableResponse](#metastore.CreateTableRequest) | Create a new table |
 | GetTable | [GetTableRequest](#metastore.GetTableRequest) | [GetTableResponse](#metastore.GetTableRequest) | Get table information |
-| ListTables | [ListTablesRequest](#metastore.ListTablesRequest) | [Table](#metastore.ListTablesRequest) | Get collection of tables |
+| ListTables | [ListTablesRequest](#metastore.ListTablesRequest) | [Table](#metastore.ListTablesRequest) | Get all tables from a database |
 | DropTable | [DropTableRequest](#metastore.DropTableRequest) | [RequestStatus](#metastore.DropTableRequest) | Destroy a table |
 
  
