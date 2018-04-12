@@ -59,7 +59,7 @@ service Metastore {
     // Get database information
     rpc GetDatabase (GetDatabaseRequest) returns  (GetDatabaseResponse) {
         option (google.api.http) = {
-           get: "/v2/database/{id.catalog}"
+           get: "/v2/database/{catalog}"
         };
     }
     // Get collection of databases
@@ -77,7 +77,7 @@ service Metastore {
     // Get table information
     rpc GetTable (GetTableRequest) returns (GetTableResponse) {
         option (google.api.http) = {
-	       get: "/v2/table/{id.catalog}/{db_id.name}/{id.name}"
+	       get: "/v2/table/{catalog}/{db_id.name}/{id.name}"
 	    };
     }
 
@@ -103,13 +103,12 @@ message RequestStatus {
     string cookie = 3; // copied from request
 }
 
-// Objects belong to a specific catalog and have unique name and unique ID
-// in the catalog. Both name and ID are just sequence of bytes - there are no
+// Objects have unique name and unique ID.
+// Both name and ID are just sequence of bytes - there are no
 // assumptions about encoding or length.
 message Id {
-    string catalog = 1;
-    string name = 2;
-    string id = 3;
+    string name = 1;
+    string id = 2;
 }
 
 // Database is a container for tables.
@@ -133,14 +132,16 @@ message Database {
 
 // Create a new database.
 message CreateDatabaseRequest {
-    Database database = 1;
-    string   cookie = 2;
+    string catalog = 1;
+    Database database = 2;
+    string   cookie = 3;
 }
 
 // Request to get database by its ID.
 message GetDatabaseRequest {
-    Id     id = 1;
-    string cookie = 2;
+    string catalog = 1;
+    Id     id = 2;
+    string cookie = 3;
 }
 
 message GetDatabaseResponse {
@@ -161,8 +162,9 @@ message ListDatabasesRequest {
 // Dropping a database also drops all objects contained in the database.
 // TODO: Add flag to prohibit dropping non-empty databases
 message DropDatabaseRequest {
-    Id     id = 1;
-    string cookie = 2;
+    string catalog = 1;
+    Id     id = 2;
+    string cookie = 3;
 }
 
 // FieldSchema defines name and type for each column.
@@ -241,7 +243,6 @@ message StorageDescriptor {
 // Table information
 message Table {
     Id id = 1;
-    Id db_id = 2;                              // Database it belongs to
     uint64 seq_id = 3;                         // Sequential ID within database
     StorageDescriptor sd = 4;                  // storage descriptor of the table
     repeated FieldSchema partitionKeys = 5;    // partition keys of the table. only primitive types are supported
@@ -252,15 +253,18 @@ message Table {
 
 // Create a new table.
 message CreateTableRequest {
-    Table table = 1;
-    string   cookie = 2;
+    string catalog = 1;
+    Id db_id = 2;
+    Table table = 3;
+    string   cookie = 4;
 }
 
 // Request to get table by its ID.
 message GetTableRequest {
-    Id     id = 1;
+    string catalog = 1;
     Id     db_id = 2; // Database ID
-    string cookie = 3;
+    Id     id = 3;
+    string cookie = 4;
 }
 
 message GetTableResponse {
@@ -271,15 +275,17 @@ message GetTableResponse {
 // Request to get list of databases
 // If exclude_params is set, result may omit parameters
 message ListTablesRequest {
-    Id db_id = 1;
-    string cookie = 2;
+    string catalog = 1;
+    Id db_id = 2;
+    string cookie = 3;
 }
 
 // Request to drop a table.
 // Dropping a table also drops all objects contained in the table
 // TODO: Add flag to prohibit dropping of non-empty table
 message DropTableRequest {
-    Id     id = 1;
+    string catalog = 1;
     Id     db_id = 2;
-    string cookie = 3;
+    Id     id = 3;
+    string cookie = 4;
 }

@@ -15,7 +15,7 @@
     "application/json"
   ],
   "paths": {
-    "/v2/database/{id.catalog}": {
+    "/v2/database/{catalog}": {
       "get": {
         "summary": "Get database information",
         "operationId": "GetDatabase",
@@ -29,7 +29,7 @@
         },
         "parameters": [
           {
-            "name": "id.catalog",
+            "name": "catalog",
             "in": "path",
             "required": true,
             "type": "string"
@@ -102,7 +102,7 @@
         ]
       }
     },
-    "/v2/table/{id.catalog}/{db_id.name}/{id.name}": {
+    "/v2/table/{catalog}/{db_id.name}/{id.name}": {
       "get": {
         "summary": "Get table information",
         "operationId": "GetTable",
@@ -116,7 +116,7 @@
         },
         "parameters": [
           {
-            "name": "id.catalog",
+            "name": "catalog",
             "in": "path",
             "required": true,
             "type": "string"
@@ -134,13 +134,13 @@
             "type": "string"
           },
           {
-            "name": "id.id",
+            "name": "db_id.id",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "db_id.id",
+            "name": "id.id",
             "in": "query",
             "required": false,
             "type": "string"
@@ -240,9 +240,6 @@
     "metastoreId": {
       "type": "object",
       "properties": {
-        "catalog": {
-          "type": "string"
-        },
         "name": {
           "type": "string"
         },
@@ -250,7 +247,7 @@
           "type": "string"
         }
       },
-      "description": "Objects belong to a specific catalog and have unique name and unique ID\nin the catalog. Both name and ID are just sequence of bytes - there are no\nassumptions about encoding or length."
+      "description": "Objects have unique name and unique ID.\nBoth name and ID are just sequence of bytes - there are no\nassumptions about encoding or length."
     },
     "metastoreInputFormat": {
       "type": "string",
@@ -402,9 +399,6 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/metastoreId"
-        },
-        "db_id": {
           "$ref": "#/definitions/metastoreId"
         },
         "seq_id": {
