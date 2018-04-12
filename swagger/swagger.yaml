@@ -1,0 +1,499 @@
+---
+swagger: 2.0
+info:
+  version: 1.0
+  title: HMS V2 API
+schemes:
+- http
+- https
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /v2/database/{catalog}:
+    get:
+      tags:
+      - Metastore
+      summary: Get database information
+      operationId: GetDatabase
+      parameters:
+      - name: catalog
+        in: path
+        required: true
+        type: string
+      - name: id.name
+        in: query
+        required: false
+        type: string
+      - name: id.id
+        in: query
+        required: false
+        type: string
+      - name: cookie
+        in: query
+        required: false
+        type: string
+      responses:
+        200:
+          description:
+          schema:
+            $ref: '#/definitions/metastoreGetDatabaseResponse'
+  /v2/dblist/{catalog}:
+    get:
+      tags:
+      - Metastore
+      summary: Get collection of databases
+      operationId: ListDatabases
+      parameters:
+      - name: catalog
+        in: path
+        required: true
+        type: string
+      - name: cookie
+        in: query
+        required: false
+        type: string
+      - name: name_pattern
+        in: query
+        required: false
+        type: string
+      - name: exclude_params
+        in: query
+        required: false
+        type: boolean
+        format: boolean
+      responses:
+        200:
+          description: (streaming responses)
+          schema:
+            $ref: '#/definitions/metastoreDatabase'
+  /v2/table/{catalog}/{db_id.name}/{id.name}:
+    get:
+      tags:
+      - Metastore
+      summary: Get table information
+      operationId: GetTable
+      parameters:
+      - name: catalog
+        in: path
+        required: true
+        type: string
+      - name: db_id.name
+        in: path
+        required: true
+        type: string
+      - name: id.name
+        in: path
+        required: true
+        type: string
+      - name: db_id.id
+        in: query
+        required: false
+        type: string
+      - name: id.id
+        in: query
+        required: false
+        type: string
+      - name: cookie
+        in: query
+        required: false
+        type: string
+      responses:
+        200:
+          description:
+          schema:
+            $ref: '#/definitions/metastoreGetTableResponse'
+definitions:
+  RequestStatusStatus:
+    type: string
+    enum:
+    - OK
+    - ERROR
+    - NOTFOUND
+    - CONFLICT
+    - BUSY
+    - INTERNAL
+    default: OK
+  metastoreDatabase:
+    type: object
+    properties:
+      id:
+        $ref: '#/definitions/metastoreId'
+      seq_id:
+        type: string
+        format: uint64
+      location:
+        type: string
+      parameters:
+        type: object
+        additionalProperties:
+          type: string
+      system_parameters:
+        type: object
+        additionalProperties:
+          type: string
+    title: |-
+      Database is a container for tables.
+      Database object has two sets of parameters:
+       - User parameters are intended for user and are just transparently passed around
+       - System parameters are intended to be used by Hive for its internal purposes
+    description: |-
+      seq_id is a numeric ID which is unique within a catalog. It can be used to track
+      new databases in the catalog
+
+      Original Metastore Database object also had owner information.
+      These can be represented using system parameters if needed since the current
+      metastore service does not interpret Owner info.
+    example:
+      system_parameters:
+        key: system_parameters
+      seq_id: seq_id
+      location: location
+      id:
+        name: name
+        id: id
+      parameters:
+        key: parameters
+  metastoreFieldSchema:
+    type: object
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+      comment:
+        type: string
+    description: FieldSchema defines name and type for each column.
+    example:
+      name: name
+      comment: comment
+      type: type
+  metastoreGetDatabaseResponse:
+    type: object
+    properties:
+      database:
+        $ref: '#/definitions/metastoreDatabase'
+      status:
+        $ref: '#/definitions/metastoreRequestStatus'
+    example:
+      database:
+        system_parameters:
+          key: system_parameters
+        seq_id: seq_id
+        location: location
+        id:
+          name: name
+          id: id
+        parameters:
+          key: parameters
+      status:
+        cookie: cookie
+        error: error
+        status: {}
+  metastoreGetTableResponse:
+    type: object
+    properties:
+      table:
+        $ref: '#/definitions/metastoreTable'
+      status:
+        $ref: '#/definitions/metastoreRequestStatus'
+    example:
+      table:
+        sd:
+          system_parameters:
+            key: system_parameters
+          bucketCols:
+          - bucketCols
+          - bucketCols
+          outputFormatName: outputFormatName
+          inputFormatName: inputFormatName
+          sortCols:
+          - col: col
+            ascending: true
+          - col: col
+            ascending: true
+          location: location
+          inputFormat: {}
+          cols:
+          - name: name
+            comment: comment
+            type: type
+          - name: name
+            comment: comment
+            type: type
+          outputFormat: {}
+          parameters:
+            key: parameters
+          serdeInfo:
+            serializationLib: serializationLib
+            name: name
+            type: {}
+            parameters:
+              key: parameters
+          numBuckets: 0
+        tableType: {}
+        system_parameters:
+          key: system_parameters
+        seq_id: seq_id
+        id:
+          name: name
+          id: id
+        partitionKeys:
+        - name: name
+          comment: comment
+          type: type
+        - name: name
+          comment: comment
+          type: type
+        parameters:
+          key: parameters
+      status:
+        cookie: cookie
+        error: error
+        status: {}
+  metastoreId:
+    type: object
+    properties:
+      name:
+        type: string
+      id:
+        type: string
+    description: |-
+      Objects have unique name and unique ID.
+      Both name and ID are just sequence of bytes - there are no
+      assumptions about encoding or length.
+    example:
+      name: name
+      id: id
+  metastoreInputFormat:
+    type: string
+    description: Known Input Formats. CUSTOM means that it should be specified as a string.
+    enum:
+    - IF_CUSTOM
+    - IF_SEQUENCE
+    - IF_TEXT
+    - IF_HIVE
+    default: IF_CUSTOM
+  metastoreOrder:
+    type: object
+    properties:
+      col:
+        type: string
+      ascending:
+        type: boolean
+        format: boolean
+    title: sort order of a column (column name along with asc/desc)
+    example:
+      col: col
+      ascending: true
+  metastoreOutputFormat:
+    type: string
+    description: Known Output Formats. CUSTOM means that it should be specified as a string.
+    enum:
+    - OF_CUSTOM
+    - OF_SEQUENCE
+    - OF_IGNORE_KEY
+    - OF_HIVE
+    default: OF_CUSTOM
+  metastoreRequestStatus:
+    type: object
+    properties:
+      status:
+        $ref: '#/definitions/RequestStatusStatus'
+      error:
+        type: string
+      cookie:
+        type: string
+    title: General status for results
+    example:
+      cookie: cookie
+      error: error
+      status: {}
+  metastoreSerDeInfo:
+    type: object
+    properties:
+      type:
+        $ref: '#/definitions/metastoreSerdeType'
+      name:
+        type: string
+      serializationLib:
+        type: string
+      parameters:
+        type: object
+        title: 'NOTE: Should we enum this as well?'
+        additionalProperties:
+          type: string
+    title: Serialization/Deserialization information
+    example:
+      serializationLib: serializationLib
+      name: name
+      type: {}
+      parameters:
+        key: parameters
+  metastoreSerdeType:
+    type: string
+    description: Known SerDes are represented using enum. Unknown ones are represented using strings.
+    enum:
+    - SERDE_CUSTOM
+    - SERDE_LAZY_SIMPLE
+    - SERDE_AVRO
+    - SERDE_JSON
+    - SERDE_ORC
+    - SERDE_REGEX
+    - SERDE_THRIFT
+    - SERDE_PARQUET
+    - SERDE_CSV
+    default: SERDE_CUSTOM
+  metastoreStorageDescriptor:
+    type: object
+    properties:
+      cols:
+        type: array
+        items:
+          $ref: '#/definitions/metastoreFieldSchema'
+      location:
+        type: string
+      inputFormat:
+        $ref: '#/definitions/metastoreInputFormat'
+      inputFormatName:
+        type: string
+      outputFormat:
+        $ref: '#/definitions/metastoreOutputFormat'
+      outputFormatName:
+        type: string
+      numBuckets:
+        type: integer
+        format: int32
+      serdeInfo:
+        $ref: '#/definitions/metastoreSerDeInfo'
+      bucketCols:
+        type: array
+        items:
+          type: string
+      sortCols:
+        type: array
+        items:
+          $ref: '#/definitions/metastoreOrder'
+      parameters:
+        type: object
+        additionalProperties:
+          type: string
+      system_parameters:
+        type: object
+        additionalProperties:
+          type: string
+    title: StorageDescriptor holds all the information about physical storage of the data belonging to a table
+    example:
+      system_parameters:
+        key: system_parameters
+      bucketCols:
+      - bucketCols
+      - bucketCols
+      outputFormatName: outputFormatName
+      inputFormatName: inputFormatName
+      sortCols:
+      - col: col
+        ascending: true
+      - col: col
+        ascending: true
+      location: location
+      inputFormat: {}
+      cols:
+      - name: name
+        comment: comment
+        type: type
+      - name: name
+        comment: comment
+        type: type
+      outputFormat: {}
+      parameters:
+        key: parameters
+      serdeInfo:
+        serializationLib: serializationLib
+        name: name
+        type: {}
+        parameters:
+          key: parameters
+      numBuckets: 0
+  metastoreTable:
+    type: object
+    properties:
+      id:
+        $ref: '#/definitions/metastoreId'
+      seq_id:
+        type: string
+        format: uint64
+      sd:
+        $ref: '#/definitions/metastoreStorageDescriptor'
+      partitionKeys:
+        type: array
+        items:
+          $ref: '#/definitions/metastoreFieldSchema'
+      tableType:
+        $ref: '#/definitions/metastoreTableType'
+      parameters:
+        type: object
+        additionalProperties:
+          type: string
+      system_parameters:
+        type: object
+        additionalProperties:
+          type: string
+    title: Table information
+    example:
+      sd:
+        system_parameters:
+          key: system_parameters
+        bucketCols:
+        - bucketCols
+        - bucketCols
+        outputFormatName: outputFormatName
+        inputFormatName: inputFormatName
+        sortCols:
+        - col: col
+          ascending: true
+        - col: col
+          ascending: true
+        location: location
+        inputFormat: {}
+        cols:
+        - name: name
+          comment: comment
+          type: type
+        - name: name
+          comment: comment
+          type: type
+        outputFormat: {}
+        parameters:
+          key: parameters
+        serdeInfo:
+          serializationLib: serializationLib
+          name: name
+          type: {}
+          parameters:
+            key: parameters
+        numBuckets: 0
+      tableType: {}
+      system_parameters:
+        key: system_parameters
+      seq_id: seq_id
+      id:
+        name: name
+        id: id
+      partitionKeys:
+      - name: name
+        comment: comment
+        type: type
+      - name: name
+        comment: comment
+        type: type
+      parameters:
+        key: parameters
+  metastoreTableType:
+    type: string
+    enum:
+    - TTYPE_MANAGED
+    - TTYPE_EXTERNAL
+    - TTYPE_INDEX
+    default: TTYPE_MANAGED
