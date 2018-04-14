@@ -56,6 +56,12 @@ func (s *metastoreServer) CreateTable(c context.Context,
 		return nil, fmt.Errorf("missing database name")
 	}
 	table := req.Table
+	if table == nil {
+		return nil, fmt.Errorf("missing table data")
+	}
+	if table.Id == nil {
+		return nil, fmt.Errorf("missing table ID")
+	}
 	tableName := table.Id.Name
 	if tableName == "" {
 		return nil, fmt.Errorf("missing table name")

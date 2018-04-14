@@ -74,35 +74,35 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 // purposes, so using generic term here.
 service Metastore {
     // Create a new database.
-    rpc CreateDabatase (CreateDatabaseRequest) returns (GetDatabaseResponse);
+    rpc CreateDabatase(CreateDatabaseRequest) returns (GetDatabaseResponse);
 
     // Get database information
-    rpc GetDatabase (GetDatabaseRequest) returns  (GetDatabaseResponse) {
+    rpc GetDatabase(GetDatabaseRequest) returns  (GetDatabaseResponse) {
         option (google.api.http) = {
            get: "/v2/db/{catalog}/{id.name}"
         };
     }
     // Return all databases in a catalog
-    rpc ListDatabases (ListDatabasesRequest) returns  (stream Database) {
+    rpc ListDatabases(ListDatabasesRequest) returns  (stream Database) {
         option (google.api.http) = {
 	       get: "/v2/db/{catalog}"
 	    };
     }
     // Destroy the database
-    rpc DropDatabase (DropDatabaseRequest) returns (RequestStatus);
+    rpc DropDatabase(DropDatabaseRequest) returns (RequestStatus);
 
     // Create a new table
-    rpc CreateTable (CreateTableRequest) returns (GetTableResponse);
+    rpc CreateTable(CreateTableRequest) returns (GetTableResponse);
 
     // Get table information
-    rpc GetTable (GetTableRequest) returns (GetTableResponse) {
+    rpc GetTable(GetTableRequest) returns (GetTableResponse) {
         option (google.api.http) = {
 	       get: "/v2/table/{catalog}/{db_id.name}/{id.name}"
 	    };
     }
 
     // Get all tables from a database
-    rpc ListTables (ListTablesRequest) returns  (stream Table) {
+    rpc ListTables(ListTablesRequest) returns  (stream Table) {
         option (google.api.http) = {
 	       get: "/v2/table/{catalog}/{db_id.name}"
 	    };
@@ -110,6 +110,9 @@ service Metastore {
 
     // Destroy a table
     rpc DropTable (DropTableRequest) returns (RequestStatus);
+
+    // Add partition to a table
+    rpc AddPartition(AddPartitionRequest) returns (RequestStatus);
 }
 
 // General status for results.
@@ -241,6 +244,17 @@ enum InputFormat {
 }
 
 // Known Output Formats. CUSTOM means that it should be specified as a string.
+//
+// Here is a list of known output formats:
+//
+// - org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+// - org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
+// - org.apache.hadoop.hive.ql.io.HiveNullValueSequenceFileOutputFormat
+// - org.apache.hadoop.hive.ql.io.HivePassThroughOutputFormat
+// - org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
+// - org.apache.hadoop.hive.ql.io.HiveBinaryOutputFormat
+// - org.apache.hadoop.hive.ql.io.RCFileOutputFormat
+//
 enum OutputFormat {
     OF_CUSTOM = 0;
     OF_SEQUENCE = 2;
@@ -252,6 +266,11 @@ enum TableType {
     TTYPE_MANAGED = 0;
     TTYPE_EXTERNAL = 1;
     TTYPE_INDEX = 2;
+}
+
+enum SerializationLib {
+    SL_CUSTOM = 0; // Unknown lib, use string
+    SL_LAZY_SIMPLE = 1; // LazySimpleSerDe
 }
 
 // Serialization/Deserialization information
@@ -333,4 +352,27 @@ message DropTableRequest {
     Id     db_id = 2;
     Id     id = 3;
     string cookie = 4;
+}
+
+// Partition
+message Partition {
+    Id                  id = 1;
+    uint64              seq_id = 2;       // Sequential ID within table
+    repeated string     values = 3;       // Values for each partition
+    StorageDescriptor   sd = 4;           // Partition descriptor
+    map<string, string> parameters = 5;   // User parameters
+}
+
+message AddPartitionRequest {
+    string catalog = 1;
+    Id db_id = 2;
+    Id table_id = 3;
+    Partition partition = 4;
+}
+
+message GetPartitionRequest {
+    string catalog = 1;
+    Id db_id = 2;
+    Id table_id = 3;
+    repeated string values = 4;
 }

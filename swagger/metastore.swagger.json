@@ -331,7 +331,35 @@
         "OF_HIVE"
       ],
       "default": "OF_CUSTOM",
-      "description": "Known Output Formats. CUSTOM means that it should be specified as a string."
+      "description": "Known Output Formats. CUSTOM means that it should be specified as a string.\n\nHere is a list of known output formats:\n\n- org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat\n- org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat\n- org.apache.hadoop.hive.ql.io.HiveNullValueSequenceFileOutputFormat\n- org.apache.hadoop.hive.ql.io.HivePassThroughOutputFormat\n- org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat\n- org.apache.hadoop.hive.ql.io.HiveBinaryOutputFormat\n- org.apache.hadoop.hive.ql.io.RCFileOutputFormat"
+    },
+    "metastorePartition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/metastoreId"
+        },
+        "seq_id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sd": {
+          "$ref": "#/definitions/metastoreStorageDescriptor"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "Partition"
     },
     "metastoreRequestStatus": {
       "type": "object",

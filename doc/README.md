@@ -4,6 +4,7 @@
 ## Table of Contents
 
 - [metastore.proto](#metastore.proto)
+    - [AddPartitionRequest](#metastore.AddPartitionRequest)
     - [CreateDatabaseRequest](#metastore.CreateDatabaseRequest)
     - [CreateTableRequest](#metastore.CreateTableRequest)
     - [Database](#metastore.Database)
@@ -14,12 +15,15 @@
     - [FieldSchema](#metastore.FieldSchema)
     - [GetDatabaseRequest](#metastore.GetDatabaseRequest)
     - [GetDatabaseResponse](#metastore.GetDatabaseResponse)
+    - [GetPartitionRequest](#metastore.GetPartitionRequest)
     - [GetTableRequest](#metastore.GetTableRequest)
     - [GetTableResponse](#metastore.GetTableResponse)
     - [Id](#metastore.Id)
     - [ListDatabasesRequest](#metastore.ListDatabasesRequest)
     - [ListTablesRequest](#metastore.ListTablesRequest)
     - [Order](#metastore.Order)
+    - [Partition](#metastore.Partition)
+    - [Partition.ParametersEntry](#metastore.Partition.ParametersEntry)
     - [RequestStatus](#metastore.RequestStatus)
     - [SerDeInfo](#metastore.SerDeInfo)
     - [SerDeInfo.ParametersEntry](#metastore.SerDeInfo.ParametersEntry)
@@ -34,6 +38,7 @@
     - [OutputFormat](#metastore.OutputFormat)
     - [RequestStatus.Status](#metastore.RequestStatus.Status)
     - [SerdeType](#metastore.SerdeType)
+    - [SerializationLib](#metastore.SerializationLib)
     - [TableType](#metastore.TableType)
   
   
@@ -52,6 +57,24 @@ Some notes on protobuf proto3
 
 - It supports maps that are extensively used here
 - All fields are optional
+
+
+<a name="metastore.AddPartitionRequest"/>
+
+### AddPartitionRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| catalog | [string](#string) |  |  |
+| db_id | [Id](#metastore.Id) |  |  |
+| table_id | [Id](#metastore.Id) |  |  |
+| partition | [Partition](#metastore.Partition) |  |  |
+
+
+
+
 
 
 <a name="metastore.CreateDatabaseRequest"/>
@@ -254,6 +277,24 @@ TODO: specify error cases
 
 
 
+<a name="metastore.GetPartitionRequest"/>
+
+### GetPartitionRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| catalog | [string](#string) |  |  |
+| db_id | [Id](#metastore.Id) |  |  |
+| table_id | [Id](#metastore.Id) |  |  |
+| values | [string](#string) | repeated |  |
+
+
+
+
+
+
 <a name="metastore.GetTableRequest"/>
 
 ### GetTableRequest
@@ -357,6 +398,41 @@ sort order of a column (column name along with asc/desc)
 | ----- | ---- | ----- | ----------- |
 | col | [string](#string) |  | sort column name |
 | ascending | [bool](#bool) |  | asc(1) or desc(0) |
+
+
+
+
+
+
+<a name="metastore.Partition"/>
+
+### Partition
+Partition
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [Id](#metastore.Id) |  |  |
+| seq_id | [uint64](#uint64) |  | Sequential ID within table |
+| values | [string](#string) | repeated | Values for each partition |
+| sd | [StorageDescriptor](#metastore.StorageDescriptor) |  | Partition descriptor |
+| parameters | [Partition.ParametersEntry](#metastore.Partition.ParametersEntry) | repeated | User parameters |
+
+
+
+
+
+
+<a name="metastore.Partition.ParametersEntry"/>
+
+### Partition.ParametersEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  |  |
+| value | [string](#string) |  |  |
 
 
 
@@ -549,6 +625,16 @@ Known Input Formats. CUSTOM means that it should be specified as a string.
 ### OutputFormat
 Known Output Formats. CUSTOM means that it should be specified as a string.
 
+Here is a list of known output formats:
+
+- org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+- org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
+- org.apache.hadoop.hive.ql.io.HiveNullValueSequenceFileOutputFormat
+- org.apache.hadoop.hive.ql.io.HivePassThroughOutputFormat
+- org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
+- org.apache.hadoop.hive.ql.io.HiveBinaryOutputFormat
+- org.apache.hadoop.hive.ql.io.RCFileOutputFormat
+
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | OF_CUSTOM | 0 |  |
@@ -590,6 +676,18 @@ Known SerDes are represented using enum. Unknown ones are represented using stri
 | SERDE_THRIFT | 6 |  |
 | SERDE_PARQUET | 7 |  |
 | SERDE_CSV | 8 |  |
+
+
+
+<a name="metastore.SerializationLib"/>
+
+### SerializationLib
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| SL_CUSTOM | 0 | Unknown lib, use string |
+| SL_LAZY_SIMPLE | 1 | LazySimpleSerDe |
 
 
 
@@ -637,6 +735,7 @@ purposes, so using generic term here.
 | GetTable | [GetTableRequest](#metastore.GetTableRequest) | [GetTableResponse](#metastore.GetTableRequest) | Get table information |
 | ListTables | [ListTablesRequest](#metastore.ListTablesRequest) | [Table](#metastore.ListTablesRequest) | Get all tables from a database |
 | DropTable | [DropTableRequest](#metastore.DropTableRequest) | [RequestStatus](#metastore.DropTableRequest) | Destroy a table |
+| AddPartition | [AddPartitionRequest](#metastore.AddPartitionRequest) | [RequestStatus](#metastore.AddPartitionRequest) | Add partition to a table |
 
  
 
