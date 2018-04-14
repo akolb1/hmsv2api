@@ -44,27 +44,9 @@ func (s *metastoreServer) AddPartition(c context.Context,
 	}
 
 	err := s.db.Update(func(tx *bolt.Tx) error {
-		catalogBucket := tx.Bucket([]byte(catalog))
-		if catalogBucket == nil {
-			return fmt.Errorf("bucket %s doesn't exist", catalog)
-		}
-
-		// Locate ID by name
-		nameIdBucket := catalogBucket.Bucket([]byte(bynameHdr))
-		if nameIdBucket == nil {
-			return fmt.Errorf("corrupt catalog - missing NAME map")
-		}
-		idBytesDb := nameIdBucket.Get([]byte(dbName))
-		if idBytesDb == nil {
-			return fmt.Errorf("database %s doesn't exist", dbName)
-		}
-		dbInfoBucket := catalogBucket.Bucket([]byte(dbHdr))
-		if dbInfoBucket == nil {
-			return fmt.Errorf("corrupt catalog %s: no DB info", catalog)
-		}
-		dbBucket := dbInfoBucket.Bucket(idBytesDb)
-		if dbBucket == nil {
-			return fmt.Errorf("corrupt catalog %s/%s: no DB info", catalog, dbName)
+		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
+		if err != nil {
+			return err
 		}
 		byNameBucket := dbBucket.Bucket([]byte(bynameHdr))
 		if byNameBucket == nil {

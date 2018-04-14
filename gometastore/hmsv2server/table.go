@@ -51,7 +51,6 @@ func (s *metastoreServer) CreateTable(c context.Context,
 		return nil, fmt.Errorf("missing catalog")
 	}
 	dbName := req.DbId.Name
-	dbId := req.DbId.Id
 	if dbName == "" {
 		return nil, fmt.Errorf("missing database name")
 	}
@@ -71,34 +70,9 @@ func (s *metastoreServer) CreateTable(c context.Context,
 	log.Println("Generated id", id)
 
 	err := s.db.Update(func(tx *bolt.Tx) error {
-		catBucket := tx.Bucket([]byte(catalog))
-		if catBucket == nil {
-			return fmt.Errorf("missing catalog %s", catalog)
-		}
-		idMap := catBucket.Bucket([]byte(byIDHdr))
-		if idMap == nil {
-			return fmt.Errorf("database %s does not exist in %s", dbName, catalog)
-		}
-
-		idBytesDb := []byte(dbId)
-		if dbId == "" {
-			// Locate DB ID by name
-			nameIdBucket := catBucket.Bucket([]byte(bynameHdr))
-			if nameIdBucket == nil {
-				return fmt.Errorf("corrupt catalog - missing NAME map")
-			}
-			idBytesDb = nameIdBucket.Get([]byte(dbName))
-			if idBytesDb == nil {
-				return fmt.Errorf("database %s doesn't exist", dbName)
-			}
-		}
-		dbInfoBucket := catBucket.Bucket([]byte(dbHdr))
-		if dbInfoBucket == nil {
-			return fmt.Errorf("corrupt catalog %s: no DB info", catalog)
-		}
-		dbBucket := dbInfoBucket.Bucket(idBytesDb)
-		if dbBucket == nil {
-			return fmt.Errorf("corrupt catalog %s/%s: no DB info", catalog, dbName)
+		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
+		if err != nil {
+			return err
 		}
 		byNameBucket := dbBucket.Bucket([]byte(bynameHdr))
 		if byNameBucket == nil {
@@ -112,7 +86,7 @@ func (s *metastoreServer) CreateTable(c context.Context,
 		if tblIdBytes != nil {
 			return fmt.Errorf("table %s:%s.%s already exists", catalog, dbName, tableName)
 		}
-		err := byNameBucket.Put([]byte(tableName), []byte(id))
+		err = byNameBucket.Put([]byte(tableName), []byte(id))
 		if err != nil {
 			return err
 		}
@@ -175,27 +149,9 @@ func (s *metastoreServer) GetTable(c context.Context,
 	var table pb.Table
 
 	err := s.db.View(func(tx *bolt.Tx) error {
-		catalogBucket := tx.Bucket([]byte(catalog))
-		if catalogBucket == nil {
-			return fmt.Errorf("bucket %s doesn't exist", catalog)
-		}
-
-		// Locate ID by name
-		nameIdBucket := catalogBucket.Bucket([]byte(bynameHdr))
-		if nameIdBucket == nil {
-			return fmt.Errorf("corrupt catalog - missing NAME map")
-		}
-		idBytesDb := nameIdBucket.Get([]byte(dbName))
-		if idBytesDb == nil {
-			return fmt.Errorf("database %s doesn't exist", dbName)
-		}
-		dbInfoBucket := catalogBucket.Bucket([]byte(dbHdr))
-		if dbInfoBucket == nil {
-			return fmt.Errorf("corrupt catalog %s: no DB info", catalog)
-		}
-		dbBucket := dbInfoBucket.Bucket(idBytesDb)
-		if dbBucket == nil {
-			return fmt.Errorf("corrupt catalog %s/%s: no DB info", catalog, dbName)
+		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
+		if err != nil {
+			return err
 		}
 		byNameBucket := dbBucket.Bucket([]byte(bynameHdr))
 		if byNameBucket == nil {
@@ -252,27 +208,9 @@ func (s *metastoreServer) ListTables(req *pb.ListTablesRequest,
 	}
 
 	err := s.db.View(func(tx *bolt.Tx) error {
-		catalogBucket := tx.Bucket([]byte(catalog))
-		if catalogBucket == nil {
-			return fmt.Errorf("bucket %s doesn't exist", catalog)
-		}
-
-		// Locate ID by name
-		nameIdBucket := catalogBucket.Bucket([]byte(bynameHdr))
-		if nameIdBucket == nil {
-			return fmt.Errorf("corrupt catalog - missing NAME map")
-		}
-		idBytesDb := nameIdBucket.Get([]byte(dbName))
-		if idBytesDb == nil {
-			return fmt.Errorf("database %s doesn't exist", dbName)
-		}
-		dbInfoBucket := catalogBucket.Bucket([]byte(dbHdr))
-		if dbInfoBucket == nil {
-			return fmt.Errorf("corrupt catalog %s: no DB info", catalog)
-		}
-		dbBucket := dbInfoBucket.Bucket(idBytesDb)
-		if dbBucket == nil {
-			return fmt.Errorf("corrupt catalog %s/%s: no DB info", catalog, dbName)
+		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
+		if err != nil {
+			return err
 		}
 		byIdBucket := dbBucket.Bucket([]byte(byIDHdr))
 		if byIdBucket == nil {
@@ -326,27 +264,9 @@ func (s *metastoreServer) DropTable(c context.Context,
 	}
 
 	err := s.db.Update(func(tx *bolt.Tx) error {
-		catalogBucket := tx.Bucket([]byte(catalog))
-		if catalogBucket == nil {
-			return fmt.Errorf("bucket %s doesn't exist", catalog)
-		}
-
-		// Locate ID by name
-		nameIdBucket := catalogBucket.Bucket([]byte(bynameHdr))
-		if nameIdBucket == nil {
-			return fmt.Errorf("corrupt catalog - missing NAME map")
-		}
-		idBytesDb := nameIdBucket.Get([]byte(dbName))
-		if idBytesDb == nil {
-			return fmt.Errorf("database %s doesn't exist", dbName)
-		}
-		dbInfoBucket := catalogBucket.Bucket([]byte(dbHdr))
-		if dbInfoBucket == nil {
-			return fmt.Errorf("corrupt catalog %s: no DB info", catalog)
-		}
-		dbBucket := dbInfoBucket.Bucket(idBytesDb)
-		if dbBucket == nil {
-			return fmt.Errorf("corrupt catalog %s/%s: no DB info", catalog, dbName)
+		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
+		if err != nil {
+			return err
 		}
 		byNameBucket := dbBucket.Bucket([]byte(bynameHdr))
 		if byNameBucket == nil {
