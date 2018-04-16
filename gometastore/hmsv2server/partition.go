@@ -194,6 +194,56 @@ func (s *metastoreServer) ListPartitions(req *pb.ListPartitionsRequest,
 	return nil
 }
 
+func (s *metastoreServer) DropPartition(c context.Context,
+	req *pb.DropPartitionRequest) (*pb.RequestStatus, error) {
+	log.Println("DropPartition:", req)
+	catalog := req.Catalog
+	if catalog == "" {
+		return nil, fmt.Errorf("missing catalog")
+	}
+	if req.DbId == nil {
+		return nil, fmt.Errorf("missing Db info")
+	}
+	dbName := req.DbId.Name
+	if dbName == "" {
+		return nil, fmt.Errorf("missing database name")
+	}
+	if req.TableId == nil {
+		return nil, fmt.Errorf("missing table info")
+	}
+	tableName := req.TableId.Name
+	if tableName == "" {
+		return nil, fmt.Errorf("missing table name")
+	}
+	// Construct partition name from values
+	values := strings.Join(req.GetValues(), "/")
+	if values == "" {
+		return nil, fmt.Errorf("missing partition values")
+	}
+
+	err := s.db.Update(func(tx *bolt.Tx) error {
+		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
+		if err != nil {
+			return err
+		}
+		tablesBucket, err := getTableBucket(dbBucket, catalog, dbName, tableName)
+		if err != nil {
+			return err
+		}
+		if err = tablesBucket.Delete([]byte(values)); err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		log.Println("failed to delete table:", err)
+		return nil, err
+	}
+
+	return &pb.RequestStatus{Status: pb.RequestStatus_STATUS_OK}, nil
+}
+
 func getTableBucket(dbBucket *bolt.Bucket, catalog string, dbName string, tableName string) (*bolt.Bucket, error) {
 	byNameBucket := dbBucket.Bucket([]byte(bynameHdr))
 	if byNameBucket == nil {

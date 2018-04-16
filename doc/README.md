@@ -11,6 +11,7 @@
     - [Database.ParametersEntry](#metastore.Database.ParametersEntry)
     - [Database.SystemParametersEntry](#metastore.Database.SystemParametersEntry)
     - [DropDatabaseRequest](#metastore.DropDatabaseRequest)
+    - [DropPartitionRequest](#metastore.DropPartitionRequest)
     - [DropTableRequest](#metastore.DropTableRequest)
     - [FieldSchema](#metastore.FieldSchema)
     - [GetDatabaseRequest](#metastore.GetDatabaseRequest)
@@ -64,7 +65,10 @@ Some notes on protobuf proto3
 <a name="metastore.AddPartitionRequest"/>
 
 ### AddPartitionRequest
+Add a single partition to a table.
 
+Partition is described by list of &#34;values&#34; - one value per partition schema.
+There is no validation that values actually match partition schema
 
 
 | Field | Type | Label | Description |
@@ -202,6 +206,28 @@ TODO: Add flag to prohibit dropping non-empty databases
 
 
 
+<a name="metastore.DropPartitionRequest"/>
+
+### DropPartitionRequest
+Delete partition.
+
+Partition is described by list of &#34;values&#34; - one value per partition schema.
+There is no validation that values actually match partition schema
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| catalog | [string](#string) |  |  |
+| db_id | [Id](#metastore.Id) |  |  |
+| table_id | [Id](#metastore.Id) |  |  |
+| values | [string](#string) | repeated |  |
+| cookie | [string](#string) |  |  |
+
+
+
+
+
+
 <a name="metastore.DropTableRequest"/>
 
 ### DropTableRequest
@@ -282,7 +308,10 @@ TODO: specify error cases
 <a name="metastore.GetPartitionRequest"/>
 
 ### GetPartitionRequest
+Get partition information.
 
+Partition is described by list of &#34;values&#34; - one value per partition schema.
+There is no validation that values actually match partition schema
 
 
 | Field | Type | Label | Description |
@@ -391,7 +420,7 @@ If exclude_params is set, result may omit parameters
 <a name="metastore.ListPartitionsRequest"/>
 
 ### ListPartitionsRequest
-
+Return all partitions in a table
 
 
 | Field | Type | Label | Description |
@@ -773,6 +802,7 @@ purposes, so using generic term here.
 | AddPartition | [AddPartitionRequest](#metastore.AddPartitionRequest) | [RequestStatus](#metastore.AddPartitionRequest) | Add partition to a table |
 | GetPartition | [GetPartitionRequest](#metastore.GetPartitionRequest) | [GetPartitionResponse](#metastore.GetPartitionRequest) | Get partition information |
 | ListPartitions | [ListPartitionsRequest](#metastore.ListPartitionsRequest) | [Partition](#metastore.ListPartitionsRequest) | List all partitions in a table |
+| DropPartition | [DropPartitionRequest](#metastore.DropPartitionRequest) | [RequestStatus](#metastore.DropPartitionRequest) | Drop partition |
 
  
 

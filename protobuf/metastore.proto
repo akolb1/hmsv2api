@@ -127,6 +127,9 @@ service Metastore {
 	       get: "/v2/partitions/{catalog}/{db_id.name}/{table_id.name}"
 	    };
     }
+
+    // Drop partition
+    rpc DropPartition(DropPartitionRequest) returns (RequestStatus);
 }
 
 // General status for results.
@@ -376,6 +379,10 @@ message Partition {
     map<string, string> parameters = 5;   // User parameters
 }
 
+// Add a single partition to a table.
+//
+// Partition is described by list of "values" - one value per partition schema.
+// There is no validation that values actually match partition schema
 message AddPartitionRequest {
     string catalog = 1;
     Id db_id = 2;
@@ -383,6 +390,10 @@ message AddPartitionRequest {
     Partition partition = 4;
 }
 
+// Get partition information.
+//
+// Partition is described by list of "values" - one value per partition schema.
+// There is no validation that values actually match partition schema
 message GetPartitionRequest {
     string catalog = 1;
     Id db_id = 2;
@@ -395,9 +406,22 @@ message GetPartitionResponse {
     RequestStatus status = 2;
 }
 
+// Return all partitions in a table
 message ListPartitionsRequest {
     string catalog = 1;
     Id db_id = 2;
     Id table_id = 3;
     string cookie = 4;
+}
+
+// Delete partition.
+//
+// Partition is described by list of "values" - one value per partition schema.
+// There is no validation that values actually match partition schema
+message DropPartitionRequest {
+    string catalog = 1;
+    Id     db_id = 2;
+    Id     table_id = 3;
+    repeated string values = 4;
+    string cookie = 5;
 }
