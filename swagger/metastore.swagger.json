@@ -107,6 +107,119 @@
         ]
       }
     },
+    "/v2/partition/{catalog}/{db_id.name}/{table_id.name}": {
+      "get": {
+        "summary": "Get partition information",
+        "operationId": "GetPartition",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/metastoreGetPartitionResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "catalog",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "db_id.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "table_id.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "db_id.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "table_id.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "values",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "Metastore"
+        ]
+      }
+    },
+    "/v2/partitions/{catalog}/{db_id.name}/{table_id.name}": {
+      "get": {
+        "summary": "List all partitions in a table",
+        "operationId": "ListPartitions",
+        "responses": {
+          "200": {
+            "description": "(streaming responses)",
+            "schema": {
+              "$ref": "#/definitions/metastorePartition"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "catalog",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "db_id.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "table_id.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "db_id.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "table_id.id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "cookie",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Metastore"
+        ]
+      }
+    },
     "/v2/table/{catalog}/{db_id.name}": {
       "get": {
         "summary": "Get all tables from a database",
@@ -275,6 +388,17 @@
       "description": "The result consists of the database information (which may be empty in case of failure)\nand request status.\nTODO: specify error cases",
       "title": "Result of GetDatabase request"
     },
+    "metastoreGetPartitionResponse": {
+      "type": "object",
+      "properties": {
+        "partition": {
+          "$ref": "#/definitions/metastorePartition"
+        },
+        "status": {
+          "$ref": "#/definitions/metastoreRequestStatus"
+        }
+      }
+    },
     "metastoreGetTableResponse": {
       "type": "object",
       "properties": {
@@ -336,9 +460,6 @@
     "metastorePartition": {
       "type": "object",
       "properties": {
-        "id": {
-          "$ref": "#/definitions/metastoreId"
-        },
         "seq_id": {
           "type": "string",
           "format": "uint64"

@@ -219,10 +219,9 @@ func (s *metastoreServer) ListTables(req *pb.ListTablesRequest,
 		byIdBucket.ForEach(func(k, v []byte) error {
 			table := new(pb.Table)
 			if err := proto.Unmarshal(v, table); err != nil {
-				return nil
+				return err
 			}
 			log.Println("send", table.Id.Name)
-			// table.Id.Catalog = ""
 			if err := stream.Send(table); err != nil {
 				log.Println("err sending ", err)
 				return err
@@ -238,7 +237,7 @@ func (s *metastoreServer) ListTables(req *pb.ListTablesRequest,
 		return err
 	}
 
-	return err
+	return nil
 }
 
 func (s *metastoreServer) DropTable(c context.Context,

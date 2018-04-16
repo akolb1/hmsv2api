@@ -16,10 +16,12 @@
     - [GetDatabaseRequest](#metastore.GetDatabaseRequest)
     - [GetDatabaseResponse](#metastore.GetDatabaseResponse)
     - [GetPartitionRequest](#metastore.GetPartitionRequest)
+    - [GetPartitionResponse](#metastore.GetPartitionResponse)
     - [GetTableRequest](#metastore.GetTableRequest)
     - [GetTableResponse](#metastore.GetTableResponse)
     - [Id](#metastore.Id)
     - [ListDatabasesRequest](#metastore.ListDatabasesRequest)
+    - [ListPartitionsRequest](#metastore.ListPartitionsRequest)
     - [ListTablesRequest](#metastore.ListTablesRequest)
     - [Order](#metastore.Order)
     - [Partition](#metastore.Partition)
@@ -295,6 +297,22 @@ TODO: specify error cases
 
 
 
+<a name="metastore.GetPartitionResponse"/>
+
+### GetPartitionResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| partition | [Partition](#metastore.Partition) |  |  |
+| status | [RequestStatus](#metastore.RequestStatus) |  |  |
+
+
+
+
+
+
 <a name="metastore.GetTableRequest"/>
 
 ### GetTableRequest
@@ -370,6 +388,24 @@ If exclude_params is set, result may omit parameters
 
 
 
+<a name="metastore.ListPartitionsRequest"/>
+
+### ListPartitionsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| catalog | [string](#string) |  |  |
+| db_id | [Id](#metastore.Id) |  |  |
+| table_id | [Id](#metastore.Id) |  |  |
+| cookie | [string](#string) |  |  |
+
+
+
+
+
+
 <a name="metastore.ListTablesRequest"/>
 
 ### ListTablesRequest
@@ -412,7 +448,6 @@ Partition
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [Id](#metastore.Id) |  |  |
 | seq_id | [uint64](#uint64) |  | Sequential ID within table |
 | values | [string](#string) | repeated | Values for each partition |
 | sd | [StorageDescriptor](#metastore.StorageDescriptor) |  | Partition descriptor |
@@ -736,6 +771,8 @@ purposes, so using generic term here.
 | ListTables | [ListTablesRequest](#metastore.ListTablesRequest) | [Table](#metastore.ListTablesRequest) | Get all tables from a database |
 | DropTable | [DropTableRequest](#metastore.DropTableRequest) | [RequestStatus](#metastore.DropTableRequest) | Destroy a table |
 | AddPartition | [AddPartitionRequest](#metastore.AddPartitionRequest) | [RequestStatus](#metastore.AddPartitionRequest) | Add partition to a table |
+| GetPartition | [GetPartitionRequest](#metastore.GetPartitionRequest) | [GetPartitionResponse](#metastore.GetPartitionRequest) | Get partition information |
+| ListPartitions | [ListPartitionsRequest](#metastore.ListPartitionsRequest) | [Partition](#metastore.ListPartitionsRequest) | List all partitions in a table |
 
  
 
