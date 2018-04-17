@@ -79,7 +79,7 @@ func (s *metastoreServer) AddPartition(c context.Context,
 
 func (s *metastoreServer) GetPartition(c context.Context,
 	req *pb.GetPartitionRequest) (*pb.GetPartitionResponse, error) {
-	log.Println("AddPartition:", req)
+	log.Println("GetPartition:", req)
 	catalog := req.Catalog
 	if catalog == "" {
 		return nil, fmt.Errorf("missing catalog")
@@ -129,7 +129,7 @@ func (s *metastoreServer) GetPartition(c context.Context,
 	})
 
 	if err != nil {
-		log.Println("failed to get table:", err)
+		log.Println("failed to get partition:", err)
 		return &pb.GetPartitionResponse{
 			Status: &pb.RequestStatus{Status: pb.RequestStatus_STATUS_ERROR, Error: err.Error()},
 		}, nil
@@ -177,9 +177,34 @@ func (s *metastoreServer) ListPartitions(req *pb.ListPartitionsRequest,
 			if err := proto.Unmarshal(v, partition); err != nil {
 				return nil
 			}
-			if err := stream.Send(partition); err != nil {
-				log.Println("err sending:", err)
-				return err
+			if len(req.GetFields()) != 0 {
+				// Only include specified fields
+				part := &pb.Partition{}
+				for _, name := range req.GetFields() {
+					switch name {
+					case "location":
+						if partition.Sd != nil {
+							if part.Sd == nil {
+								part.Sd = &pb.StorageDescriptor{Location: partition.Sd.Location}
+							} else {
+								part.Sd.Location = partition.Sd.Location
+							}
+						}
+					case "parameters":
+						part.Parameters = partition.Parameters
+					case "values":
+						part.Values = partition.Values
+					}
+				}
+				if err := stream.Send(part); err != nil {
+					log.Println("err sending:", err)
+					return err
+				}
+				} else {
+				if err := stream.Send(partition); err != nil {
+					log.Println("err sending:", err)
+					return err
+				}
 			}
 			return nil
 		})

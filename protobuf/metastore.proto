@@ -19,6 +19,10 @@
 // Hive Metastore API definitions.
 //
 // TODO: Add catalog API
+// TODO: DB should be returned by GetTable call
+// TODO: table should be returned by GetPartition call
+// TODO: Add selectors for table/partition fields
+// TODO: Add location directly to table and partition
 
 //
 // Some notes on protobuf proto3
@@ -353,12 +357,19 @@ message GetTableResponse {
     RequestStatus status = 2;
 }
 
-// Request to get list of databases
-// If exclude_params is set, result may omit parameters
+// Request to get list of databases.
 message ListTablesRequest {
     string catalog = 1;
     Id db_id = 2;
     string cookie = 3;
+    // Field selectors.
+    //
+    // If specified, only certain fields are sent. The following fields are supported:
+    //   - id: table Id
+    //   - location: table location
+    //   - parameters: table user parameters
+    //   - partkeys: table partition keys
+    repeated string fields = 4;
 }
 
 // Request to drop a table.
@@ -412,6 +423,13 @@ message ListPartitionsRequest {
     Id db_id = 2;
     Id table_id = 3;
     string cookie = 4;
+    // Field selectors.
+    //
+    // If specified, only certain fields are sent. The following fields are supported:
+    //   - location:
+    //   - values:
+    //   - parameters:
+    repeated string fields = 5;
 }
 
 // Delete partition.

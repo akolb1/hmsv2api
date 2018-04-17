@@ -429,6 +429,9 @@ Return all partitions in a table
 | db_id | [Id](#metastore.Id) |  |  |
 | table_id | [Id](#metastore.Id) |  |  |
 | cookie | [string](#string) |  |  |
+| fields | [string](#string) | repeated | Field selectors.
+
+If specified, only certain fields are sent. The following fields are supported: - location: - values: - parameters: |
 
 
 
@@ -438,8 +441,7 @@ Return all partitions in a table
 <a name="metastore.ListTablesRequest"/>
 
 ### ListTablesRequest
-Request to get list of databases
-If exclude_params is set, result may omit parameters
+Request to get list of databases.
 
 
 | Field | Type | Label | Description |
@@ -447,6 +449,9 @@ If exclude_params is set, result may omit parameters
 | catalog | [string](#string) |  |  |
 | db_id | [Id](#metastore.Id) |  |  |
 | cookie | [string](#string) |  |  |
+| fields | [string](#string) | repeated | Field selectors.
+
+If specified, only certain fields are sent. The following fields are supported: - id: table Id - location: table location - parameters: table user parameters - partkeys: table partition keys |
 
 
 

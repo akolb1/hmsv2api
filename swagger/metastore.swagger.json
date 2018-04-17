@@ -213,6 +213,16 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Field selectors.\n\nIf specified, only certain fields are sent. The following fields are supported:\n  - location:\n  - values:\n  - parameters:",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         ],
         "tags": [
@@ -256,6 +266,16 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "fields",
+            "description": "Field selectors.\n\nIf specified, only certain fields are sent. The following fields are supported:\n  - id: table Id\n  - location: table location\n  - parameters: table user parameters\n  - partkeys: table partition keys",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         ],
         "tags": [

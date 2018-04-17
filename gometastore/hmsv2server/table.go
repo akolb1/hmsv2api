@@ -221,10 +221,44 @@ func (s *metastoreServer) ListTables(req *pb.ListTablesRequest,
 			if err := proto.Unmarshal(v, table); err != nil {
 				return err
 			}
-			log.Println("send", table.Id.Name)
-			if err := stream.Send(table); err != nil {
-				log.Println("err sending ", err)
-				return err
+
+			if len(req.GetFields()) != 0 {
+				// Only include specified fields
+				tbl := &pb.Table{}
+				for _, name := range req.GetFields() {
+					switch name {
+					case "id.name":
+						if tbl.Id == nil {
+							tbl.Id = &pb.Id{Name: table.Id.Name}
+						} else {
+							tbl.Id.Name = table.Id.Name
+						}
+					case "id":
+						tbl.Id = table.Id
+					case "location":
+						if table.Sd != nil {
+							if tbl.Sd == nil {
+								tbl.Sd = &pb.StorageDescriptor{Location: table.Sd.Location}
+							} else {
+								tbl.Sd.Location = table.Sd.Location
+							}
+						}
+					case "parameters":
+						tbl.Parameters = table.Parameters
+					case "partkeys":
+						tbl.PartitionKeys = table.PartitionKeys
+					}
+				}
+				log.Println("send", tbl)
+				if err := stream.Send(tbl); err != nil {
+					log.Println("err sending ", err)
+					return err
+				}
+			} else {
+				if err := stream.Send(table); err != nil {
+					log.Println("err sending ", err)
+					return err
+				}
 			}
 			return nil
 		})
