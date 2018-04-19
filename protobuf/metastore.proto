@@ -25,6 +25,10 @@
 // TODO: Add location directly to table and partition
 
 //
+// General notes
+//
+// Design goals
+//
 // Some notes on protobuf proto3
 //
 // - It supports maps that are extensively used here
@@ -334,6 +338,7 @@ message Table {
     TableType tableType = 6;                   // table type enum, e.g. EXTERNAL_TABLE
     map<string, string> parameters = 7;        // User-settable parameters
     map<string, string> system_parameters = 8; // Internal parameters
+    string location = 9;                       // Table location
 }
 
 // Create a new table.
@@ -388,6 +393,7 @@ message Partition {
     repeated string     values = 3;       // Values for each partition
     StorageDescriptor   sd = 4;           // Partition descriptor
     map<string, string> parameters = 5;   // User parameters
+    string location = 6;                  // Partition location
 }
 
 // Add a single partition to a table.
@@ -426,9 +432,9 @@ message ListPartitionsRequest {
     // Field selectors.
     //
     // If specified, only certain fields are sent. The following fields are supported:
-    //   - location:
-    //   - values:
-    //   - parameters:
+    //   - location
+    //   - values
+    //   - parameters
     repeated string fields = 5;
 }
 

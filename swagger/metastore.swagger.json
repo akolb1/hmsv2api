@@ -216,7 +216,7 @@
           },
           {
             "name": "fields",
-            "description": "Field selectors.\n\nIf specified, only certain fields are sent. The following fields are supported:\n  - location:\n  - values:\n  - parameters:",
+            "description": "Field selectors.\n\nIf specified, only certain fields are sent. The following fields are supported:\n  - location\n  - values\n  - parameters",
             "in": "query",
             "required": false,
             "type": "array",
@@ -498,6 +498,9 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "location": {
+          "type": "string"
         }
       },
       "title": "Partition"
@@ -643,6 +646,9 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "location": {
+          "type": "string"
         }
       },
       "title": "Table information"

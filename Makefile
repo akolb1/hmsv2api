@@ -15,7 +15,7 @@ INCLUDES = -I protobuf
 INCLUDES += -I $(GOPATH)/src/$(GITHUB)/grpc-ecosystem/grpc-gateway/third_party/googleapis
 INCLUDES += -I $(GOPATH)/src/$(GITHUB)/grpc-ecosystem/grpc-gateway
 
-all: build doc api
+all: build
 
 build:
 	cd $(GOMETASTORE)/hmsv2server && go build
@@ -35,7 +35,7 @@ doc: $(PROTO)
 	$(PROTOC) $(INCLUDES) \
         --doc_out=doc --doc_opt=markdown,README.md \
         $(PROTO)
-    $(PROTOC) ${INCLUDES} \
+	$(PROTOC) ${INCLUDES} \
       --doc_out=doc --doc_opt=html,index.html \
       $(PROTO)
 

@@ -1,7 +1,7 @@
 ---
-swagger: 2.0
+swagger: "2.0"
 info:
-  version: 1.0
+  version: "1.0"
   title: Hive Metastore Api
   contact:
     name: Hive Metastore Project
@@ -69,9 +69,98 @@ paths:
         type: string
       responses:
         200:
-          description:
+          description: ""
           schema:
             $ref: '#/definitions/metastoreGetDatabaseResponse'
+  /v2/partition/{catalog}/{db_id.name}/{table_id.name}:
+    get:
+      tags:
+      - Metastore
+      summary: Get partition information
+      operationId: GetPartition
+      parameters:
+      - name: catalog
+        in: path
+        required: true
+        type: string
+      - name: db_id.name
+        in: path
+        required: true
+        type: string
+      - name: table_id.name
+        in: path
+        required: true
+        type: string
+      - name: db_id.id
+        in: query
+        required: false
+        type: string
+      - name: table_id.id
+        in: query
+        required: false
+        type: string
+      - name: values
+        in: query
+        required: false
+        type: array
+        items:
+          type: string
+        collectionFormat: multi
+      responses:
+        200:
+          description: ""
+          schema:
+            $ref: '#/definitions/metastoreGetPartitionResponse'
+  /v2/partitions/{catalog}/{db_id.name}/{table_id.name}:
+    get:
+      tags:
+      - Metastore
+      summary: List all partitions in a table
+      operationId: ListPartitions
+      parameters:
+      - name: catalog
+        in: path
+        required: true
+        type: string
+      - name: db_id.name
+        in: path
+        required: true
+        type: string
+      - name: table_id.name
+        in: path
+        required: true
+        type: string
+      - name: db_id.id
+        in: query
+        required: false
+        type: string
+      - name: table_id.id
+        in: query
+        required: false
+        type: string
+      - name: cookie
+        in: query
+        required: false
+        type: string
+      - name: fields
+        in: query
+        description: |-
+          Field selectors.
+
+          If specified, only certain fields are sent. The following fields are supported:
+            - location
+            - values
+            - parameters
+        required: false
+        type: array
+        items:
+          type: string
+        collectionFormat: multi
+      responses:
+        200:
+          description: (streaming responses)
+          schema:
+            $ref: '#/definitions/metastorePartition'
   /v2/table/{catalog}/{db_id.name}:
     get:
       tags:
@@ -95,6 +184,21 @@ paths:
         in: query
         required: false
         type: string
+      - name: fields
+        in: query
+        description: |-
+          Field selectors.
+
+          If specified, only certain fields are sent. The following fields are supported:
+            - id: table Id
+            - location: table location
+            - parameters: table user parameters
+            - partkeys: table partition keys
+        required: false
+        type: array
+        items:
+          type: string
+        collectionFormat: multi
       responses:
         200:
           description: (streaming responses)
@@ -133,7 +237,7 @@ paths:
         type: string
       responses:
         200:
-          description:
+          description: ""
           schema:
             $ref: '#/definitions/metastoreGetTableResponse'
 definitions:
@@ -172,8 +276,13 @@ definitions:
        - User parameters are intended for user and are just transparently passed around
        - System parameters are intended to be used by Hive for its internal purposes
 
-      seq_id is a numeric ID which is unique within a catalog. It can be used to track
-      new databases in the catalog
+      Database has two IDs:
+      - Id.id is assigned during database creation and it is a unique and stable ID. WHile database
+        name can change, the id can't, so clients can cache Database by ID.
+      - seq_id is assigned during database creation. It should be a unique ID within the catalog.
+        The intention is having an incrementing integer value for each new database. It is not
+        guaranteed to be monotonous.
+
       Original Metastore Database object also had owner information.
       These can be represented using system parameters if needed since the current
       metastore service does not interpret Owner info.
@@ -208,6 +317,11 @@ definitions:
         $ref: '#/definitions/metastoreDatabase'
       status:
         $ref: '#/definitions/metastoreRequestStatus'
+    title: Result of GetDatabase request
+    description: |-
+      The result consists of the database information (which may be empty in case of failure)
+      and request status.
+      TODO: specify error cases
     example:
       database:
         system_parameters:
@@ -217,6 +331,56 @@ definitions:
         id:
           name: name
           id: id
+        parameters:
+          key: parameters
+      status:
+        error: error
+        status: {}
+  metastoreGetPartitionResponse:
+    type: object
+    properties:
+      partition:
+        $ref: '#/definitions/metastorePartition'
+      status:
+        $ref: '#/definitions/metastoreRequestStatus'
+    example:
+      partition:
+        sd:
+          system_parameters:
+            key: system_parameters
+          bucketCols:
+          - bucketCols
+          - bucketCols
+          outputFormatName: outputFormatName
+          inputFormatName: inputFormatName
+          sortCols:
+          - col: col
+            ascending: true
+          - col: col
+            ascending: true
+          location: location
+          inputFormat: {}
+          cols:
+          - name: name
+            comment: comment
+            type: type
+          - name: name
+            comment: comment
+            type: type
+          outputFormat: {}
+          parameters:
+            key: parameters
+          serdeInfo:
+            serializationLib: serializationLib
+            name: name
+            type: {}
+            parameters:
+              key: parameters
+          numBuckets: 0
+        values:
+        - values
+        - values
+        seq_id: seq_id
         parameters:
           key: parameters
       status:
@@ -323,13 +487,80 @@ definitions:
       ascending: true
   metastoreOutputFormat:
     type: string
-    description: Known Output Formats. CUSTOM means that it should be specified as a string.
+    description: |-
+      Known Output Formats. CUSTOM means that it should be specified as a string.
+
+      Here is a list of known output formats:
+
+      - org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+      - org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
+      - org.apache.hadoop.hive.ql.io.HiveNullValueSequenceFileOutputFormat
+      - org.apache.hadoop.hive.ql.io.HivePassThroughOutputFormat
+      - org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
+      - org.apache.hadoop.hive.ql.io.HiveBinaryOutputFormat
+      - org.apache.hadoop.hive.ql.io.RCFileOutputFormat
     enum:
     - OF_CUSTOM
     - OF_SEQUENCE
     - OF_IGNORE_KEY
     - OF_HIVE
     default: OF_CUSTOM
+  metastorePartition:
+    type: object
+    properties:
+      seq_id:
+        type: string
+        format: uint64
+      values:
+        type: array
+        items:
+          type: string
+      sd:
+        $ref: '#/definitions/metastoreStorageDescriptor'
+      parameters:
+        type: object
+        additionalProperties:
+          type: string
+    title: Partition
+    example:
+      sd:
+        system_parameters:
+          key: system_parameters
+        bucketCols:
+        - bucketCols
+        - bucketCols
+        outputFormatName: outputFormatName
+        inputFormatName: inputFormatName
+        sortCols:
+        - col: col
+          ascending: true
+        - col: col
+          ascending: true
+        location: location
+        inputFormat: {}
+        cols:
+        - name: name
+          comment: comment
+          type: type
+        - name: name
+          comment: comment
+          type: type
+        outputFormat: {}
+        parameters:
+          key: parameters
+        serdeInfo:
+          serializationLib: serializationLib
+          name: name
+          type: {}
+          parameters:
+            key: parameters
+        numBuckets: 0
+      values:
+      - values
+      - values
+      seq_id: seq_id
+      parameters:
+        key: parameters
   metastoreRequestStatus:
     type: object
     properties:

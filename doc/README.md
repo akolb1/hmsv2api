@@ -56,6 +56,10 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## metastore.proto
+General notes
+
+Design goals
+
 Some notes on protobuf proto3
 
 - It supports maps that are extensively used here
@@ -431,7 +435,7 @@ Return all partitions in a table
 | cookie | [string](#string) |  |  |
 | fields | [string](#string) | repeated | Field selectors.
 
-If specified, only certain fields are sent. The following fields are supported: - location: - values: - parameters: |
+If specified, only certain fields are sent. The following fields are supported: - location - values - parameters |
 
 
 
@@ -486,6 +490,7 @@ Partition
 | values | [string](#string) | repeated | Values for each partition |
 | sd | [StorageDescriptor](#metastore.StorageDescriptor) |  | Partition descriptor |
 | parameters | [Partition.ParametersEntry](#metastore.Partition.ParametersEntry) | repeated | User parameters |
+| location | [string](#string) |  | Partition location |
 
 
 
@@ -635,6 +640,7 @@ Table information
 | tableType | [TableType](#metastore.TableType) |  | table type enum, e.g. EXTERNAL_TABLE |
 | parameters | [Table.ParametersEntry](#metastore.Table.ParametersEntry) | repeated | User-settable parameters |
 | system_parameters | [Table.SystemParametersEntry](#metastore.Table.SystemParametersEntry) | repeated | Internal parameters |
+| location | [string](#string) |  | Table location |
 
 
 

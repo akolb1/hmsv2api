@@ -68,8 +68,12 @@ func (s *metastoreServer) CreateTable(c context.Context,
 	table.Id.Id = getULID()
 	id := table.Id.Id
 	log.Println("Generated id", id)
+    // TODO: Remove compat mode for location
+    if table.Location == "" && table.Sd != nil {
+        table.Location = table.Sd.Location
+    }
 
-	err := s.db.Update(func(tx *bolt.Tx) error {
+    err := s.db.Update(func(tx *bolt.Tx) error {
 		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
 		if err != nil {
 			return err
@@ -170,11 +174,15 @@ func (s *metastoreServer) GetTable(c context.Context,
 			return fmt.Errorf("catalog corrupted: table %s:%s.%s does not exist",
 				catalog, dbName, tableName)
 		}
-		if err := proto.Unmarshal(data, &table); err != nil {
-			return err
-		} else {
-			return nil
-		}
+		err = proto.Unmarshal(data, &table)
+		if err != nil {
+            return fmt.Errorf("catalog corruted: can't decode table data for %s.%s: %v",
+                dbName, tableName, err)
+        }
+        // TODO: Remove compat mode for location
+        if table.Location == "" && table.Sd != nil {
+            table.Location = table.Sd.Location
+        }
 
 		return nil
 	})
@@ -236,13 +244,11 @@ func (s *metastoreServer) ListTables(req *pb.ListTablesRequest,
 					case "id":
 						tbl.Id = table.Id
 					case "location":
-						if table.Sd != nil {
-							if tbl.Sd == nil {
-								tbl.Sd = &pb.StorageDescriptor{Location: table.Sd.Location}
-							} else {
-								tbl.Sd.Location = table.Sd.Location
-							}
-						}
+					    tbl.Location = table.Location
+					    // TODO: Remove compat handling of locaiton
+					    if tbl.Location == "" && table.Sd != nil {
+					        tbl.Location = table.Sd.Location
+                        }
 					case "parameters":
 						tbl.Parameters = table.Parameters
 					case "partkeys":
@@ -255,7 +261,11 @@ func (s *metastoreServer) ListTables(req *pb.ListTablesRequest,
 					return err
 				}
 			} else {
-				if err := stream.Send(table); err != nil {
+                // TODO: Remove compat mode for location
+                if table.Location == "" && table.Sd != nil {
+                    table.Location = table.Sd.Location
+                }
+                if err := stream.Send(table); err != nil {
 					log.Println("err sending ", err)
 					return err
 				}
