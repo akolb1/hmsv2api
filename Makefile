@@ -41,6 +41,9 @@ doc: $(PROTO)
 
 deps:
 	go get $(GITHUB)/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
+	go get $(GITHUB)/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
+	go get $(GITHUB)/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+	go get $(GITHUB)/golang/protobuf/protoc-gen-go
 
 proto:
 	@ if ! which protoc > /dev/null; then \

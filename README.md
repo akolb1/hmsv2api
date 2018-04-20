@@ -52,7 +52,9 @@ This project uses gRPC version 3 and needs Version 3 protoc compiler in your pat
 The definition is in [protobuf/metastore.proto](protobuf/metastore.proto).
 After any changes, please run
 
+    make deps # Only need to run this once
     make proto
+    make
     
 to regenerate all auto-generated files. 
 To regenerate documentation use
