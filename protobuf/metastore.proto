@@ -99,6 +99,9 @@ service Metastore {
     // Destroy the database
     rpc DropDatabase(DropDatabaseRequest) returns (RequestStatus);
 
+    // Alter database
+    rpc AlterDatabase(AlterDatabaseRequest) returns (GetDatabaseResponse);
+
     // Create a new table
     rpc CreateTable(CreateTableRequest) returns (GetTableResponse);
 
@@ -202,13 +205,21 @@ message CreateDatabaseRequest {
     string   cookie = 3;    // Session cookie
 }
 
+// Alter database
+message AlterDatabaseRequest {
+    string catalog = 1;      // Catalog this database belongs to
+    Id     id = 2;           // Database ID. Database can be found by name or id
+    Database database = 3;   // Database object
+    string cookie = 4;       // Session cookie
+}
+
 // Request to get database by its ID.
 //
 // Database can be located by either part of the ID. If id.id is specified, it will be used first,
 // otherwise iid.name is used. One of these must be specified.
 message GetDatabaseRequest {
     string catalog = 1;  // Catalog this database belongs to
-    Id     id = 2;       // Database ID. Database can be found by name or id/
+    Id     id = 2;       // Database ID. Database can be found by name or id
     string cookie = 3;   // Session cookie
 }
 
