@@ -240,6 +240,14 @@ message ListDatabasesRequest {
     string cookie = 2;
     string name_pattern = 3;
     bool   exclude_params = 4;
+    // Field selectors.
+    //
+    // If specified, only certain fields are sent. The following fields are supported:
+    //   - location
+    //   - id
+    //   - id.name
+    //   - parameters
+    repeated string fields = 5;
 }
 
 // Request to drop a database.

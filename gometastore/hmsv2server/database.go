@@ -136,12 +136,12 @@ func (s *metastoreServer) GetDatabase(c context.Context,
 	}
 
 	err := s.db.View(func(tx *bolt.Tx) error {
-	    db, err := getDatabase(tx, catalog, req.Id)
-	    if err != nil {
-	        return err
-        }
-	    database = *db
-	    return nil
+		db, err := getDatabase(tx, catalog, req.Id)
+		if err != nil {
+			return err
+		}
+		database = *db
+		return nil
 	})
 
 	if err != nil {
@@ -192,15 +192,36 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 			if err != nil {
 				return nil
 			}
-			log.Println("send", database.Id.Name)
-			// Do not send parameters if not asked to
-			if req.ExcludeParams {
-				database.Parameters = nil
-				database.SystemParameters = nil
-			}
-			if err = stream.Send(database); err != nil {
-				log.Println("err sending ", err)
-				return err
+			if len(req.GetFields()) != 0 {
+				// Only include specified fields
+				db := &pb.Database{}
+				for _, name := range req.GetFields() {
+					switch name {
+					case "id.name":
+						if db.Id == nil {
+							db.Id = &pb.Id{Name: database.Id.Name}
+						} else {
+							db.Id.Name = database.Id.Name
+						}
+					case "id":
+						db.Id = database.Id
+					case "location":
+						db.Location = database.Location
+					case "parameters":
+						db.Parameters = database.Parameters
+					}
+					log.Println("send", db)
+					if err = stream.Send(database); err != nil {
+						log.Println("err sending ", err)
+						return err
+					}
+				}
+			} else {
+				log.Println("send", database)
+				if err = stream.Send(database); err != nil {
+					log.Println("err sending ", err)
+					return err
+				}
 			}
 			return nil
 		})
@@ -231,16 +252,16 @@ func (s *metastoreServer) DropDatabase(c context.Context,
 	}
 
 	err := s.db.Update(func(tx *bolt.Tx) error {
-	    nameMap, idMap, idBytes, err := getDatabaseId(tx, catalog, req.Id)
-	    if err != nil {
-	        return err
-        }
-        catalogBucket := tx.Bucket([]byte(catalog))
-        if catalogBucket == nil {
-            return fmt.Errorf("bucket %s doesn't exist", catalog)
-        }
+		nameMap, idMap, idBytes, err := getDatabaseId(tx, catalog, req.Id)
+		if err != nil {
+			return err
+		}
+		catalogBucket := tx.Bucket([]byte(catalog))
+		if catalogBucket == nil {
+			return fmt.Errorf("bucket %s doesn't exist", catalog)
+		}
 
-        // Remove info from this DB
+		// Remove info from this DB
 		nameMap.Delete([]byte(dbName))
 		idMap.Delete(idBytes)
 		if dbInfo := catalogBucket.Bucket([]byte(dbHdr)); dbInfo != nil {
@@ -259,103 +280,104 @@ func (s *metastoreServer) DropDatabase(c context.Context,
 }
 
 func (s metastoreServer) AlterDatabase(c context.Context,
-    req *pb.AlterDatabaseRequest) (*pb.GetDatabaseResponse, error)  {
-    log.Println("AlterDatabase:", req)
-    if req.Database == nil {
-        return nil, fmt.Errorf("missing database")
-    }
+	req *pb.AlterDatabaseRequest) (*pb.GetDatabaseResponse, error) {
+	log.Println("AlterDatabase:", req)
+	if req.Database == nil {
+		return nil, fmt.Errorf("missing database")
+	}
 
-    if req.Id == nil {
-        return nil, fmt.Errorf("missing identity info")
-    }
-    catalog := req.Catalog
-    if catalog == "" {
-        return nil, fmt.Errorf("missing catalog")
-    }
-    dbName := req.Id.Name
-    if dbName == "" {
-        return nil, fmt.Errorf("missing database name")
-    }
-    var database pb.Database
-    err := s.db.Update(func(tx *bolt.Tx) error {
-        _, idMap, idBytes, err := getDatabaseId(tx, catalog, req.Id)
-        if err != nil {
-            return err
-        }
-        data := idMap.Get(idBytes)
-        if data == nil {
-            return fmt.Errorf("corrupt catalog - missing db %s", string(idBytes))
-        }
-        err = proto.Unmarshal(data, &database)
-        if err != nil {
-            return err
-        }
+	if req.Id == nil {
+		return nil, fmt.Errorf("missing identity info")
+	}
+	catalog := req.Catalog
+	if catalog == "" {
+		return nil, fmt.Errorf("missing catalog")
+	}
+	dbName := req.Id.Name
+	if dbName == "" {
+		return nil, fmt.Errorf("missing database name")
+	}
+	var database pb.Database
+	err := s.db.Update(func(tx *bolt.Tx) error {
+		_, idMap, idBytes, err := getDatabaseId(tx, catalog, req.Id)
+		if err != nil {
+			return err
+		}
+		data := idMap.Get(idBytes)
+		if data == nil {
+			return fmt.Errorf("corrupt catalog - missing db %s", string(idBytes))
+		}
+		err = proto.Unmarshal(data, &database)
+		if err != nil {
+			return err
+		}
 
-        // Source database
-        db := req.Database
-        database.Parameters = db.Parameters
-        if database.SystemParameters != nil {
-            database.SystemParameters = db.SystemParameters
-        }
-        if db.Location != "" {
-            database.Location = db.Location
-        }
-        return nil
-    })
+		// Source database
+		db := req.Database
+		database.Parameters = db.Parameters
+		if database.SystemParameters != nil {
+			database.SystemParameters = db.SystemParameters
+		}
+		if db.Location != "" {
+			database.Location = db.Location
+		}
+		return nil
+	})
 
-    if err != nil {
-        log.Println("failed to alter database:", err)
-        return &pb.GetDatabaseResponse{
-            Status: &pb.RequestStatus{Status: pb.RequestStatus_STATUS_ERROR, Error: err.Error()},
-        }, nil
-    }
+	if err != nil {
+		log.Println("failed to alter database:", err)
+		return &pb.GetDatabaseResponse{
+			Status: &pb.RequestStatus{Status: pb.RequestStatus_STATUS_ERROR, Error: err.Error()},
+		}, nil
+	}
 
-    return &pb.GetDatabaseResponse{
-        Status:   &pb.RequestStatus{Status: pb.RequestStatus_STATUS_OK},
-        Database: &database,
-    }, nil
+	return &pb.GetDatabaseResponse{
+		Status:   &pb.RequestStatus{Status: pb.RequestStatus_STATUS_OK},
+		Database: &database,
+	}, nil
 }
 
 func getDatabaseId(tx *bolt.Tx, catalog string, id *pb.Id) (*bolt.Bucket, *bolt.Bucket,
-    []byte, error) {
-    catalogBucket := tx.Bucket([]byte(catalog))
-    if catalogBucket == nil {
-        return nil, nil, nil, fmt.Errorf("bucket %s doesn't exist", catalog)
-    }
-    idBucket := catalogBucket.Bucket([]byte(byIDHdr))
-    if idBucket == nil {
-        return nil, nil, nil, fmt.Errorf("corrupt catalog - missing ID map")
-    }
-    idBytes := []byte(id.Id)
-    nameIdBucket := catalogBucket.Bucket([]byte(bynameHdr))
-    if nameIdBucket == nil {
-        return nil, nil, nil, fmt.Errorf("corrupt catalog - missing NAME map")
-    }
-    if id.Id == "" {
-        // Locate ID by name
-        idBytes = nameIdBucket.Get([]byte(id.Name))
-        if idBytes == nil {
-            return nil, nil, nil, fmt.Errorf("database %s doesn't exist", id.Name)
-        }
-    }
-    return nameIdBucket, idBucket, idBytes, nil
+	[]byte, error) {
+	catalogBucket := tx.Bucket([]byte(catalog))
+	if catalogBucket == nil {
+		return nil, nil, nil, fmt.Errorf("bucket %s doesn't exist", catalog)
+	}
+	idBucket := catalogBucket.Bucket([]byte(byIDHdr))
+	if idBucket == nil {
+		return nil, nil, nil, fmt.Errorf("corrupt catalog - missing ID map")
+	}
+	idBytes := []byte(id.Id)
+	nameIdBucket := catalogBucket.Bucket([]byte(bynameHdr))
+	if nameIdBucket == nil {
+		return nil, nil, nil, fmt.Errorf("corrupt catalog - missing NAME map")
+	}
+	if id.Id == "" {
+		// Locate ID by name
+		idBytes = nameIdBucket.Get([]byte(id.Name))
+		if idBytes == nil {
+			return nil, nil, nil, fmt.Errorf("database %s doesn't exist", id.Name)
+		}
+	}
+	return nameIdBucket, idBucket, idBytes, nil
 }
 
 func getDatabase(tx *bolt.Tx, catalog string,
-    id *pb.Id) (*pb.Database, error) {
-    _, idBucket, idBytes, err := getDatabaseId(tx, catalog, id)
-    if err != nil {
-        return nil, err
-    }
+	id *pb.Id) (*pb.Database, error) {
+	_, idBucket, idBytes, err := getDatabaseId(tx, catalog, id)
+	if err != nil {
+		return nil, err
+	}
 
-    data := idBucket.Get(idBytes)
-    if data == nil {
-        return nil, fmt.Errorf("corrupt catalog - missing db %s", string(idBytes))
-    }
-    var database pb.Database
-    err = proto.Unmarshal(data, &database)
-    if err != nil {
-        return nil, err
-    }
-    return &database, nil
+	data := idBucket.Get(idBytes)
+	if data == nil {
+		return nil, fmt.Errorf("corrupt catalog - missing db %s", string(idBytes))
+	}
+	var database pb.Database
+	err = proto.Unmarshal(data, &database)
+	if err != nil {
+		return nil, err
+	}
+
+	return &database, nil
 }
