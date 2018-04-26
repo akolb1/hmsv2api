@@ -209,12 +209,13 @@ func (s *metastoreServer) ListDatabases(req *pb.ListDatabasesRequest,
 						db.Location = database.Location
 					case "parameters":
 						db.Parameters = database.Parameters
+						db.SystemParameters = database.SystemParameters
 					}
-					log.Println("send", db)
-					if err = stream.Send(database); err != nil {
-						log.Println("err sending ", err)
-						return err
-					}
+				}
+				log.Println("send", db)
+				if err = stream.Send(db); err != nil {
+					log.Println("err sending ", err)
+					return err
 				}
 			} else {
 				log.Println("send", database)
