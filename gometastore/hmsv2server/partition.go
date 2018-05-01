@@ -37,10 +37,10 @@ func (s *metastoreServer) AddPartition(c context.Context,
 		return nil, fmt.Errorf("missing partition data")
 	}
 
-    // TODO: Remove compat mode for location
-    if partition.Location == "" && partition.Sd != nil {
-        partition.Location = partition.Sd.Location
-    }
+	// TODO: Remove compat mode for location
+	if partition.Location == "" && partition.Sd != nil {
+		partition.Location = partition.Sd.Location
+	}
 
 	// Construct partition name from values
 	values := strings.Join(partition.GetValues(), "/")
@@ -126,13 +126,11 @@ func (s *metastoreServer) GetPartition(c context.Context,
 			return fmt.Errorf("no partition %s.%s/%s", dbName, tableName, values)
 		}
 		if err := proto.Unmarshal(data, &partition); err != nil {
-            // TODO: Remove compat mode for location
-            if partition.Location == "" && partition.Sd != nil {
-                partition.Location = partition.Sd.Location
-            }
+			// TODO: Remove compat mode for location
+			if partition.Location == "" && partition.Sd != nil {
+				partition.Location = partition.Sd.Location
+			}
 			return err
-		} else {
-			return nil
 		}
 		return nil
 	})
@@ -192,10 +190,10 @@ func (s *metastoreServer) ListPartitions(req *pb.ListPartitionsRequest,
 				for _, name := range req.GetFields() {
 					switch name {
 					case "location":
-					    part.Location = partition.Location
-					    if part.Location == "" && partition.Sd != nil {
-					        part.Location = partition.Sd.Location
-                        }
+						part.Location = partition.Location
+						if part.Location == "" && partition.Sd != nil {
+							part.Location = partition.Sd.Location
+						}
 					case "parameters":
 						part.Parameters = partition.Parameters
 					case "values":
@@ -208,10 +206,10 @@ func (s *metastoreServer) ListPartitions(req *pb.ListPartitionsRequest,
 					return err
 				}
 			} else {
-                // TODO: Remove compat mode for location
-                if partition.Location == "" && partition.Sd != nil {
-                    partition.Location = partition.Sd.Location
-                }
+				// TODO: Remove compat mode for location
+				if partition.Location == "" && partition.Sd != nil {
+					partition.Location = partition.Sd.Location
+				}
 				if err := stream.Send(partition); err != nil {
 					log.Println("err sending:", err)
 					return err
@@ -285,8 +283,8 @@ func getTableBucket(dbBucket *bolt.Bucket, catalog string, dbName string, tableN
 	if byNameBucket == nil {
 		return nil, fmt.Errorf("corrupt catalog %s/%s: no BYNAME info", catalog, dbName)
 	}
-	tblIdBytes := byNameBucket.Get([]byte(tableName))
-	if tblIdBytes == nil {
+	tblIDBytes := byNameBucket.Get([]byte(tableName))
+	if tblIDBytes == nil {
 		return nil, fmt.Errorf("table %s:%s.%s does not exist", catalog, dbName, tableName)
 	}
 	tablesBucket := dbBucket.Bucket([]byte(tblsHdr))

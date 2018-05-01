@@ -253,7 +253,7 @@ func (s *metastoreServer) DropDatabase(c context.Context,
 	}
 
 	err := s.db.Update(func(tx *bolt.Tx) error {
-		nameMap, idMap, idBytes, err := getDatabaseId(tx, catalog, req.Id)
+		nameMap, idMap, idBytes, err := getDatabaseID(tx, catalog, req.Id)
 		if err != nil {
 			return err
 		}
@@ -300,7 +300,7 @@ func (s metastoreServer) AlterDatabase(c context.Context,
 	}
 	var database pb.Database
 	err := s.db.Update(func(tx *bolt.Tx) error {
-		_, idMap, idBytes, err := getDatabaseId(tx, catalog, req.Id)
+		_, idMap, idBytes, err := getDatabaseID(tx, catalog, req.Id)
 		if err != nil {
 			return err
 		}
@@ -338,7 +338,7 @@ func (s metastoreServer) AlterDatabase(c context.Context,
 	}, nil
 }
 
-func getDatabaseId(tx *bolt.Tx, catalog string, id *pb.Id) (*bolt.Bucket, *bolt.Bucket,
+func getDatabaseID(tx *bolt.Tx, catalog string, id *pb.Id) (*bolt.Bucket, *bolt.Bucket,
 	[]byte, error) {
 	catalogBucket := tx.Bucket([]byte(catalog))
 	if catalogBucket == nil {
@@ -349,23 +349,23 @@ func getDatabaseId(tx *bolt.Tx, catalog string, id *pb.Id) (*bolt.Bucket, *bolt.
 		return nil, nil, nil, fmt.Errorf("corrupt catalog - missing ID map")
 	}
 	idBytes := []byte(id.Id)
-	nameIdBucket := catalogBucket.Bucket([]byte(bynameHdr))
-	if nameIdBucket == nil {
+	nameIDBucket := catalogBucket.Bucket([]byte(bynameHdr))
+	if nameIDBucket == nil {
 		return nil, nil, nil, fmt.Errorf("corrupt catalog - missing NAME map")
 	}
 	if id.Id == "" {
 		// Locate ID by name
-		idBytes = nameIdBucket.Get([]byte(id.Name))
+		idBytes = nameIDBucket.Get([]byte(id.Name))
 		if idBytes == nil {
 			return nil, nil, nil, fmt.Errorf("database %s doesn't exist", id.Name)
 		}
 	}
-	return nameIdBucket, idBucket, idBytes, nil
+	return nameIDBucket, idBucket, idBytes, nil
 }
 
 func getDatabase(tx *bolt.Tx, catalog string,
 	id *pb.Id) (*pb.Database, error) {
-	_, idBucket, idBytes, err := getDatabaseId(tx, catalog, id)
+	_, idBucket, idBytes, err := getDatabaseID(tx, catalog, id)
 	if err != nil {
 		return nil, err
 	}

@@ -76,11 +76,11 @@ func getDatabaseBucket(tx *bolt.Tx, catalog string, db *pb.Id) (bucket *bolt.Buc
 	idBytesDb := []byte(db.Id)
 	if db.Id == "" {
 		// Locate DB ID by name
-		nameIdBucket := catBucket.Bucket([]byte(bynameHdr))
-		if nameIdBucket == nil {
+		nameIDBucket := catBucket.Bucket([]byte(bynameHdr))
+		if nameIDBucket == nil {
 			return nil, fmt.Errorf("corrupt catalog - missing NAME map")
 		}
-		idBytesDb = nameIdBucket.Get([]byte(db.Name))
+		idBytesDb = nameIDBucket.Get([]byte(db.Name))
 		if idBytesDb == nil {
 			return nil, fmt.Errorf("database %s doesn't exist", db.Name)
 		}
