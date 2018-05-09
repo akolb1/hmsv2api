@@ -31,13 +31,17 @@ import (
 	"log"
 	"strings"
 
+	"io"
+
 	pb "github.com/akolb1/hmsv2api/gometastore/protobuf"
 	"github.com/boltdb/bolt"
 	"github.com/golang/protobuf/proto"
 )
 
+// TODO: Figure out schema evolution for partitions
+
 func (s *metastoreServer) AddPartition(c context.Context,
-	req *pb.AddPartitionRequest) (*pb.RequestStatus, error) {
+	req *pb.AddPartitionRequest) (*pb.AddPartitionResponse, error) {
 	log.Println("AddPartition:", req)
 	catalog := req.Catalog
 	if catalog == "" {
@@ -96,10 +100,62 @@ func (s *metastoreServer) AddPartition(c context.Context,
 
 	if err != nil {
 		log.Println("failed to create table:", err)
-		return &pb.RequestStatus{Status: pb.RequestStatus_STATUS_ERROR, Error: err.Error()}, nil
+		return &pb.AddPartitionResponse{
+			Sequence: req.Sequence,
+			Status: &pb.RequestStatus{
+				Status: pb.RequestStatus_STATUS_ERROR,
+				Error:  err.Error(),
+			},
+		}, nil
 	}
 
-	return &pb.RequestStatus{Status: pb.RequestStatus_STATUS_OK}, nil
+	return &pb.AddPartitionResponse{
+		Sequence: req.Sequence,
+		Status:   &pb.RequestStatus{Status: pb.RequestStatus_STATUS_OK},
+	}, nil
+}
+
+func (s *metastoreServer) AddManyPartitions(stream pb.Metastore_AddManyPartitionsServer) error {
+	// Read first request
+	log.Println("AddMnayPartitions")
+	req, err := stream.Recv()
+	if err != nil {
+		if err == io.EOF {
+			return nil
+		}
+		return err
+	}
+
+	log.Println("AddPartition:", req)
+	catalog := req.Catalog
+	if catalog == "" {
+		return fmt.Errorf("missing catalog")
+	}
+	if req.DbId == nil {
+		return fmt.Errorf("missing Db info")
+	}
+	dbName := req.DbId.Name
+	if dbName == "" {
+		return fmt.Errorf("missing database name")
+	}
+	if req.TableId == nil {
+		return fmt.Errorf("missing table info")
+	}
+	tableName := req.TableId.Name
+	if tableName == "" {
+		return fmt.Errorf("missing table name")
+	}
+	partition := req.Partition
+	if partition == nil {
+		return fmt.Errorf("missing partition data")
+	}
+
+	// Construct partition name from values
+	values := strings.Join(partition.GetValues(), "/")
+	if values == "" {
+		return fmt.Errorf("missing partition values")
+	}
+	return nil
 }
 
 func (s *metastoreServer) GetPartition(c context.Context,
@@ -288,6 +344,76 @@ func (s *metastoreServer) DropPartition(c context.Context,
 	}
 
 	return &pb.RequestStatus{Status: pb.RequestStatus_STATUS_OK}, nil
+}
+
+func (s *metastoreServer) DropPartitions(stream pb.Metastore_DropPartitionsServer) error {
+	// Read first request
+	log.Println("DropPartitions")
+	req, err := stream.Recv()
+	if err != nil {
+		if err == io.EOF {
+			log.Println("no partitions to drop")
+			return nil
+		}
+		return err
+	}
+
+	catalog := req.Catalog
+	if catalog == "" {
+		return fmt.Errorf("missing catalog")
+	}
+	if req.DbId == nil {
+		return fmt.Errorf("missing Db info")
+	}
+	dbName := req.DbId.Name
+	if dbName == "" {
+		return fmt.Errorf("missing database name")
+	}
+	if req.TableId == nil {
+		return fmt.Errorf("missing table info")
+	}
+	tableName := req.TableId.Name
+	if tableName == "" {
+		return fmt.Errorf("missing table name")
+	}
+
+	err = s.db.Update(func(tx *bolt.Tx) error {
+		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
+		if err != nil {
+			return err
+		}
+		tablesBucket, err := getTableBucket(dbBucket, catalog, dbName, tableName, false)
+		if err != nil {
+			return err
+		}
+		for {
+			values := strings.Join(req.GetValues(), "/")
+			if values == "" {
+				log.Println("missing value from request")
+				continue
+			}
+			log.Println("dropping ", values)
+			if err = tablesBucket.Delete([]byte(values)); err != nil {
+				return err
+			}
+			req, err = stream.Recv()
+			if err != nil {
+				if err == io.EOF {
+					log.Println("done dropping partitions")
+					return nil
+				}
+				return err
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		log.Println("failed to drop partitions:", err)
+		return err
+	}
+
+	return nil
 }
 
 func getTableBucket(dbBucket *bolt.Bucket, catalog string, dbName string, tableName string,
