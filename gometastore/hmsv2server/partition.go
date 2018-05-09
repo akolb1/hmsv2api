@@ -304,12 +304,12 @@ func getTableBucket(dbBucket *bolt.Bucket, catalog string, dbName string, tableN
 	if tablesBucket == nil {
 		return nil, fmt.Errorf("corrupt catalog %s/%s: no TBLS info", catalog, dbName)
 	}
-	tBucket := tablesBucket.Bucket(tblIdBytes)
+	tBucket := tablesBucket.Bucket(tblIDBytes)
 	if tBucket == nil {
 		if !create {
 			return nil, fmt.Errorf("corrupt catalog %s/%s: no TBLS info", catalog, dbName)
 		}
-		tBucket, err := tablesBucket.CreateBucketIfNotExists(tblIdBytes)
+		tBucket, err := tablesBucket.CreateBucketIfNotExists(tblIDBytes)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create table bucket for %s: %v", tableName, err)
 		}
