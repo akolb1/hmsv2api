@@ -1,3 +1,28 @@
+// DB Structure:
+//
+// root+
+//   catalog1+
+//           |
+//           + BYNAME Name -> Id
+//           + BYID   Id -> { Database }
+//           + DB +
+//                |
+//                +<id1>
+//                    BYNAME Name -> Id
+//                    BYID   ID -> { Table }
+//                    TBLS
+//                       + <id1>
+//                            DATA
+//                            PARTS
+//                       + <id2>
+//                            DATA
+//                            PARTS
+//                |
+//                + <id2>
+//                    DATA
+//                    TBLS
+//
+
 package main
 
 import (
@@ -37,11 +62,6 @@ func (s *metastoreServer) AddPartition(c context.Context,
 		return nil, fmt.Errorf("missing partition data")
 	}
 
-	// TODO: Remove compat mode for location
-	if partition.Location == "" && partition.Sd != nil {
-		partition.Location = partition.Sd.Location
-	}
-
 	// Construct partition name from values
 	values := strings.Join(partition.GetValues(), "/")
 	if values == "" {
@@ -53,7 +73,7 @@ func (s *metastoreServer) AddPartition(c context.Context,
 		if err != nil {
 			return err
 		}
-		tablesBucket, err := getTableBucket(dbBucket, catalog, dbName, tableName)
+		tablesBucket, err := getTableBucket(dbBucket, catalog, dbName, tableName, true)
 		if err != nil {
 			return err
 		}
@@ -116,7 +136,7 @@ func (s *metastoreServer) GetPartition(c context.Context,
 		if err != nil {
 			return err
 		}
-		tablesBucket, err := getTableBucket(dbBucket, catalog, dbName, tableName)
+		tablesBucket, err := getTableBucket(dbBucket, catalog, dbName, tableName, false)
 		if err != nil {
 			return err
 		}
@@ -126,10 +146,6 @@ func (s *metastoreServer) GetPartition(c context.Context,
 			return fmt.Errorf("no partition %s.%s/%s", dbName, tableName, values)
 		}
 		if err := proto.Unmarshal(data, &partition); err != nil {
-			// TODO: Remove compat mode for location
-			if partition.Location == "" && partition.Sd != nil {
-				partition.Location = partition.Sd.Location
-			}
 			return err
 		}
 		return nil
@@ -175,7 +191,7 @@ func (s *metastoreServer) ListPartitions(req *pb.ListPartitionsRequest,
 		if err != nil {
 			return err
 		}
-		tablesBucket, err := getTableBucket(dbBucket, catalog, dbName, tableName)
+		tablesBucket, err := getTableBucket(dbBucket, catalog, dbName, tableName, false)
 		if err != nil {
 			return err
 		}
@@ -206,10 +222,6 @@ func (s *metastoreServer) ListPartitions(req *pb.ListPartitionsRequest,
 					return err
 				}
 			} else {
-				// TODO: Remove compat mode for location
-				if partition.Location == "" && partition.Sd != nil {
-					partition.Location = partition.Sd.Location
-				}
 				if err := stream.Send(partition); err != nil {
 					log.Println("err sending:", err)
 					return err
@@ -260,7 +272,7 @@ func (s *metastoreServer) DropPartition(c context.Context,
 		if err != nil {
 			return err
 		}
-		tablesBucket, err := getTableBucket(dbBucket, catalog, dbName, tableName)
+		tablesBucket, err := getTableBucket(dbBucket, catalog, dbName, tableName, false)
 		if err != nil {
 			return err
 		}
@@ -278,7 +290,8 @@ func (s *metastoreServer) DropPartition(c context.Context,
 	return &pb.RequestStatus{Status: pb.RequestStatus_STATUS_OK}, nil
 }
 
-func getTableBucket(dbBucket *bolt.Bucket, catalog string, dbName string, tableName string) (*bolt.Bucket, error) {
+func getTableBucket(dbBucket *bolt.Bucket, catalog string, dbName string, tableName string,
+	create bool) (*bolt.Bucket, error) {
 	byNameBucket := dbBucket.Bucket([]byte(bynameHdr))
 	if byNameBucket == nil {
 		return nil, fmt.Errorf("corrupt catalog %s/%s: no BYNAME info", catalog, dbName)
@@ -291,5 +304,16 @@ func getTableBucket(dbBucket *bolt.Bucket, catalog string, dbName string, tableN
 	if tablesBucket == nil {
 		return nil, fmt.Errorf("corrupt catalog %s/%s: no TBLS info", catalog, dbName)
 	}
-	return tablesBucket, nil
+	tBucket := tablesBucket.Bucket(tblIdBytes)
+	if tBucket == nil {
+		if !create {
+			return nil, fmt.Errorf("corrupt catalog %s/%s: no TBLS info", catalog, dbName)
+		}
+		tBucket, err := tablesBucket.CreateBucketIfNotExists(tblIdBytes)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create table bucket for %s: %v", tableName, err)
+		}
+		return tBucket, nil
+	}
+	return tBucket, nil
 }

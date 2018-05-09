@@ -90,6 +90,14 @@ func (s *metastoreServer) CreateTable(c context.Context,
 		if tblIDBytes != nil {
 			return fmt.Errorf("table %s:%s.%s already exists", catalog, dbName, tableName)
 		}
+		tbHdrBucket := dbBucket.Bucket([]byte(tblsHdr))
+		if tbHdrBucket == nil {
+			return fmt.Errorf("corrupt catalog - missing %s", tblsHdr)
+		}
+		if _, err = tbHdrBucket.CreateBucket([]byte(id)); err != nil {
+			return err
+		}
+
 		err = byNameBucket.Put([]byte(tableName), []byte(id))
 		if err != nil {
 			return err
