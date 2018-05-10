@@ -281,7 +281,7 @@ enum SerdeType {
     SERDE_ORC = 4;
     SERDE_REGEX = 5;
     SERDE_THRIFT = 6;
-    SERDE_PARQUET = 7;
+    SERDE_PARQUET = 7; // "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
     SERDE_CSV = 8;
 }
 
@@ -291,6 +291,7 @@ enum InputFormat {
     IF_SEQUENCE = 1;
     IF_TEXT = 2;
     IF_HIVE = 3;
+    IF_PARQUET = 4;
 }
 
 // Known Output Formats. CUSTOM means that it should be specified as a string.
@@ -304,12 +305,14 @@ enum InputFormat {
 // - org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
 // - org.apache.hadoop.hive.ql.io.HiveBinaryOutputFormat
 // - org.apache.hadoop.hive.ql.io.RCFileOutputFormat
+// - org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
 //
 enum OutputFormat {
     OF_CUSTOM = 0;
     OF_SEQUENCE = 2;
     OF_IGNORE_KEY = 3;
     OF_HIVE = 4;
+    OF_PARQUET = 5;
 }
 
 enum TableType {
@@ -321,6 +324,7 @@ enum TableType {
 enum SerializationLib {
     SL_CUSTOM = 0; // Unknown lib, use string
     SL_LAZY_SIMPLE = 1; // LazySimpleSerDe
+    SL_PARQUET = 2; // org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
 }
 
 // Serialization/Deserialization information
