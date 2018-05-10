@@ -21,6 +21,7 @@
 // TODO: Add catalog API
 // TODO: DB should be returned by GetTable call
 // TODO: table should be retfurned by GetPartition call
+// TODO: Add ID for storage descriptor
 
 //
 // General notes
@@ -145,10 +146,7 @@ service Metastore {
     }
 
     // Drop partition
-    rpc DropPartition(DropPartitionRequest) returns (RequestStatus);
-
-    // Drop multiple partitions
-    rpc DropPartitions(stream DropPartitionRequest) returns (RequestStatus);
+    rpc DropPartitions(DropPartitionsRequest) returns (RequestStatus);
 }
 
 // General status for results.
@@ -343,7 +341,6 @@ message Order {
 // StorageDescriptor holds all the information about physical storage of the data belonging to a table
 message StorageDescriptor {
     repeated FieldSchema cols = 1;           // required (refer to types defined above)
-    string location = 2;                     // Object location
     InputFormat inputFormat = 3;             // Specification of input format. If custom, use inputFormatName.
     string inputFormatName = 4;              // Name of input format if custom
     OutputFormat outputFormat = 5;           // Specification of input format. If custom, use outputFormatName.
@@ -473,14 +470,19 @@ message ListPartitionsRequest {
     repeated string fields = 5;
 }
 
+
 // Delete partition.
 //
 // Partition is described by list of "values" - one value per partition schema.
 // There is no validation that values actually match partition schema
-message DropPartitionRequest {
+// TODO: have flag for specifying fields in the returned value
+message DropPartitionsRequest {
+    message PartitionValues {
+        repeated string value = 1;
+    }
     string catalog = 1;
     Id     db_id = 2;
     Id     table_id = 3;
-    repeated string values = 4;
+    repeated PartitionValues values = 4;
     string cookie = 5;
 }

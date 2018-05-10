@@ -263,9 +263,6 @@ func (s *metastoreServer) ListPartitions(req *pb.ListPartitionsRequest,
 					switch name {
 					case "location":
 						part.Location = partition.Location
-						if part.Location == "" && partition.Sd != nil {
-							part.Location = partition.Sd.Location
-						}
 					case "parameters":
 						part.Parameters = partition.Parameters
 					case "values":
@@ -296,8 +293,8 @@ func (s *metastoreServer) ListPartitions(req *pb.ListPartitionsRequest,
 	return nil
 }
 
-func (s *metastoreServer) DropPartition(c context.Context,
-	req *pb.DropPartitionRequest) (*pb.RequestStatus, error) {
+func (s *metastoreServer) DropPartitions(c context.Context,
+	req *pb.DropPartitionsRequest) (*pb.RequestStatus, error) {
 	log.Println("DropPartition:", req)
 	catalog := req.Catalog
 	if catalog == "" {
@@ -317,11 +314,7 @@ func (s *metastoreServer) DropPartition(c context.Context,
 	if tableName == "" {
 		return nil, fmt.Errorf("missing table name")
 	}
-	// Construct partition name from values
-	values := strings.Join(req.GetValues(), "/")
-	if values == "" {
-		return nil, fmt.Errorf("missing partition values")
-	}
+	partitionValues := req.GetValues();
 
 	err := s.db.Update(func(tx *bolt.Tx) error {
 		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
@@ -332,8 +325,11 @@ func (s *metastoreServer) DropPartition(c context.Context,
 		if err != nil {
 			return err
 		}
-		if err = tablesBucket.Delete([]byte(values)); err != nil {
-			return err
+		for _, values := range partitionValues {
+			vString := strings.Join(values.GetValue(), "/")
+			if err = tablesBucket.Delete([]byte(vString)); err != nil {
+				return err
+			}
 		}
 		return nil
 	})
@@ -344,76 +340,6 @@ func (s *metastoreServer) DropPartition(c context.Context,
 	}
 
 	return &pb.RequestStatus{Status: pb.RequestStatus_STATUS_OK}, nil
-}
-
-func (s *metastoreServer) DropPartitions(stream pb.Metastore_DropPartitionsServer) error {
-	// Read first request
-	log.Println("DropPartitions")
-	req, err := stream.Recv()
-	if err != nil {
-		if err == io.EOF {
-			log.Println("no partitions to drop")
-			return nil
-		}
-		return err
-	}
-
-	catalog := req.Catalog
-	if catalog == "" {
-		return fmt.Errorf("missing catalog")
-	}
-	if req.DbId == nil {
-		return fmt.Errorf("missing Db info")
-	}
-	dbName := req.DbId.Name
-	if dbName == "" {
-		return fmt.Errorf("missing database name")
-	}
-	if req.TableId == nil {
-		return fmt.Errorf("missing table info")
-	}
-	tableName := req.TableId.Name
-	if tableName == "" {
-		return fmt.Errorf("missing table name")
-	}
-
-	err = s.db.Update(func(tx *bolt.Tx) error {
-		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
-		if err != nil {
-			return err
-		}
-		tablesBucket, err := getTableBucket(dbBucket, catalog, dbName, tableName, false)
-		if err != nil {
-			return err
-		}
-		for {
-			values := strings.Join(req.GetValues(), "/")
-			if values == "" {
-				log.Println("missing value from request")
-				continue
-			}
-			log.Println("dropping ", values)
-			if err = tablesBucket.Delete([]byte(values)); err != nil {
-				return err
-			}
-			req, err = stream.Recv()
-			if err != nil {
-				if err == io.EOF {
-					log.Println("done dropping partitions")
-					return nil
-				}
-				return err
-			}
-		}
-		return nil
-	})
-
-	if err != nil {
-		log.Println("failed to drop partitions:", err)
-		return err
-	}
-
-	return nil
 }
 
 func getTableBucket(dbBucket *bolt.Bucket, catalog string, dbName string, tableName string,

@@ -68,10 +68,6 @@ func (s *metastoreServer) CreateTable(c context.Context,
 	table.Id.Id = getULID()
 	id := table.Id.Id
 	log.Println("Generated id", id)
-	// TODO: Remove compat mode for location
-	if table.Location == "" && table.Sd != nil {
-		table.Location = table.Sd.Location
-	}
 
 	err := s.db.Update(func(tx *bolt.Tx) error {
 		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
@@ -187,11 +183,6 @@ func (s *metastoreServer) GetTable(c context.Context,
 			return fmt.Errorf("catalog corruted: can't decode table data for %s.%s: %v",
 				dbName, tableName, err)
 		}
-		// TODO: Remove compat mode for location
-		if table.Location == "" && table.Sd != nil {
-			table.Location = table.Sd.Location
-		}
-
 		return nil
 	})
 
@@ -253,10 +244,6 @@ func (s *metastoreServer) ListTables(req *pb.ListTablesRequest,
 						tbl.Id = table.Id
 					case "location":
 						tbl.Location = table.Location
-						// TODO: Remove compat handling of locaiton
-						if tbl.Location == "" && table.Sd != nil {
-							tbl.Location = table.Sd.Location
-						}
 					case "parameters":
 						tbl.Parameters = table.Parameters
 					case "partkeys":
@@ -269,10 +256,6 @@ func (s *metastoreServer) ListTables(req *pb.ListTablesRequest,
 					return err
 				}
 			} else {
-				// TODO: Remove compat mode for location
-				if table.Location == "" && table.Sd != nil {
-					table.Location = table.Sd.Location
-				}
 				if err := stream.Send(table); err != nil {
 					log.Println("err sending ", err)
 					return err
