@@ -22,6 +22,12 @@
 // TODO: DB should be returned by GetTable call
 // TODO: table should be retfurned by GetPartition call
 // TODO: Add ID for storage descriptor
+// TODO: GetPartitions by values
+// TODO: Drop partitions should drop all if values are not specified
+// TODO: Drop partitions shouldn't fail if some values are missing
+// TODO: GetPartitions should return table in the first element
+// TODO: Remove field schema from partitions
+//
 
 //
 // General notes
@@ -422,6 +428,7 @@ message Partition {
     StorageDescriptor   sd = 4;           // Partition descriptor
     map<string, string> parameters = 5;   // User parameters
     string location = 6;                  // Partition location
+    Table table = 7;                      // Enclosing table
 }
 
 // Add a single partition to a table.
@@ -471,9 +478,14 @@ message ListPartitionsRequest {
     //   - location
     //   - values
     //   - parameters
+    //   - table
     repeated string fields = 5;
+    repeated PartitionValues values = 6;
 }
 
+message PartitionValues {
+    repeated string value = 1;
+}
 
 // Delete partition.
 //
@@ -481,9 +493,6 @@ message ListPartitionsRequest {
 // There is no validation that values actually match partition schema
 // TODO: have flag for specifying fields in the returned value
 message DropPartitionsRequest {
-    message PartitionValues {
-        repeated string value = 1;
-    }
     string catalog = 1;
     Id     db_id = 2;
     Id     table_id = 3;
