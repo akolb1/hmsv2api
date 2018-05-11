@@ -22,11 +22,11 @@
 // TODO: DB should be returned by GetTable call
 // TODO: table should be retfurned by GetPartition call
 // TODO: Add ID for storage descriptor
-// TODO: GetPartitions by values
+// Done: GetPartitions by values
 // TODO: Drop partitions should drop all if values are not specified
 // TODO: Drop partitions shouldn't fail if some values are missing
-// TODO: GetPartitions should return table in the first element
-// TODO: Remove field schema from partitions
+// Done: GetPartitions should return table in the first element
+// Done: Remove field schema from partitions
 //
 
 //
@@ -467,18 +467,23 @@ message GetPartitionResponse {
 }
 
 // Return all partitions in a table
+//
+// Field selectors.
+//
+// If specified, only certain fields are sent. The following fields are supported:
+//   - location
+//   - values
+//   - parameters
+//   - sd
+//   - sd.parameters
+//   - sd.serdeinfo
+//   - sd.serdeinfo.parameters
+//   - table
 message ListPartitionsRequest {
     string catalog = 1;
     Id db_id = 2;
     Id table_id = 3;
     string cookie = 4;
-    // Field selectors.
-    //
-    // If specified, only certain fields are sent. The following fields are supported:
-    //   - location
-    //   - values
-    //   - parameters
-    //   - table
     repeated string fields = 5;
     repeated PartitionValues values = 6;
 }

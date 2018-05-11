@@ -5,13 +5,15 @@
 
 - [metastore.proto](#metastore.proto)
     - [AddPartitionRequest](#metastore.AddPartitionRequest)
+    - [AddPartitionResponse](#metastore.AddPartitionResponse)
+    - [AlterDatabaseRequest](#metastore.AlterDatabaseRequest)
     - [CreateDatabaseRequest](#metastore.CreateDatabaseRequest)
     - [CreateTableRequest](#metastore.CreateTableRequest)
     - [Database](#metastore.Database)
     - [Database.ParametersEntry](#metastore.Database.ParametersEntry)
     - [Database.SystemParametersEntry](#metastore.Database.SystemParametersEntry)
     - [DropDatabaseRequest](#metastore.DropDatabaseRequest)
-    - [DropPartitionRequest](#metastore.DropPartitionRequest)
+    - [DropPartitionsRequest](#metastore.DropPartitionsRequest)
     - [DropTableRequest](#metastore.DropTableRequest)
     - [FieldSchema](#metastore.FieldSchema)
     - [GetDatabaseRequest](#metastore.GetDatabaseRequest)
@@ -27,6 +29,7 @@
     - [Order](#metastore.Order)
     - [Partition](#metastore.Partition)
     - [Partition.ParametersEntry](#metastore.Partition.ParametersEntry)
+    - [PartitionValues](#metastore.PartitionValues)
     - [RequestStatus](#metastore.RequestStatus)
     - [SerDeInfo](#metastore.SerDeInfo)
     - [SerDeInfo.ParametersEntry](#metastore.SerDeInfo.ParametersEntry)
@@ -62,8 +65,10 @@ Design goals
 
 Some notes on protobuf proto3
 
-- It supports maps that are extensively used here
-- All fields are optional
+- It supports maps that are extensively used here. It is possible to simulate maps in proto2
+  if needed.
+- All fields are optional. If we need to move to proto2, it is important to add optional to
+  every field then to preserve semantics.
 
 
 <a name="metastore.AddPartitionRequest"/>
@@ -73,14 +78,50 @@ Add a single partition to a table.
 
 Partition is described by list of &#34;values&#34; - one value per partition schema.
 There is no validation that values actually match partition schema
+Each partition belongs to a table and each table belongs to a database
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| sequence | [uint64](#uint64) |  | Request sequence (used for bulk requests) |
 | catalog | [string](#string) |  |  |
 | db_id | [Id](#metastore.Id) |  |  |
 | table_id | [Id](#metastore.Id) |  |  |
 | partition | [Partition](#metastore.Partition) |  |  |
+
+
+
+
+
+
+<a name="metastore.AddPartitionResponse"/>
+
+### AddPartitionResponse
+Response from AdddPartitionRequest matches sequence to the request.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sequence | [uint64](#uint64) |  | Comes from request |
+| status | [RequestStatus](#metastore.RequestStatus) |  |  |
+
+
+
+
+
+
+<a name="metastore.AlterDatabaseRequest"/>
+
+### AlterDatabaseRequest
+Alter database
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| catalog | [string](#string) |  | Catalog this database belongs to |
+| id | [Id](#metastore.Id) |  | Database ID. Database can be found by name or id |
+| database | [Database](#metastore.Database) |  | Database object |
+| cookie | [string](#string) |  | Session cookie |
 
 
 
@@ -210,13 +251,14 @@ TODO: Add flag to prohibit dropping non-empty databases
 
 
 
-<a name="metastore.DropPartitionRequest"/>
+<a name="metastore.DropPartitionsRequest"/>
 
-### DropPartitionRequest
+### DropPartitionsRequest
 Delete partition.
 
 Partition is described by list of &#34;values&#34; - one value per partition schema.
 There is no validation that values actually match partition schema
+TODO: have flag for specifying fields in the returned value
 
 
 | Field | Type | Label | Description |
@@ -224,7 +266,7 @@ There is no validation that values actually match partition schema
 | catalog | [string](#string) |  |  |
 | db_id | [Id](#metastore.Id) |  |  |
 | table_id | [Id](#metastore.Id) |  |  |
-| values | [string](#string) | repeated |  |
+| values | [PartitionValues](#metastore.PartitionValues) | repeated |  |
 | cookie | [string](#string) |  |  |
 
 
@@ -281,7 +323,7 @@ otherwise iid.name is used. One of these must be specified.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | catalog | [string](#string) |  | Catalog this database belongs to |
-| id | [Id](#metastore.Id) |  | Database ID. Database can be found by name or id/ |
+| id | [Id](#metastore.Id) |  | Database ID. Database can be found by name or id |
 | cookie | [string](#string) |  | Session cookie |
 
 
@@ -415,6 +457,9 @@ If exclude_params is set, result may omit parameters
 | cookie | [string](#string) |  |  |
 | name_pattern | [string](#string) |  |  |
 | exclude_params | [bool](#bool) |  |  |
+| fields | [string](#string) | repeated | Field selectors.
+
+If specified, only certain fields are sent. The following fields are supported: - location - id - id.name - parameters |
 
 
 
@@ -426,6 +471,18 @@ If exclude_params is set, result may omit parameters
 ### ListPartitionsRequest
 Return all partitions in a table
 
+Field selectors.
+
+If specified, only certain fields are sent. The following fields are supported:
+  - location
+  - values
+  - parameters
+  - sd
+  - sd.parameters
+  - sd.serdeinfo
+  - sd.serdeinfo.parameters
+  - table
+
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -433,9 +490,8 @@ Return all partitions in a table
 | db_id | [Id](#metastore.Id) |  |  |
 | table_id | [Id](#metastore.Id) |  |  |
 | cookie | [string](#string) |  |  |
-| fields | [string](#string) | repeated | Field selectors.
-
-If specified, only certain fields are sent. The following fields are supported: - location - values - parameters |
+| fields | [string](#string) | repeated |  |
+| values | [PartitionValues](#metastore.PartitionValues) | repeated |  |
 
 
 
@@ -491,6 +547,7 @@ Partition
 | sd | [StorageDescriptor](#metastore.StorageDescriptor) |  | Partition descriptor |
 | parameters | [Partition.ParametersEntry](#metastore.Partition.ParametersEntry) | repeated | User parameters |
 | location | [string](#string) |  | Partition location |
+| table | [Table](#metastore.Table) |  | Enclosing table |
 
 
 
@@ -507,6 +564,21 @@ Partition
 | ----- | ---- | ----- | ----------- |
 | key | [string](#string) |  |  |
 | value | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="metastore.PartitionValues"/>
+
+### PartitionValues
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| value | [string](#string) | repeated |  |
 
 
 
@@ -576,7 +648,6 @@ StorageDescriptor holds all the information about physical storage of the data b
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | cols | [FieldSchema](#metastore.FieldSchema) | repeated | required (refer to types defined above) |
-| location | [string](#string) |  | Object location |
 | inputFormat | [InputFormat](#metastore.InputFormat) |  | Specification of input format. If custom, use inputFormatName. |
 | inputFormatName | [string](#string) |  | Name of input format if custom |
 | outputFormat | [OutputFormat](#metastore.OutputFormat) |  | Specification of input format. If custom, use outputFormatName. |
@@ -692,6 +763,7 @@ Known Input Formats. CUSTOM means that it should be specified as a string.
 | IF_SEQUENCE | 1 |  |
 | IF_TEXT | 2 |  |
 | IF_HIVE | 3 |  |
+| IF_PARQUET | 4 |  |
 
 
 
@@ -709,6 +781,7 @@ Here is a list of known output formats:
 - org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
 - org.apache.hadoop.hive.ql.io.HiveBinaryOutputFormat
 - org.apache.hadoop.hive.ql.io.RCFileOutputFormat
+- org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -716,6 +789,7 @@ Here is a list of known output formats:
 | OF_SEQUENCE | 2 |  |
 | OF_IGNORE_KEY | 3 |  |
 | OF_HIVE | 4 |  |
+| OF_PARQUET | 5 |  |
 
 
 
@@ -749,7 +823,7 @@ Known SerDes are represented using enum. Unknown ones are represented using stri
 | SERDE_ORC | 4 |  |
 | SERDE_REGEX | 5 |  |
 | SERDE_THRIFT | 6 |  |
-| SERDE_PARQUET | 7 |  |
+| SERDE_PARQUET | 7 | &#34;org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe&#34; |
 | SERDE_CSV | 8 |  |
 
 
@@ -763,6 +837,7 @@ Known SerDes are represented using enum. Unknown ones are represented using stri
 | ---- | ------ | ----------- |
 | SL_CUSTOM | 0 | Unknown lib, use string |
 | SL_LAZY_SIMPLE | 1 | LazySimpleSerDe |
+| SL_PARQUET | 2 | org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe |
 
 
 
@@ -806,14 +881,16 @@ purposes, so using generic term here.
 | GetDatabase | [GetDatabaseRequest](#metastore.GetDatabaseRequest) | [GetDatabaseResponse](#metastore.GetDatabaseRequest) | Get database information |
 | ListDatabases | [ListDatabasesRequest](#metastore.ListDatabasesRequest) | [Database](#metastore.ListDatabasesRequest) | Return all databases in a catalog |
 | DropDatabase | [DropDatabaseRequest](#metastore.DropDatabaseRequest) | [RequestStatus](#metastore.DropDatabaseRequest) | Destroy the database |
+| AlterDatabase | [AlterDatabaseRequest](#metastore.AlterDatabaseRequest) | [GetDatabaseResponse](#metastore.AlterDatabaseRequest) | Alter database |
 | CreateTable | [CreateTableRequest](#metastore.CreateTableRequest) | [GetTableResponse](#metastore.CreateTableRequest) | Create a new table |
 | GetTable | [GetTableRequest](#metastore.GetTableRequest) | [GetTableResponse](#metastore.GetTableRequest) | Get table information |
 | ListTables | [ListTablesRequest](#metastore.ListTablesRequest) | [Table](#metastore.ListTablesRequest) | Get all tables from a database |
 | DropTable | [DropTableRequest](#metastore.DropTableRequest) | [RequestStatus](#metastore.DropTableRequest) | Destroy a table |
-| AddPartition | [AddPartitionRequest](#metastore.AddPartitionRequest) | [RequestStatus](#metastore.AddPartitionRequest) | Add partition to a table |
+| AddPartition | [AddPartitionRequest](#metastore.AddPartitionRequest) | [AddPartitionResponse](#metastore.AddPartitionRequest) | Add partition to a table |
+| AddManyPartitions | [AddPartitionRequest](#metastore.AddPartitionRequest) | [AddPartitionResponse](#metastore.AddPartitionRequest) | Add multiple partitions. The first request contains DB and table info, followed by others, for which db and table info is not needed |
 | GetPartition | [GetPartitionRequest](#metastore.GetPartitionRequest) | [GetPartitionResponse](#metastore.GetPartitionRequest) | Get partition information |
 | ListPartitions | [ListPartitionsRequest](#metastore.ListPartitionsRequest) | [Partition](#metastore.ListPartitionsRequest) | List all partitions in a table |
-| DropPartition | [DropPartitionRequest](#metastore.DropPartitionRequest) | [RequestStatus](#metastore.DropPartitionRequest) | Drop partition |
+| DropPartitions | [DropPartitionsRequest](#metastore.DropPartitionsRequest) | [RequestStatus](#metastore.DropPartitionsRequest) | Drop partition |
 
  
 

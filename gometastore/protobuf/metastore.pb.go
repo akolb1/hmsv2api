@@ -1285,20 +1285,25 @@ func (m *GetPartitionResponse) GetStatus() *RequestStatus {
 }
 
 // Return all partitions in a table
+//
+// Field selectors.
+//
+// If specified, only certain fields are sent. The following fields are supported:
+//   - location
+//   - values
+//   - parameters
+//   - sd
+//   - sd.parameters
+//   - sd.serdeinfo
+//   - sd.serdeinfo.parameters
+//   - table
 type ListPartitionsRequest struct {
-	Catalog string `protobuf:"bytes,1,opt,name=catalog" json:"catalog,omitempty"`
-	DbId    *Id    `protobuf:"bytes,2,opt,name=db_id,json=dbId" json:"db_id,omitempty"`
-	TableId *Id    `protobuf:"bytes,3,opt,name=table_id,json=tableId" json:"table_id,omitempty"`
-	Cookie  string `protobuf:"bytes,4,opt,name=cookie" json:"cookie,omitempty"`
-	// Field selectors.
-	//
-	// If specified, only certain fields are sent. The following fields are supported:
-	//   - location
-	//   - values
-	//   - parameters
-	//   - table
-	Fields []string           `protobuf:"bytes,5,rep,name=fields" json:"fields,omitempty"`
-	Values []*PartitionValues `protobuf:"bytes,6,rep,name=values" json:"values,omitempty"`
+	Catalog string             `protobuf:"bytes,1,opt,name=catalog" json:"catalog,omitempty"`
+	DbId    *Id                `protobuf:"bytes,2,opt,name=db_id,json=dbId" json:"db_id,omitempty"`
+	TableId *Id                `protobuf:"bytes,3,opt,name=table_id,json=tableId" json:"table_id,omitempty"`
+	Cookie  string             `protobuf:"bytes,4,opt,name=cookie" json:"cookie,omitempty"`
+	Fields  []string           `protobuf:"bytes,5,rep,name=fields" json:"fields,omitempty"`
+	Values  []*PartitionValues `protobuf:"bytes,6,rep,name=values" json:"values,omitempty"`
 }
 
 func (m *ListPartitionsRequest) Reset()                    { *m = ListPartitionsRequest{} }

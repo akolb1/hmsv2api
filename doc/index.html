@@ -183,6 +183,14 @@
                 </li>
               
                 <li>
+                  <a href="#metastore.AddPartitionResponse"><span class="badge">M</span>AddPartitionResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.AlterDatabaseRequest"><span class="badge">M</span>AlterDatabaseRequest</a>
+                </li>
+              
+                <li>
                   <a href="#metastore.CreateDatabaseRequest"><span class="badge">M</span>CreateDatabaseRequest</a>
                 </li>
               
@@ -207,7 +215,7 @@
                 </li>
               
                 <li>
-                  <a href="#metastore.DropPartitionRequest"><span class="badge">M</span>DropPartitionRequest</a>
+                  <a href="#metastore.DropPartitionsRequest"><span class="badge">M</span>DropPartitionsRequest</a>
                 </li>
               
                 <li>
@@ -268,6 +276,10 @@
               
                 <li>
                   <a href="#metastore.Partition.ParametersEntry"><span class="badge">M</span>Partition.ParametersEntry</a>
+                </li>
+              
+                <li>
+                  <a href="#metastore.PartitionValues"><span class="badge">M</span>PartitionValues</a>
                 </li>
               
                 <li>
@@ -349,11 +361,11 @@
       <div class="file-heading">
         <h2 id="metastore.proto">metastore.proto</h2><a href="#title">Top</a>
       </div>
-      <p>General notes</p><p>Design goals</p><p>Some notes on protobuf proto3</p><p>- It supports maps that are extensively used here</p><p>- All fields are optional</p>
+      <p>General notes</p><p>Design goals</p><p>Some notes on protobuf proto3</p><p>- It supports maps that are extensively used here. It is possible to simulate maps in proto2</p><p>if needed.</p><p>- All fields are optional. If we need to move to proto2, it is important to add optional to</p><p>every field then to preserve semantics.</p>
 
       
         <h3 id="metastore.AddPartitionRequest">AddPartitionRequest</h3>
-        <p>Add a single partition to a table.</p><p>Partition is described by list of "values" - one value per partition schema.</p><p>There is no validation that values actually match partition schema</p>
+        <p>Add a single partition to a table.</p><p>Partition is described by list of "values" - one value per partition schema.</p><p>There is no validation that values actually match partition schema</p><p>Each partition belongs to a table and each table belongs to a database</p>
 
         
           <table class="field-table">
@@ -361,6 +373,13 @@
               <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
             </thead>
             <tbody>
+              
+                <tr>
+                  <td>sequence</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Request sequence (used for bulk requests) </p></td>
+                </tr>
               
                 <tr>
                   <td>catalog</td>
@@ -388,6 +407,80 @@
                   <td><a href="#metastore.Partition">Partition</a></td>
                   <td></td>
                   <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.AddPartitionResponse">AddPartitionResponse</h3>
+        <p>Response from AdddPartitionRequest matches sequence to the request.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>sequence</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Comes from request </p></td>
+                </tr>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#metastore.RequestStatus">RequestStatus</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.AlterDatabaseRequest">AlterDatabaseRequest</h3>
+        <p>Alter database</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>catalog</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Catalog this database belongs to </p></td>
+                </tr>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#metastore.Id">Id</a></td>
+                  <td></td>
+                  <td><p>Database ID. Database can be found by name or id </p></td>
+                </tr>
+              
+                <tr>
+                  <td>database</td>
+                  <td><a href="#metastore.Database">Database</a></td>
+                  <td></td>
+                  <td><p>Database object </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cookie</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Session cookie </p></td>
                 </tr>
               
             </tbody>
@@ -625,8 +718,8 @@
 
         
       
-        <h3 id="metastore.DropPartitionRequest">DropPartitionRequest</h3>
-        <p>Delete partition.</p><p>Partition is described by list of "values" - one value per partition schema.</p><p>There is no validation that values actually match partition schema</p>
+        <h3 id="metastore.DropPartitionsRequest">DropPartitionsRequest</h3>
+        <p>Delete partition.</p><p>Partition is described by list of "values" - one value per partition schema.</p><p>There is no validation that values actually match partition schema</p><p>TODO: have flag for specifying fields in the returned value</p>
 
         
           <table class="field-table">
@@ -658,7 +751,7 @@
               
                 <tr>
                   <td>values</td>
-                  <td><a href="#string">string</a></td>
+                  <td><a href="#metastore.PartitionValues">PartitionValues</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -778,7 +871,7 @@
                   <td>id</td>
                   <td><a href="#metastore.Id">Id</a></td>
                   <td></td>
-                  <td><p>Database ID. Database can be found by name or id/ </p></td>
+                  <td><p>Database ID. Database can be found by name or id </p></td>
                 </tr>
               
                 <tr>
@@ -1040,6 +1133,19 @@
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>fields</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Field selectors.
+
+If specified, only certain fields are sent. The following fields are supported:
+  - location
+  - id
+  - id.name
+  - parameters </p></td>
+                </tr>
+              
             </tbody>
           </table>
         
@@ -1047,7 +1153,7 @@
         
       
         <h3 id="metastore.ListPartitionsRequest">ListPartitionsRequest</h3>
-        <p>Return all partitions in a table</p>
+        <p>Return all partitions in a table</p><p>Field selectors.</p><p>If specified, only certain fields are sent. The following fields are supported:</p><p>- location</p><p>- values</p><p>- parameters</p><p>- sd</p><p>- sd.parameters</p><p>- sd.serdeinfo</p><p>- sd.serdeinfo.parameters</p><p>- table</p>
 
         
           <table class="field-table">
@@ -1088,12 +1194,14 @@
                   <td>fields</td>
                   <td><a href="#string">string</a></td>
                   <td>repeated</td>
-                  <td><p>Field selectors.
-
-If specified, only certain fields are sent. The following fields are supported:
-  - location
-  - values
-  - parameters </p></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>values</td>
+                  <td><a href="#metastore.PartitionValues">PartitionValues</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
                 </tr>
               
             </tbody>
@@ -1227,6 +1335,13 @@ If specified, only certain fields are sent. The following fields are supported:
                   <td><p>Partition location </p></td>
                 </tr>
               
+                <tr>
+                  <td>table</td>
+                  <td><a href="#metastore.Table">Table</a></td>
+                  <td></td>
+                  <td><p>Enclosing table </p></td>
+                </tr>
+              
             </tbody>
           </table>
         
@@ -1254,6 +1369,29 @@ If specified, only certain fields are sent. The following fields are supported:
                   <td>value</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="metastore.PartitionValues">PartitionValues</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
               
@@ -1384,13 +1522,6 @@ initialization parameters </p></td>
                   <td><a href="#metastore.FieldSchema">FieldSchema</a></td>
                   <td>repeated</td>
                   <td><p>required (refer to types defined above) </p></td>
-                </tr>
-              
-                <tr>
-                  <td>location</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p>Object location </p></td>
                 </tr>
               
                 <tr>
@@ -1695,11 +1826,17 @@ initialization parameters </p></td>
                 <td><p></p></td>
               </tr>
             
+              <tr>
+                <td>IF_PARQUET</td>
+                <td>4</td>
+                <td><p></p></td>
+              </tr>
+            
           </tbody>
         </table>
       
         <h3 id="metastore.OutputFormat">OutputFormat</h3>
-        <p>Known Output Formats. CUSTOM means that it should be specified as a string.</p><p>Here is a list of known output formats:</p><p>- org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.HiveNullValueSequenceFileOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.HivePassThroughOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.HiveBinaryOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.RCFileOutputFormat</p>
+        <p>Known Output Formats. CUSTOM means that it should be specified as a string.</p><p>Here is a list of known output formats:</p><p>- org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.HiveNullValueSequenceFileOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.HivePassThroughOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.HiveBinaryOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.RCFileOutputFormat</p><p>- org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat</p>
         <table class="enum-table">
           <thead>
             <tr><td>Name</td><td>Number</td><td>Description</td></tr>
@@ -1727,6 +1864,12 @@ initialization parameters </p></td>
               <tr>
                 <td>OF_HIVE</td>
                 <td>4</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>OF_PARQUET</td>
+                <td>5</td>
                 <td><p></p></td>
               </tr>
             
@@ -1833,7 +1976,7 @@ initialization parameters </p></td>
               <tr>
                 <td>SERDE_PARQUET</td>
                 <td>7</td>
-                <td><p></p></td>
+                <td><p>&#34;org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe&#34;</p></td>
               </tr>
             
               <tr>
@@ -1863,6 +2006,12 @@ initialization parameters </p></td>
                 <td>SL_LAZY_SIMPLE</td>
                 <td>1</td>
                 <td><p>LazySimpleSerDe</p></td>
+              </tr>
+            
+              <tr>
+                <td>SL_PARQUET</td>
+                <td>2</td>
+                <td><p>org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe</p></td>
               </tr>
             
           </tbody>
@@ -1938,6 +2087,13 @@ initialization parameters </p></td>
               </tr>
             
               <tr>
+                <td>AlterDatabase</td>
+                <td><a href="#metastore.AlterDatabaseRequest">AlterDatabaseRequest</a></td>
+                <td><a href="#metastore.GetDatabaseResponse">GetDatabaseResponse</a></td>
+                <td><p>Alter database</p></td>
+              </tr>
+            
+              <tr>
                 <td>CreateTable</td>
                 <td><a href="#metastore.CreateTableRequest">CreateTableRequest</a></td>
                 <td><a href="#metastore.GetTableResponse">GetTableResponse</a></td>
@@ -1968,8 +2124,17 @@ initialization parameters </p></td>
               <tr>
                 <td>AddPartition</td>
                 <td><a href="#metastore.AddPartitionRequest">AddPartitionRequest</a></td>
-                <td><a href="#metastore.RequestStatus">RequestStatus</a></td>
+                <td><a href="#metastore.AddPartitionResponse">AddPartitionResponse</a></td>
                 <td><p>Add partition to a table</p></td>
+              </tr>
+            
+              <tr>
+                <td>AddManyPartitions</td>
+                <td><a href="#metastore.AddPartitionRequest">AddPartitionRequest</a></td>
+                <td><a href="#metastore.AddPartitionResponse">AddPartitionResponse</a></td>
+                <td><p>Add multiple partitions. The first request contains DB and table info,
+followed by others, for which db and table info
+is not needed</p></td>
               </tr>
             
               <tr>
@@ -1987,8 +2152,8 @@ initialization parameters </p></td>
               </tr>
             
               <tr>
-                <td>DropPartition</td>
-                <td><a href="#metastore.DropPartitionRequest">DropPartitionRequest</a></td>
+                <td>DropPartitions</td>
+                <td><a href="#metastore.DropPartitionsRequest">DropPartitionsRequest</a></td>
                 <td><a href="#metastore.RequestStatus">RequestStatus</a></td>
                 <td><p>Drop partition</p></td>
               </tr>
