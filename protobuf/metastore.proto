@@ -20,13 +20,12 @@
 //
 // TODO: Add catalog API
 // TODO: DB should be returned by GetTable call
-// TODO: table should be retfurned by GetPartition call
 // TODO: Add ID for storage descriptor
-// Done: GetPartitions by values
 // TODO: Drop partitions should drop all if values are not specified
 // TODO: Drop partitions shouldn't fail if some values are missing
-// Done: GetPartitions should return table in the first element
-// Done: Remove field schema from partitions
+// TODO: Allow filtering by property name
+// TODO: Define behavior for already existing objects
+// TODO: Define behavior for deleting non-empty objects (CASCADE)
 //
 
 //
@@ -423,6 +422,7 @@ message DropTableRequest {
 
 // Partition
 message Partition {
+    Id                  id = 1;
     uint64              seq_id = 2;       // Sequential ID within table
     repeated string     values = 3;       // Values for each partition
     StorageDescriptor   sd = 4;           // Partition descriptor
@@ -486,6 +486,7 @@ message ListPartitionsRequest {
     string cookie = 4;
     repeated string fields = 5;
     repeated PartitionValues values = 6;
+    repeated string exclude = 7;
 }
 
 message PartitionValues {

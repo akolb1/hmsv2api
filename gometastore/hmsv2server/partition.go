@@ -72,6 +72,8 @@ func (s *metastoreServer) AddPartition(c context.Context,
 		return nil, fmt.Errorf("missing partition values")
 	}
 
+	partition.Id.Id = getULID()
+
 	err := s.db.Update(func(tx *bolt.Tx) error {
 		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
 		if err != nil {
@@ -223,7 +225,6 @@ func (s *metastoreServer) GetPartition(c context.Context,
 				dbName, tableName, err)
 		}
 
-
 		// Do we have this partition?
 		data := tablesBucket.Get([]byte(values))
 		if data == nil {
@@ -364,6 +365,10 @@ func (s *metastoreServer) ListPartitions(req *pb.ListPartitionsRequest,
 						}
 					}
 				}
+
+				if req.GetExclude() != nil {
+				    excludeParts(part, req.GetExclude())
+                }
 				log.Println("send", part)
 				if err := stream.Send(part); err != nil {
 					log.Println("err sending:", err)
@@ -376,6 +381,9 @@ func (s *metastoreServer) ListPartitions(req *pb.ListPartitionsRequest,
 					partition.Table = &table
 				}
 				log.Println("Send partition", partition)
+                if req.GetExclude() != nil {
+                    excludeParts(partition, req.GetExclude())
+                }
 				if err := stream.Send(partition); err != nil {
 					log.Println("err sending:", err)
 					return err
@@ -483,4 +491,33 @@ func getTableBucket(dbBucket *bolt.Bucket, catalog string, dbName string, tableN
 		return tBucket, nil
 	}
 	return tBucket, nil
+}
+
+func excludeParts(part *pb.Partition, exclude []string) {
+	for _, e := range exclude {
+		switch e {
+		case "location":
+			part.Location = ""
+		case "parameters":
+			part.Parameters = nil
+		case "values":
+			part.Values = nil
+		case "sd":
+			part.Sd = nil
+		case "sd.parameters":
+			if part.Sd != nil {
+				part.Sd.Parameters = nil
+			}
+		case "sd.serdeinfo":
+			if part.Sd != nil {
+				part.Sd.SerdeInfo = nil
+			}
+		case "sd.serdeinfo.parameters":
+			if part.Sd != nil {
+				part.Sd.Parameters = nil
+			}
+		case "table":
+			part.Table = nil
+		}
+	}
 }

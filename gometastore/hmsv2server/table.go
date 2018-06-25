@@ -67,7 +67,6 @@ func (s *metastoreServer) CreateTable(c context.Context,
 	}
 	table.Id.Id = getULID()
 	id := table.Id.Id
-	log.Println("Generated id", id)
 
 	err := s.db.Update(func(tx *bolt.Tx) error {
 		dbBucket, err := getDatabaseBucket(tx, catalog, req.DbId)
@@ -109,8 +108,6 @@ func (s *metastoreServer) CreateTable(c context.Context,
 		if err != nil {
 			return err
 		}
-
-		log.Println(id, "->", table)
 
 		return nil
 	})

@@ -1,6 +1,7 @@
 //go:generate protoc -I../../protobuf -I ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis -I ${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway ../../protobuf/metastore.proto --go_out=plugins=grpc:../protobuf
 
 // TODO: Handle errors properly
+// TODO: Add stats support
 
 package main
 
