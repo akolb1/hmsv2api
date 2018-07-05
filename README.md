@@ -16,7 +16,7 @@ All Java work required to use the new API is elsewhere.
 
 - API Documentation
   - [Markdown](doc/README.md)
-  - [HTML](doc/index.html)
+  - [HTML](https://akolb1.github.io/hmsv2api/doc/index.html)
   - [Definition](protobuf/metastore.proto)
   - [Swagger/JSON](swagger/metastore.swagger.json)
   - [Swagger/YAML](swagger/swagger.yaml)
