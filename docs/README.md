@@ -492,6 +492,7 @@ If specified, only certain fields are sent. The following fields are supported:
 | cookie | [string](#string) |  |  |
 | fields | [string](#string) | repeated |  |
 | values | [PartitionValues](#metastore.PartitionValues) | repeated |  |
+| exclude | [string](#string) | repeated |  |
 
 
 
@@ -542,6 +543,7 @@ Partition
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| id | [Id](#metastore.Id) |  |  |
 | seq_id | [uint64](#uint64) |  | Sequential ID within table |
 | values | [string](#string) | repeated | Values for each partition |
 | sd | [StorageDescriptor](#metastore.StorageDescriptor) |  | Partition descriptor |

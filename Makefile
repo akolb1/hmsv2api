@@ -31,12 +31,12 @@ api: $(SWAGGER)
 
 $(SWAGGER): $(PROTO)
 
-doc: $(PROTO)
+docs: $(PROTO)
 	$(PROTOC) $(INCLUDES) \
-        --doc_out=doc --doc_opt=markdown,README.md \
+        --doc_out=docs --doc_opt=markdown,README.md \
         $(PROTO)
 	$(PROTOC) ${INCLUDES} \
-      --doc_out=doc --doc_opt=html,index.html \
+      --doc_out=docs --doc_opt=html,index.html \
       $(PROTO)
 
 deps:
