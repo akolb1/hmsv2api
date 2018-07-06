@@ -33,10 +33,10 @@ $(SWAGGER): $(PROTO)
 
 docs: $(PROTO)
 	$(PROTOC) $(INCLUDES) \
-        --doc_out=docs --doc_opt=markdown,README.md \
+        --doc_out=docs --doc_opt=markdown,README_proto.md \
         $(PROTO)
 	$(PROTOC) ${INCLUDES} \
-      --doc_out=docs --doc_opt=html,index.html \
+      --doc_out=docs --doc_opt=html,proto_index.html \
       $(PROTO)
 
 deps:
