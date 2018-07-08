@@ -33,6 +33,7 @@
     <os.plugin.version>1.5.0.Final</os.plugin.version>
     <protobuf.plugin.version>0.5.0</protobuf.plugin.version>
     <protoc.version>3.5.1</protoc.version>
+    <hive.version>2.3.0</hive.version>
   </properties>
 
   <dependencyManagement>
@@ -62,6 +63,17 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${guava.version}</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.7.25</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hive.hcatalog</groupId>
+        <artifactId>hive-hcatalog-server-extensions</artifactId>
+        <version>${hive.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
