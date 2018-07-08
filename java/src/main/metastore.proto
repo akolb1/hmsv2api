@@ -1,0 +1,460 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Hive Metastore API definitions.
+//
+// TODO: Add catalog API
+// TODO: DB should be returned by GetTable call
+// TODO: Add ID for storage descriptor
+// TODO: Drop partitions should drop all if values are not specified
+// TODO: Drop partitions shouldn't fail if some values are missing
+//
+
+//
+// General notes
+//
+// Design goals
+//
+// Some notes on protobuf proto3
+//
+// - It supports maps that are extensively used here. It is possible to simulate maps in proto2
+//   if needed.
+// - All fields are optional. If we need to move to proto2, it is important to add optional to
+//   every field then to preserve semantics.
+//
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.akolb.metastore";
+option java_outer_classname = "MetaStore";
+
+package metastore;
+
+// Metastore service
+//
+// This API is different from traditional metastore API. It separates all
+// metadata-only operations and does not include any filesystem operations.
+// The assumption is that some other service or the client deals with file system
+// operations.
+//
+// This API also uses cookies to associates requests with a session.
+// The value of the cookie is likely to be printed in logs so it shouldn't contain
+// any sensitive information.
+// Metastore service does not interpret the cookie but may print it in its logs.
+// We could call it SessionId but callers may decide to use it for whatever other
+// purposes, so using generic term here.
+service Metastore {
+    // Create a new database.
+    rpc CreateDabatase(CreateDatabaseRequest) returns (GetDatabaseResponse);
+
+    // Get database information
+    rpc GetDatabase(GetDatabaseRequest) returns  (GetDatabaseResponse) {
+    }
+    // Return all databases in a catalog
+    rpc ListDatabases(ListDatabasesRequest) returns  (stream Database) {
+    }
+    // Destroy the database
+    rpc DropDatabase(DropDatabaseRequest) returns (RequestStatus);
+
+    // Alter database
+    rpc AlterDatabase(AlterDatabaseRequest) returns (GetDatabaseResponse);
+
+    // Create a new table
+    rpc CreateTable(CreateTableRequest) returns (GetTableResponse);
+
+    // Get table information
+    rpc GetTable(GetTableRequest) returns (GetTableResponse) {
+    }
+
+    // Get all tables from a database
+    rpc ListTables(ListTablesRequest) returns  (stream Table) {
+    }
+
+    // Destroy a table
+    rpc DropTable (DropTableRequest) returns (RequestStatus);
+
+    // Add partition to a table
+    rpc AddPartition(AddPartitionRequest) returns (AddPartitionResponse);
+
+    // Add multiple partitions. The first request contains DB and table info,
+    // followed by others, for which db and table info
+    // is not needed
+    rpc AddManyPartitions(stream AddPartitionRequest) returns (stream AddPartitionResponse);
+
+    // Get partition information
+    rpc GetPartition(GetPartitionRequest) returns (GetPartitionResponse) {
+    }
+
+    // List all partitions in a table
+    rpc ListPartitions(ListPartitionsRequest) returns (stream Partition) {
+    }
+
+    // Drop partition
+    rpc DropPartitions(DropPartitionsRequest) returns (RequestStatus);
+}
+
+// General status for results.
+//
+// All non-streaming requests should return RequestStatus.
+message RequestStatus {
+    enum Status {
+        STATUS_OK           = 0; // successful request
+        STATUS_ERROR        = 1; // General error
+        STATUS_NOTFOUND     = 2; // Requested object not found
+        STATUS_CONFLICT     = 3; // Object already exists
+        STATUS_BUSY         = 4; // Object is busy/used and can't be accessed/destroyed
+        STATUS_INTERNAL_ERR = 5; // Internal server error
+    }
+    Status status = 1; // request status
+    string error = 2;  // detailed error message
+}
+
+// Objects have unique name and unique ID.
+//
+// Name of the object can change but ID never changes. This allows caching of objects
+// by ID.
+// Both name and ID are just sequence of bytes - there are no
+// assumptions about encoding or length.
+// Implementations may enforce specific assumptions.
+message Id {
+    string name = 1;  // Object name
+    string id = 2;    // Permanent object ID
+}
+
+// Database is a container for tables.
+//
+// Database object has two sets of parameters:
+//  - User parameters are intended for user and are just transparently passed around
+//  - System parameters are intended to be used by Hive for its internal purposes
+//
+// Database has two IDs:
+// - Id.id is assigned during database creation and it is a unique and stable ID. WHile database
+//   name can change, the id can't, so clients can cache Database by ID.
+// - seq_id is assigned during database creation. It should be a unique ID within the catalog.
+//   The intention is having an incrementing integer value for each new database. It is not
+//   guaranteed to be monotonous.
+//
+// Original Metastore Database object also had owner information.
+// These can be represented using system parameters if needed since the current
+// metastore service does not interpret Owner info.
+message Database {
+  Id                  id = 1;          // Unique database ID
+  uint64              seq_id = 2;      // Unique sequence ID within calalog
+  string              location = 3;    // Default location of database objects
+  map<string, string> parameters = 4;  // Database user parameters
+  map<string, string> system_parameters = 5; // System parameters (can't be set by user)
+}
+
+// Create a new database.
+//
+// If database.Id.id is empty, it will be assigned a unique ID
+// database.seq_id is assigned when database is created
+message CreateDatabaseRequest {
+    string catalog = 1;     // Catalog this database belongs to
+    Database database = 2;  // Database object
+    string   cookie = 3;    // Session cookie
+}
+
+// Alter database
+message AlterDatabaseRequest {
+    string catalog = 1;      // Catalog this database belongs to
+    Id     id = 2;           // Database ID. Database can be found by name or id
+    Database database = 3;   // Database object
+    string cookie = 4;       // Session cookie
+}
+
+// Request to get database by its ID.
+//
+// Database can be located by either part of the ID. If id.id is specified, it will be used first,
+// otherwise iid.name is used. One of these must be specified.
+message GetDatabaseRequest {
+    string catalog = 1;  // Catalog this database belongs to
+    Id     id = 2;       // Database ID. Database can be found by name or id
+    string cookie = 3;   // Session cookie
+}
+
+// Result of GetDatabase request
+//
+// The result consists of the database information (which may be empty in case of failure)
+// and request status.
+// TODO: specify error cases
+message GetDatabaseResponse {
+    Database      database = 1;
+    RequestStatus status = 2;
+}
+
+// Request to get list of databases
+// If exclude_params is set, result may omit parameters
+message ListDatabasesRequest {
+    string catalog = 1;
+    string cookie = 2;
+    string name_pattern = 3;
+    bool   exclude_params = 4;
+    // Field selectors.
+    //
+    // If specified, only certain fields are sent. The following fields are supported:
+    //   - location
+    //   - id
+    //   - id.name
+    //   - parameters
+    repeated string fields = 5;
+}
+
+// Request to drop a database.
+// Dropping a database also drops all objects contained in the database.
+// TODO: Add flag to prohibit dropping non-empty databases
+message DropDatabaseRequest {
+    string catalog = 1;
+    Id     id = 2;
+    string cookie = 3;
+}
+
+// FieldSchema defines name and type for each column.
+message FieldSchema {
+    string name = 1; // name of the field
+    string type = 2; // type of the field.
+    string comment = 3; // User description
+}
+
+// Known SerDes are represented using enum. Unknown ones are represented using strings.
+enum SerdeType {
+    SERDE_CUSTOM = 0;
+    SERDE_LAZY_SIMPLE = 1;
+    SERDE_AVRO = 2;
+    SERDE_JSON = 3;
+    SERDE_ORC = 4;
+    SERDE_REGEX = 5;
+    SERDE_THRIFT = 6;
+    SERDE_PARQUET = 7; // "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+    SERDE_CSV = 8;
+}
+
+// Known Input Formats. CUSTOM means that it should be specified as a string.
+enum InputFormat {
+    IF_CUSTOM = 0;
+    IF_SEQUENCE = 1;
+    IF_TEXT = 2;
+    IF_HIVE = 3;
+    IF_PARQUET = 4;
+}
+
+// Known Output Formats. CUSTOM means that it should be specified as a string.
+//
+// Here is a list of known output formats:
+//
+// - org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+// - org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
+// - org.apache.hadoop.hive.ql.io.HiveNullValueSequenceFileOutputFormat
+// - org.apache.hadoop.hive.ql.io.HivePassThroughOutputFormat
+// - org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
+// - org.apache.hadoop.hive.ql.io.HiveBinaryOutputFormat
+// - org.apache.hadoop.hive.ql.io.RCFileOutputFormat
+// - org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
+//
+enum OutputFormat {
+    OF_CUSTOM = 0;
+    OF_SEQUENCE = 2;
+    OF_IGNORE_KEY = 3;
+    OF_HIVE = 4;
+    OF_PARQUET = 5;
+}
+
+enum TableType {
+    TTYPE_MANAGED = 0;
+    TTYPE_EXTERNAL = 1;
+    TTYPE_INDEX = 2;
+}
+
+enum SerializationLib {
+    SL_CUSTOM = 0; // Unknown lib, use string
+    SL_LAZY_SIMPLE = 1; // LazySimpleSerDe
+    SL_PARQUET = 2; // org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
+}
+
+// Serialization/Deserialization information
+message SerDeInfo {
+    SerdeType type = 1;                 // Serde type. If CUSTOM, use the name
+    string name = 2;                    // name of the serde, table name by default
+    string serializationLib = 3;        // usually the class that implements the extractor & loader
+                                        // NOTE: Should we enum this as well?
+    map<string, string> parameters = 4; // initialization parameters
+}
+
+// sort order of a column (column name along with asc/desc)
+message Order {
+    string col = 1;         // sort column name
+    bool ascending = 2;     // asc(1) or desc(0)
+}
+
+// StorageDescriptor holds all the information about physical storage of the data belonging to a table
+message StorageDescriptor {
+    repeated FieldSchema cols = 1;           // required (refer to types defined above)
+    InputFormat inputFormat = 3;             // Specification of input format. If custom, use inputFormatName.
+    string inputFormatName = 4;              // Name of input format if custom
+    OutputFormat outputFormat = 5;           // Specification of input format. If custom, use outputFormatName.
+    string outputFormatName = 6;             // Name of output format if custom
+    int32 numBuckets = 7;                    // this must be specified if there are any dimension columns
+    SerDeInfo serdeInfo = 8;                 // serialization and deserialization information
+    repeated string bucketCols = 9;          // reducer grouping columns and clustering columns and bucketing columns`
+    repeated Order sortCols = 10;            // sort order of the data in each bucket
+    map<string, string> parameters = 11;     // any user supplied key value hash
+    map<string, string> system_parameters = 12;    // Internal parameters not settable by user
+}
+
+// Table information
+message Table {
+    Id id = 1;
+    uint64 seq_id = 3;                         // Sequential ID within database
+    StorageDescriptor sd = 4;                  // storage descriptor of the table
+    repeated FieldSchema partitionKeys = 5;    // partition keys of the table. only primitive types are supported
+    TableType tableType = 6;                   // table type enum, e.g. EXTERNAL_TABLE
+    map<string, string> parameters = 7;        // User-settable parameters
+    map<string, string> system_parameters = 8; // Internal parameters
+    string location = 9;                       // Table location
+}
+
+// Create a new table.
+message CreateTableRequest {
+    string catalog = 1;
+    Id db_id = 2;
+    Table table = 3;
+    string   cookie = 4;
+}
+
+// Request to get table by its ID.
+message GetTableRequest {
+    string catalog = 1;
+    Id     db_id = 2; // Database ID
+    Id     id = 3;
+    string cookie = 4;
+}
+
+message GetTableResponse {
+    Table     table = 1;
+    RequestStatus status = 2;
+}
+
+// Request to get list of databases.
+message ListTablesRequest {
+    string catalog = 1;
+    Id db_id = 2;
+    string cookie = 3;
+    // Field selectors.
+    //
+    // If specified, only certain fields are sent. The following fields are supported:
+    //   - id: table Id
+    //   - location: table location
+    //   - parameters: table user parameters
+    //   - partkeys: table partition keys
+    repeated string fields = 4;
+}
+
+// Request to drop a table.
+// Dropping a table also drops all objects contained in the table
+// TODO: Add flag to prohibit dropping of non-empty table
+message DropTableRequest {
+    string catalog = 1;
+    Id     db_id = 2;
+    Id     id = 3;
+    string cookie = 4;
+}
+
+// Partition
+message Partition {
+    Id                  id = 1;
+    uint64              seq_id = 2;       // Sequential ID within table
+    repeated string     values = 3;       // Values for each partition
+    StorageDescriptor   sd = 4;           // Partition descriptor
+    map<string, string> parameters = 5;   // User parameters
+    string location = 6;                  // Partition location
+    Table table = 7;                      // Enclosing table
+}
+
+// Add a single partition to a table.
+//
+// Partition is described by list of "values" - one value per partition schema.
+// There is no validation that values actually match partition schema
+// Each partition belongs to a table and each table belongs to a database
+message AddPartitionRequest {
+    uint64 sequence = 1;         // Request sequence (used for bulk requests)
+    string catalog = 2;
+    Id db_id = 3;
+    Id table_id = 4;
+    Partition partition = 5;
+}
+
+// Response from AdddPartitionRequest matches sequence to the request.
+message AddPartitionResponse {
+    uint64 sequence = 1;  // Comes from request
+    RequestStatus status = 2;
+}
+
+// Get partition information.
+//
+// Partition is described by list of "values" - one value per partition schema.
+// There is no validation that values actually match partition schema
+message GetPartitionRequest {
+    string catalog = 1;
+    Id db_id = 2;
+    Id table_id = 3;
+    repeated string values = 4;
+}
+
+message GetPartitionResponse {
+    Partition partition = 1;
+    RequestStatus status = 2;
+}
+
+// Return all partitions in a table
+//
+// Field selectors.
+//
+// If specified, only certain fields are sent. The following fields are supported:
+//   - location
+//   - values
+//   - parameters
+//   - sd
+//   - sd.parameters
+//   - sd.serdeinfo
+//   - sd.serdeinfo.parameters
+//   - table
+message ListPartitionsRequest {
+    string catalog = 1;
+    Id db_id = 2;
+    Id table_id = 3;
+    string cookie = 4;
+    repeated string fields = 5;
+    repeated PartitionValues values = 6;
+}
+
+message PartitionValues {
+    repeated string value = 1;
+}
+
+// Delete partition.
+//
+// Partition is described by list of "values" - one value per partition schema.
+// There is no validation that values actually match partition schema
+// TODO: have flag for specifying fields in the returned value
+message DropPartitionsRequest {
+    string catalog = 1;
+    Id     db_id = 2;
+    Id     table_id = 3;
+    repeated PartitionValues values = 4;
+    string cookie = 5;
+}
