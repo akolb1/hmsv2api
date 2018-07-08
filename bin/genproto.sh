@@ -40,10 +40,10 @@ cd ${TOP} &&
 # Generate Docs
 cd ${TOP} && protoc \
   ${INCLUDES} \
-    --doc_out=doc --doc_opt=markdown,README.md \
+    --doc_out=docs --doc_opt=markdown,README_proto.md \
     ${PROTO}
 
 cd ${TOP} && protoc \
   ${INCLUDES} \
-    --doc_out=doc --doc_opt=html,index.html \
+    --doc_out=docs --doc_opt=html,proto_index.html \
     ${PROTO}
