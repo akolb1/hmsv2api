@@ -37,15 +37,22 @@
   </dependencies>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>${os.plugin.version}</version>
+      </extension>
+    </extensions>
     <plugins>
       <plugin>
         <groupId>org.xolstice.maven.plugins</groupId>
         <artifactId>protobuf-maven-plugin</artifactId>
-        <version>0.5.0</version>
+        <version>${protobuf.plugin.version}</version>
         <configuration>
-          <protocArtifact>com.google.protobuf:protoc:3.5.1-1:exe:${os.detected.classifier}</protocArtifact>
+          <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
           <pluginId>grpc-java</pluginId>
-          <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.10.0:exe:${os.detected.classifier}</pluginArtifact>
+          <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
         </configuration>
         <executions>
           <execution>
@@ -55,11 +62,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven.compiler.plugin.version}</version>
       </plugin>
     </plugins>
   </build>
